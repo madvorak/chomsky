@@ -165,9 +165,8 @@ by
   · exact pre_in
   use sinkString lg.sinkNt u
   use sinkString lg.sinkNt v
-  have correct_inverse : sinkSymbol lg.sinkNt ∘ liftSymbol lg.liftNt = Option.some :=
-    by
-    ext1 x
+  have correct_inverse : sinkSymbol lg.sinkNt ∘ liftSymbol lg.liftNt = Option.some
+  · ext1 x
     cases x
     · rfl
     rw [Function.comp_apply]

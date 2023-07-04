@@ -27,8 +27,8 @@ private def reversalGrammar (g : Grammar T) : Grammar T :=
   Grammar.mk g.nt g.initial (List.map reversalGrule g.rules)
 
 private lemma dual_of_reversalGrammar (g : Grammar T) :
-    reversalGrammar (reversalGrammar g) = g :=
-  by
+  reversalGrammar (reversalGrammar g) = g :=
+by
   cases g
   unfold reversalGrammar
   dsimp only
@@ -55,28 +55,24 @@ by
   use y.reverse
   use x.reverse
   constructor
-  · have rid₁ : r₀.inputL = r.inputR.reverse :=
-      by
-      rw [← r_from_r₀]
+  · have rid₁ : r₀.inputL = r.inputR.reverse
+    · rw [← r_from_r₀]
       unfold reversalGrule
       rw [List.reverse_reverse]
-    have rid₂ : [Symbol.nonterminal r₀.inputN] = [Symbol.nonterminal r.inputN].reverse :=
-      by
-      rw [← r_from_r₀]
+    have rid₂ : [Symbol.nonterminal r₀.inputN] = [Symbol.nonterminal r.inputN].reverse
+    · rw [← r_from_r₀]
       rw [List.reverse_singleton]
       rfl
       exact T
-    have rid₃ : r₀.inputR = r.inputL.reverse :=
-      by
-      rw [← r_from_r₀]
+    have rid₃ : r₀.inputR = r.inputL.reverse
+    · rw [← r_from_r₀]
       unfold reversalGrule
       rw [List.reverse_reverse]
     rw [rid₁, rid₂, rid₃, ← List.reverse_append_append, ← List.reverse_append_append, ←
       List.append_assoc, ← List.append_assoc]
     congr
-  · have snd_from_r : r₀.outputString = r.outputString.reverse :=
-      by
-      rw [← r_from_r₀]
+  · have snd_from_r : r₀.outputString = r.outputString.reverse
+    · rw [← r_from_r₀]
       unfold reversalGrule
       rw [List.reverse_reverse]
     rw [snd_from_r]

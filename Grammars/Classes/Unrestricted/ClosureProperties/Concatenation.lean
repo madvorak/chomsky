@@ -1,67 +1,57 @@
-/-import Grammars.Classes.Unrestricted.Basics.Toolbox
+import Grammars.Classes.Unrestricted.Basics.Toolbox
 import Grammars.Utilities.ListUtils
 
-/-section ListTechnicalities
+section ListTechnicalities
 
 variable {α β : Type}
 
 lemma list_take_one_drop {l : List α} {i : ℕ} (hil : i < l.length) :
-    List.take 1 (List.drop i l) = [l.nthLe i hil] :=
-  by
+  List.take 1 (List.drop i l) = [l.nthLe i hil] :=
+by
   have l_split : l = List.take i l ++ List.drop i l := by rw [List.take_append_drop]
   rw [List.nthLe_of_eq l_split]
   rw [List.nthLe_append_right]
   · have smaller_i : min i l.length = i := min_eq_left (le_of_lt hil)
     simp only [List.length_take, smaller_i, Nat.sub_self]
-    have underscore : 0 < (List.drop i l).length := by finish
-    cases' List.drop i l with d x
-    · exfalso
-      exact false_of_ne (ne_of_lt underscore)
-    · rfl
+    sorry
   · apply List.length_take_le
 
 lemma list_drop_take_succ {l : List α} {i : ℕ} (hil : i < l.length) :
-    List.drop i (List.take (i + 1) l) = [l.nthLe i hil] :=
-  by
+  List.drop i (List.take (i + 1) l) = [l.nthLe i hil] :=
+by
   rw [List.drop_take]
   apply list_take_one_drop
 
 lemma list_forall₂_nthLe {R : α → β → Prop} :
-    ∀ {x : List α},
-      ∀ {y : List β},
-        List.Forall₂ R x y →
-          ∀ {i : ℕ},
-            ∀ i_lt_len_x : i < x.length,
-              ∀ i_lt_len_y : i < y.length, R (x.nthLe i i_lt_len_x) (y.nthLe i i_lt_len_y)
-  | [], [] => by intro hyp i hx; exfalso; apply Nat.not_lt_zero; exact hx
-  | [], a₂::l₂ => by intro hyp; exfalso; cases hyp
-  | a₁::l₁, [] => by intro hyp; exfalso; cases hyp
-  | a₁::l₁, a₂::l₂ => by
+  ∀ {x : List α}, ∀ {y : List β},
+      List.Forall₂ R x y → ∀ {i : ℕ}, ∀ i_lt_len_x : i < x.length, ∀ i_lt_len_y : i < y.length,
+        R (x.nthLe i i_lt_len_x) (y.nthLe i i_lt_len_y)
+| [], [] => by intro hyp i hx; exfalso; apply Nat.not_lt_zero; exact hx
+| [], a₂::l₂ => by intro hyp; exfalso; cases hyp
+| a₁::l₁, [] => by intro hyp; exfalso; cases hyp
+| a₁::l₁, a₂::l₂ => by
     intro ass i i_lt_len_x i_lt_len_y
     rw [List.forall₂_cons] at ass 
     cases i
     · unfold List.nthLe
       exact ass.1
     unfold List.nthLe
-    apply list_forall₂_nthLe
-    exact ass.2
+    sorry
 
 lemma list_filterMap_eq_of_map_eq_map_some {f : α → Option β} :
-    ∀ {x : List α}, ∀ {y : List β}, List.map f x = List.map Option.some y → List.filterMap f x = y
-  | [], [] => fun _ => rfl
-  | a₁::l₁, [] => by intro hyp; exfalso; apply List.cons_ne_nil; exact hyp
-  | [], a₂::l₂ => by intro hyp; exfalso; apply List.cons_ne_nil; exact hyp.symm
-  | a₁::l₁, a₂::l₂ => by
+  ∀ {x : List α}, ∀ {y : List β},
+    List.map f x = List.map Option.some y →
+      List.filterMap f x = y
+| [], [] => fun _ => rfl
+| a₁::l₁, [] => by intro hyp; exfalso; apply List.cons_ne_nil; exact hyp
+| [], a₂::l₂ => by intro hyp; exfalso; apply List.cons_ne_nil; exact hyp.symm
+| a₁::l₁, a₂::l₂ => by
     intro ass
     rw [List.map] at ass 
     rw [List.map] at ass 
-    rw [List.cons.inj_eq] at ass 
-    rw [List.filterMap_cons_some _ _ _ ass.1]
-    congr
-    apply list_filterMap_eq_of_map_eq_map_some
-    exact ass.2
+    sorry
 
-end ListTechnicalities-/
+end ListTechnicalities
 
 -- new nonterminal type
 def nnn (T N₁ N₂ : Type) : Type :=
@@ -113,10 +103,10 @@ end TheConstruction
 section EasyDirection
 
 lemma grammar_generates_only_legit_terminals {g : Grammar T} {w : List (Symbol T g.nt)}
-    (ass : g.Derives [Symbol.nonterminal g.initial] w) {s : Symbol T g.nt}
-    (symbol_derived : s ∈ w) :
-    (∃ r : Grule T g.nt, r ∈ g.rules ∧ s ∈ r.outputString) ∨ s = Symbol.nonterminal g.initial :=
-  by
+    (ass : g.Derives [Symbol.nonterminal g.initial] w)
+    (s : Symbol T g.nt) (symbol_derived : s ∈ w) :
+  (∃ r : Grule T g.nt, r ∈ g.rules ∧ s ∈ r.outputString) ∨ (s = Symbol.nonterminal g.initial) :=
+by
   induction' ass with x y _ orig ih
   · rw [List.mem_singleton] at symbol_derived 
     right
@@ -145,25 +135,22 @@ lemma grammar_generates_only_legit_terminals {g : Grammar T} {w : List (Symbol T
     exact s_in_v
 
 private lemma first_transformation {g₁ g₂ : Grammar T} :
-    (bigGrammar g₁ g₂).Transforms [Symbol.nonterminal (bigGrammar g₁ g₂).initial]
-      [Symbol.nonterminal (Sum.inl (some (Sum.inl g₁.initial))),
-        Symbol.nonterminal (Sum.inl (some (Sum.inr g₂.initial)))] :=
-  by
+  (bigGrammar g₁ g₂).Transforms
+    [Symbol.nonterminal (bigGrammar g₁ g₂).initial]
+    [Symbol.nonterminal (Sum.inl (some (Sum.inl g₁.initial))),
+     Symbol.nonterminal (Sum.inl (some (Sum.inr g₂.initial)))] :=
+by
   use (bigGrammar g₁ g₂).rules.nthLe 0 (by sorry)
-  constructor
-  · change _ ∈ List.cons _ _
-    simp
-  use [], []
-  constructor <;> rfl
+  sorry
 
 private lemma substitute_terminals {g₁ g₂ : Grammar T} {side : T → Sum T T} {w : List T}
-    (rule_for_each_terminal :
-      ∀ t ∈ w,
-        Grule.mk [] (Sum.inr (side t)) [] [Symbol.terminal t] ∈
-          rulesForTerminals₁ g₂.nt g₁ ++ rulesForTerminals₂ g₁.nt g₂) :
-    (bigGrammar g₁ g₂).Derives (List.map (Symbol.nonterminal ∘ Sum.inr ∘ side) w)
-      (List.map Symbol.terminal w) :=
-  by
+  (rule_for_each_terminal : ∀ t ∈ w,
+      Grule.mk [] (Sum.inr (side t)) [] [Symbol.terminal t] ∈
+        rulesForTerminals₁ g₂.nt g₁ ++ rulesForTerminals₂ g₁.nt g₂) :
+  (bigGrammar g₁ g₂).Derives
+    (List.map (Symbol.nonterminal ∘ Sum.inr ∘ side) w)
+    (List.map Symbol.terminal w) :=
+by
   induction' w with d l ih
   · apply Grammar.deri_self
   rw [List.map]
@@ -174,9 +161,8 @@ private lemma substitute_terminals {g₁ g₂ : Grammar T} {side : T → Sum T T
     (bigGrammar g₁ g₂).Transforms
       ([(Symbol.nonterminal ∘ Sum.inr ∘ side) d] ++
         List.map (Symbol.nonterminal ∘ Sum.inr ∘ side) l)
-      ([Symbol.terminal d] ++ List.map (Symbol.nonterminal ∘ Sum.inr ∘ side) l) :=
-    by
-    use Grule.mk [] (Sum.inr (side d)) [] [Symbol.terminal d]
+      ([Symbol.terminal d] ++ List.map (Symbol.nonterminal ∘ Sum.inr ∘ side) l)
+  · use Grule.mk [] (Sum.inr (side d)) [] [Symbol.terminal d]
     constructor
     · change _ ∈ List.cons _ _
       apply List.mem_cons_of_mem
@@ -185,54 +171,50 @@ private lemma substitute_terminals {g₁ g₂ : Grammar T} {side : T → Sum T T
       apply List.mem_cons_self
     use [], List.map (Symbol.nonterminal ∘ Sum.inr ∘ side) l
     constructor <;> rfl
-  apply grammar_deri_of_tran_deri step_head
-  apply grammar_deri_with_prefix
+  apply Grammar.deri_of_tran_deri step_head
+  apply Grammar.deri_with_prefix
   apply ih
   · intro t tin
     apply rule_for_each_terminal t
     exact List.mem_cons_of_mem d tin
 
-/- ./././Mathport/Syntax/Translate/Expr.lean:177:8: unsupported: ambiguous notation -/
-/- ./././Mathport/Syntax/Translate/Expr.lean:177:8: unsupported: ambiguous notation -/
 lemma in_big_of_in_concatenated {g₁ g₂ : Grammar T} {w : List T}
-    (ass : w ∈ grammarLanguage g₁ * grammarLanguage g₂) : w ∈ grammarLanguage (bigGrammar g₁ g₂) :=
-  by
+    (ass : w ∈ g₁.Language * g₂.Language) :
+  w ∈ (bigGrammar g₁ g₂).Language :=
+by
   rw [Language.mem_mul] at ass 
   rcases ass with ⟨u, v, hu, hv, hw⟩
-  unfold grammarLanguage at *
+  unfold Grammar.Language at *
   rw [Set.mem_setOf_eq] at *
-  unfold GrammarGenerates at *
-  apply grammar_deri_of_tran_deri first_transformation
+  unfold Grammar.Generates at *
+  apply Grammar.deri_of_tran_deri first_transformation
   rw [← hw]
   rw [List.map_append]
   apply
-    @grammar_deri_of_deri_deri T (bigGrammar g₁ g₂) _
-      (List.map Symbol.terminal u ++ [Symbol.nonterminal (Sum.inl (some (Sum.inr g₂.initial)))]) _
+    (bigGrammar g₁ g₂).deri_of_deri_deri
+      (v := List.map Symbol.terminal u ++ [Symbol.nonterminal (Sum.inl (some (Sum.inr g₂.initial)))])
   · clear * - hu
     rw [← List.singleton_append]
-    apply grammar_deri_with_postfix
+    apply Grammar.deri_with_postfix
     apply
-      @grammar_deri_of_deri_deri _ _ _
-        (List.map (@Symbol.nonterminal T (bigGrammar g₁ g₂).Nt ∘ Sum.inr ∘ Sum.inl) u) _
+      (bigGrammar g₁ g₂).deri_of_deri_deri
+        (v := List.map (@Symbol.nonterminal T (bigGrammar g₁ g₂).nt ∘ Sum.inr ∘ Sum.inl) u)
     · have upgrade_deri₁ :
         ∀ w : List (Symbol T g₁.nt),
-          GrammarDerives g₁ [Symbol.nonterminal g₁.initial] w →
-            GrammarDerives (bigGrammar g₁ g₂)
+          g₁.Derives [Symbol.nonterminal g₁.initial] w →
+            (bigGrammar g₁ g₂).Derives
               [Symbol.nonterminal (Sum.inl (some (Sum.inl g₁.initial)))]
-              (List.map (wrapSymbol₁ g₂.nt) w) :=
-        by
-        clear * -
+              (List.map (wrapSymbol₁ g₂.nt) w)
+      · clear * -
         intro w deri₁
         induction' deri₁ with x y trash orig ih
-        · apply grammar_deri_self
-        apply grammar_deri_of_deri_tran ih
+        · apply Grammar.deri_self
+        apply Grammar.deri_of_deri_tran ih
         clear * - orig
         rcases orig with ⟨r, rin, u, v, bef, aft⟩
-        use wrap_grule₁ g₂.nt r
+        use wrapGrule₁ g₂.nt r
         constructor
-        · change
-            wrap_grule₁ g₂.nt r ∈
-              _::List.map (wrap_grule₁ g₂.nt) g₁.rules ++ List.map (wrap_grule₂ g₁.nt) g₂.rules ++ _
+        · dsimp [bigGrammar]
           apply List.mem_cons_of_mem
           apply List.mem_append_left
           apply List.mem_append_left
@@ -255,21 +237,20 @@ lemma in_big_of_in_concatenated {g₁ g₂ : Grammar T} {w : List T}
       rw [List.map_map] at upgraded 
       exact upgraded
     · have legit_terminals₁ :
-        ∀ t ∈ u, ∃ r : Grule T g₁.nt, r ∈ g₁.rules ∧ Symbol.terminal t ∈ r.outputString :=
-        by
-        intro t tin
-        have tin' : Symbol.terminal t ∈ List.map Symbol.terminal u :=
-          by
+        ∀ t ∈ u, ∃ r : Grule T g₁.nt,
+          r ∈ g₁.rules ∧ Symbol.terminal t ∈ r.outputString
+      · intro t tin
+        have legit := grammar_generates_only_legit_terminals hu (Symbol.terminal t) (by
           rw [List.mem_map]
           use t
           constructor
           · exact tin
           · rfl
-        have legit := grammar_generates_only_legit_terminals hu tin'
-        cases legit
-        · exact legit
+        )
+        cases' legit with possibl imposs
+        · exact possibl
         · exfalso
-          exact Symbol.noConfusion legit
+          exact Symbol.noConfusion imposs
       apply substitute_terminals
       · intro t tin
         apply List.mem_append_left
@@ -283,7 +264,7 @@ lemma in_big_of_in_concatenated {g₁ g₂ : Grammar T} {w : List T}
           constructor
           · rw [List.mem_join]
             obtain ⟨r, rin, sttin⟩ := legit_terminals₁ t tin
-            use r.output_string
+            use r.outputString
             constructor
             · apply List.mem_map_of_mem
               exact rin
@@ -291,29 +272,28 @@ lemma in_big_of_in_concatenated {g₁ g₂ : Grammar T} {w : List T}
           · rfl
         · rfl
   · clear * - hv
-    apply grammar_deri_with_prefix
+    apply Grammar.deri_with_prefix
     apply
-      @grammar_deri_of_deri_deri _ _ _
-        (List.map (@Symbol.nonterminal T (bigGrammar g₁ g₂).Nt ∘ Sum.inr ∘ Sum.inr) v) _
+      @Grammar.deri_of_deri_deri _ _ _
+        (List.map (@Symbol.nonterminal T (bigGrammar g₁ g₂).nt ∘ Sum.inr ∘ Sum.inr) v) _
     · have upgrade_deri₂ :
         ∀ w : List (Symbol T g₂.nt),
-          GrammarDerives g₂ [Symbol.nonterminal g₂.initial] w →
-            GrammarDerives (bigGrammar g₁ g₂)
+          g₂.Derives [Symbol.nonterminal g₂.initial] w →
+            (bigGrammar g₁ g₂).Derives
               [Symbol.nonterminal (Sum.inl (some (Sum.inr g₂.initial)))]
-              (List.map (wrapSymbol₂ g₁.nt) w) :=
-        by
-        clear * -
+              (List.map (wrapSymbol₂ g₁.nt) w)
+      · clear * -
         intro w deri₁
         induction' deri₁ with x y trash orig ih
-        · apply grammar_deri_self
-        apply grammar_deri_of_deri_tran ih
+        · apply Grammar.deri_self
+        apply Grammar.deri_of_deri_tran ih
         clear * - orig
         rcases orig with ⟨r, rin, u, v, bef, aft⟩
-        use wrap_grule₂ g₁.nt r
+        use wrapGrule₂ g₁.nt r
         constructor
         · change
-            wrap_grule₂ g₁.nt r ∈
-              _::List.map (wrap_grule₁ g₂.nt) g₁.rules ++ List.map (wrap_grule₂ g₁.nt) g₂.rules ++ _
+            wrapGrule₂ g₁.nt r ∈
+              _::List.map (wrapGrule₁ g₂.nt) g₁.rules ++ List.map (wrapGrule₂ g₁.nt) g₂.rules ++ _
           apply List.mem_cons_of_mem
           apply List.mem_append_left
           apply List.mem_append_right
@@ -336,21 +316,20 @@ lemma in_big_of_in_concatenated {g₁ g₂ : Grammar T} {w : List T}
       rw [List.map_map] at upgraded 
       exact upgraded
     · have legit_terminals₂ :
-        ∀ t ∈ v, ∃ r : Grule T g₂.nt, r ∈ g₂.rules ∧ Symbol.terminal t ∈ r.outputString :=
-        by
-        intro t tin
-        have tin' : Symbol.terminal t ∈ List.map Symbol.terminal v :=
-          by
+        ∀ t ∈ v, ∃ r : Grule T g₂.nt,
+          r ∈ g₂.rules ∧ Symbol.terminal t ∈ r.outputString
+      · intro t tin
+        have legit := grammar_generates_only_legit_terminals hv (Symbol.terminal t) (by
           rw [List.mem_map]
           use t
           constructor
           · exact tin
           · rfl
-        have legit := grammar_generates_only_legit_terminals hv tin'
-        cases legit
-        · exact legit
+        )
+        cases' legit with possibl imposs
+        · exact possibl
         · exfalso
-          exact Symbol.noConfusion legit
+          exact Symbol.noConfusion imposs
       apply substitute_terminals
       · intro t tin
         apply List.mem_append_right
@@ -364,7 +343,7 @@ lemma in_big_of_in_concatenated {g₁ g₂ : Grammar T} {w : List T}
           constructor
           · rw [List.mem_join]
             obtain ⟨r, rin, sttin⟩ := legit_terminals₂ t tin
-            use r.output_string
+            use r.outputString
             constructor
             · apply List.mem_map_of_mem
               exact rin
@@ -378,130 +357,161 @@ section HardDirection
 
 section CorrespondenceForTerminals
 
-private def corresponding_symbols {N₁ N₂ : Type} : Nst T N₁ N₂ → Nst T N₁ N₂ → Prop
-  | Symbol.terminal t, Symbol.terminal t' => t = t'
-  | Symbol.nonterminal (Sum.inr (Sum.inl a)), Symbol.nonterminal (Sum.inr (Sum.inl a')) => a = a'
-  | Symbol.nonterminal (Sum.inr (Sum.inr a)), Symbol.nonterminal (Sum.inr (Sum.inr a')) => a = a'
-  | Symbol.nonterminal (Sum.inr (Sum.inl a)), Symbol.terminal t => t = a
-  | Symbol.nonterminal (Sum.inr (Sum.inr a)), Symbol.terminal t => t = a
-  | Symbol.nonterminal (Sum.inl (some (Sum.inl n))),
-    Symbol.nonterminal (Sum.inl (some (Sum.inl n'))) => n = n'
-  | Symbol.nonterminal (Sum.inl (some (Sum.inr n))),
-    Symbol.nonterminal (Sum.inl (some (Sum.inr n'))) => n = n'
-  | Symbol.nonterminal (Sum.inl none), Symbol.nonterminal (Sum.inl none) => True
+private def correspondingSymbols {N₁ N₂ : Type} : nst T N₁ N₂ → nst T N₁ N₂ → Prop
+  | Symbol.terminal t
+  , Symbol.terminal t' =>
+      t = t'
+  | Symbol.nonterminal (Sum.inr (Sum.inl a))
+  , Symbol.nonterminal (Sum.inr (Sum.inl a')) =>
+      a = a'
+  | Symbol.nonterminal (Sum.inr (Sum.inr a))
+  , Symbol.nonterminal (Sum.inr (Sum.inr a')) =>
+      a = a'
+  | Symbol.nonterminal (Sum.inr (Sum.inl a))
+  , Symbol.terminal t =>
+      t = a
+  | Symbol.nonterminal (Sum.inr (Sum.inr a))
+  , Symbol.terminal t =>
+      t = a
+  | Symbol.nonterminal (Sum.inl (some (Sum.inl n)))
+  , Symbol.nonterminal (Sum.inl (some (Sum.inl n'))) =>
+      n = n'
+  | Symbol.nonterminal (Sum.inl (some (Sum.inr n)))
+  , Symbol.nonterminal (Sum.inl (some (Sum.inr n'))) =>
+      n = n'
+  | Symbol.nonterminal (Sum.inl none)
+  , Symbol.nonterminal (Sum.inl none) =>
+      True
   | _, _ => False
 
-private lemma corresponding_symbols_self {N₁ N₂ : Type} (s : Nst T N₁ N₂) :
-    CorrespondingSymbols s s := by
-  repeat'
-    try cases s
-    try unfold corresponding_symbols
+private lemma correspondingSymbols_self {N₁ N₂ : Type} (s : nst T N₁ N₂) :
+  correspondingSymbols s s :=
+by
+  cases' s with t n
+  · simp [correspondingSymbols]
+  · cases' n with a b 
+    · cases' a with v
+      · simp [correspondingSymbols]
+      · cases' v with n₁ n₂
+        · simp [correspondingSymbols]
+        · simp [correspondingSymbols]
+    · cases' b with t₁ t₂
+      · simp [correspondingSymbols]
+      · simp [correspondingSymbols]
 
-private lemma corresponding_symbols_never₁ {N₁ N₂ : Type} {s₁ : Symbol T N₁} {s₂ : Symbol T N₂} :
-    ¬CorrespondingSymbols (wrapSymbol₁ N₂ s₁) (wrapSymbol₂ N₁ s₂) := by
+private lemma correspondingSymbols_never₁ {N₁ N₂ : Type} {s₁ : Symbol T N₁} {s₂ : Symbol T N₂} :
+  ¬ correspondingSymbols (wrapSymbol₁ N₂ s₁) (wrapSymbol₂ N₁ s₂) :=
+by
   cases s₁ <;> cases s₂ <;>
     · unfold wrapSymbol₁
       unfold wrapSymbol₂
-      unfold corresponding_symbols
+      unfold correspondingSymbols
       exact not_false
 
-private lemma corresponding_symbols_never₂ {N₁ N₂ : Type} {s₁ : Symbol T N₁} {s₂ : Symbol T N₂} :
-    ¬CorrespondingSymbols (wrapSymbol₂ N₁ s₂) (wrapSymbol₁ N₂ s₁) := by
+private lemma correspondingSymbols_never₂ {N₁ N₂ : Type} {s₁ : Symbol T N₁} {s₂ : Symbol T N₂} :
+    ¬ correspondingSymbols (wrapSymbol₂ N₁ s₂) (wrapSymbol₁ N₂ s₁) := by
   cases s₁ <;> cases s₂ <;>
     · unfold wrapSymbol₁
       unfold wrapSymbol₂
-      unfold corresponding_symbols
+      unfold correspondingSymbols
       exact not_false
 
-private def corresponding_strings {N₁ N₂ : Type} : List (Nst T N₁ N₂) → List (Nst T N₁ N₂) → Prop :=
-  List.Forall₂ CorrespondingSymbols
+private def correspondingStrings {N₁ N₂ : Type} : List (nst T N₁ N₂) → List (nst T N₁ N₂) → Prop :=
+  List.Forall₂ correspondingSymbols
 
-private lemma corresponding_strings_self {N₁ N₂ : Type} {x : List (Nst T N₁ N₂)} :
-    CorrespondingStrings x x := by
-  unfold corresponding_strings
+private lemma correspondingStrings_self {N₁ N₂ : Type} {x : List (nst T N₁ N₂)} :
+  correspondingStrings x x :=
+by
+  unfold correspondingStrings
   rw [List.forall₂_same]
-  intro s trash
-  exact corresponding_symbols_self s
+  intros s _
+  exact correspondingSymbols_self s
 
-private lemma corresponding_strings_singleton {N₁ N₂ : Type} {s₁ s₂ : Nst T N₁ N₂}
-    (ass : CorrespondingSymbols s₁ s₂) : CorrespondingStrings [s₁] [s₂] :=
-  by
-  unfold corresponding_strings
+private lemma correspondingStrings_singleton {N₁ N₂ : Type} {s₁ s₂ : nst T N₁ N₂}
+    (ass : correspondingSymbols s₁ s₂) :
+  correspondingStrings [s₁] [s₂] :=
+by
+  unfold correspondingStrings
   rw [List.forall₂_cons]
   constructor
   · exact ass
   · exact List.Forall₂.nil
 
-private lemma corresponding_strings_append {N₁ N₂ : Type} {x₁ x₂ y₁ y₂ : List (Nst T N₁ N₂)}
-    (ass₁ : CorrespondingStrings x₁ y₁) (ass₂ : CorrespondingStrings x₂ y₂) :
-    CorrespondingStrings (x₁ ++ x₂) (y₁ ++ y₂) :=
-  by
-  unfold corresponding_strings at *
+private lemma correspondingStrings_append {N₁ N₂ : Type} {x₁ x₂ y₁ y₂ : List (nst T N₁ N₂)}
+    (ass₁ : correspondingStrings x₁ y₁) (ass₂ : correspondingStrings x₂ y₂) :
+  correspondingStrings (x₁ ++ x₂) (y₁ ++ y₂) :=
+by
+  unfold correspondingStrings at *
   exact List.rel_append ass₁ ass₂
 
-private lemma corresponding_strings_length {N₁ N₂ : Type} {x y : List (Nst T N₁ N₂)}
-    (ass : CorrespondingStrings x y) : x.length = y.length :=
-  by
-  unfold corresponding_strings at ass 
+private lemma correspondingStrings_length {N₁ N₂ : Type} {x y : List (nst T N₁ N₂)}
+    (ass : correspondingStrings x y) :
+  x.length = y.length :=
+by
+  unfold correspondingStrings at ass 
   exact List.Forall₂.length_eq ass
 
-private lemma corresponding_strings_nth_le {N₁ N₂ : Type} {x y : List (Nst T N₁ N₂)} {i : ℕ}
-    (i_lt_len_x : i < x.length) (i_lt_len_y : i < y.length) (ass : CorrespondingStrings x y) :
-    CorrespondingSymbols (x.nthLe i i_lt_len_x) (y.nthLe i i_lt_len_y) :=
-  by
+private lemma correspondingStrings_nth_le {N₁ N₂ : Type} {x y : List (nst T N₁ N₂)} {i : ℕ}
+    (i_lt_len_x : i < x.length) (i_lt_len_y : i < y.length) (ass : correspondingStrings x y) :
+  correspondingSymbols (x.nthLe i i_lt_len_x) (y.nthLe i i_lt_len_y) :=
+by
   apply list_forall₂_nthLe
   exact ass
 
-private lemma corresponding_strings_reverse {N₁ N₂ : Type} {x y : List (Nst T N₁ N₂)}
-    (ass : CorrespondingStrings x y) : CorrespondingStrings x.reverse y.reverse :=
-  by
-  unfold corresponding_strings at *
+private lemma correspondingStrings_reverse {N₁ N₂ : Type} {x y : List (nst T N₁ N₂)}
+    (ass : correspondingStrings x y) :
+  correspondingStrings x.reverse y.reverse :=
+by
+  unfold correspondingStrings at *
   rw [List.forall₂_reverse_iff]
   exact ass
 
-private lemma corresponding_strings_of_reverse {N₁ N₂ : Type} {x y : List (Nst T N₁ N₂)}
-    (ass : CorrespondingStrings x.reverse y.reverse) : CorrespondingStrings x y :=
-  by
-  unfold corresponding_strings at *
+private lemma correspondingStrings_of_reverse {N₁ N₂ : Type} {x y : List (nst T N₁ N₂)}
+    (ass : correspondingStrings x.reverse y.reverse) :
+  correspondingStrings x y :=
+by
+  unfold correspondingStrings at *
   rw [List.forall₂_reverse_iff] at ass 
   exact ass
 
-private lemma corresponding_strings_take {N₁ N₂ : Type} {x y : List (Nst T N₁ N₂)} (n : ℕ)
-    (ass : CorrespondingStrings x y) : CorrespondingStrings (List.take n x) (List.take n y) :=
-  by
-  unfold corresponding_strings at *
+private lemma correspondingStrings_take {N₁ N₂ : Type} {x y : List (nst T N₁ N₂)} (n : ℕ)
+    (ass : correspondingStrings x y) :
+  correspondingStrings (List.take n x) (List.take n y) :=
+by
+  unfold correspondingStrings at *
   exact List.forall₂_take n ass
 
-private lemma corresponding_strings_drop {N₁ N₂ : Type} {x y : List (Nst T N₁ N₂)} (n : ℕ)
-    (ass : CorrespondingStrings x y) : CorrespondingStrings (List.drop n x) (List.drop n y) :=
-  by
-  unfold corresponding_strings at *
+private lemma correspondingStrings_drop {N₁ N₂ : Type} {x y : List (nst T N₁ N₂)} (n : ℕ)
+    (ass : correspondingStrings x y) :
+  correspondingStrings (List.drop n x) (List.drop n y) :=
+by
+  unfold correspondingStrings at *
   exact List.forall₂_drop n ass
 
-private lemma corresponding_strings_split {N₁ N₂ : Type} {x y : List (Nst T N₁ N₂)} (n : ℕ)
-    (ass : CorrespondingStrings x y) :
-    CorrespondingStrings (List.take n x) (List.take n y) ∧
-      CorrespondingStrings (List.drop n x) (List.drop n y) :=
-  by
+private lemma correspondingStrings_split {N₁ N₂ : Type} {x y : List (nst T N₁ N₂)} (n : ℕ)
+    (ass : correspondingStrings x y) :
+  correspondingStrings (List.take n x) (List.take n y) ∧
+  correspondingStrings (List.drop n x) (List.drop n y) :=
+by
   constructor
-  · exact corresponding_strings_take n ass
-  · exact corresponding_strings_drop n ass
+  · exact correspondingStrings_take n ass
+  · exact correspondingStrings_drop n ass
 
 end CorrespondenceForTerminals
 
-section UnwrappingNst
+/-section UnwrappingNst
 
-private def unwrap_symbol₁ {N₁ N₂ : Type} : Nst T N₁ N₂ → Option (Symbol T N₁)
+private def unwrap_symbol₁ {N₁ N₂ : Type} : nst T N₁ N₂ → Option (Symbol T N₁)
   | Symbol.terminal t => some (Symbol.terminal t)
   | Symbol.nonterminal (Sum.inr (Sum.inl a)) => some (Symbol.terminal a)
-  | Symbol.nonterminal (Sum.inr (Sum.inr a)) => none
+  | Symbol.nonterminal (Sum.inr (Sum.inr _)) => none
   | Symbol.nonterminal (Sum.inl (some (Sum.inl n))) => some (Symbol.nonterminal n)
   | Symbol.nonterminal (Sum.inl (some (Sum.inr n))) => none
   | Symbol.nonterminal (Sum.inl none) => none
 
-private def unwrap_symbol₂ {N₁ N₂ : Type} : Nst T N₁ N₂ → Option (Symbol T N₂)
+private def unwrap_symbol₂ {N₁ N₂ : Type} : nst T N₁ N₂ → Option (Symbol T N₂)
   | Symbol.terminal t => some (Symbol.terminal t)
-  | Symbol.nonterminal (Sum.inr (Sum.inl a)) => none
+  | Symbol.nonterminal (Sum.inr (Sum.inl _)) => none
   | Symbol.nonterminal (Sum.inr (Sum.inr a)) => some (Symbol.terminal a)
   | Symbol.nonterminal (Sum.inl (some (Sum.inl n))) => none
   | Symbol.nonterminal (Sum.inl (some (Sum.inr n))) => some (Symbol.nonterminal n)
@@ -968,7 +978,7 @@ private lemma induction_step_for_lifted_rule_from_g₁ {g₁ g₂ : Grammar T}
     omega
   constructor
   · constructor
-    · apply grammar_deri_of_deri_tran ih_x
+    · apply Grammar.deri_of_deri_tran ih_x
       use r₁
       constructor
       · exact rin₁
@@ -1476,7 +1486,7 @@ private lemma induction_step_for_lifted_rule_from_g₂ {g₁ g₂ : Grammar T}
   constructor
   · constructor
     · exact ih_x
-    · apply grammar_deri_of_deri_tran ih_y
+    · apply Grammar.deri_of_deri_tran ih_y
       use r₂
       constructor
       · exact rin₂
@@ -1650,7 +1660,7 @@ private lemma big_induction {g₁ g₂ : Grammar T} {w : List (Nst T g₁.Nt g�
   induction' ass with a b trash orig ih
   · use [Symbol.nonterminal g₁.initial], [Symbol.nonterminal g₂.initial]
     constructor
-    · constructor <;> apply grammar_deri_self
+    · constructor <;> apply Grammar.deri_self
     · rw [List.map_singleton]
       rw [List.map_singleton]
       unfold wrapSymbol₁
@@ -1954,7 +1964,7 @@ lemma in_concatenated_of_in_big {g₁ g₂ : Grammar T} {w : List T}
     (ass : w ∈ grammarLanguage (bigGrammar g₁ g₂)) : w ∈ grammarLanguage g₁ * grammarLanguage g₂ :=
   by
   rw [Language.mem_mul]
-  cases grammar_tran_or_id_of_deri ass
+  cases Grammar.tran_or_id_of_deri ass
   · exfalso
     have nonmatch := congr_fun (congr_arg List.get? h) 0
     clear * - nonmatch
@@ -2252,13 +2262,14 @@ lemma in_concatenated_of_in_big {g₁ g₂ : Grammar T} {w : List T}
     rw [List.get?_map]
   apply List.take_append_drop
 
-end VeryComplicated
+end VeryComplicated-/
 
 end HardDirection
 
 /-- The class of recursively-enumerable languages is closed under concatenation. -/
-lemma RE_of_RE_c_RE (L₁ : Language T) (L₂ : Language T) : IsRE L₁ ∧ IsRE L₂ → IsRE (L₁ * L₂) :=
-  by
+theorem RE_of_RE_c_RE (L₁ : Language T) (L₂ : Language T) :
+  IsRE L₁  ∧  IsRE L₂  →  IsRE (L₁ * L₂)  :=
+by
   rintro ⟨⟨g₁, eq_L₁⟩, ⟨g₂, eq_L₂⟩⟩
   use bigGrammar g₁ g₂
   apply Set.eq_of_subset_of_subset
@@ -2266,10 +2277,9 @@ lemma RE_of_RE_c_RE (L₁ : Language T) (L₂ : Language T) : IsRE L₁ ∧ IsRE
     intro w hyp
     rw [← eq_L₁]
     rw [← eq_L₂]
-    exact in_concatenated_of_in_big hyp
+    sorry -- exact in_concatenated_of_in_big hyp
   · -- prove `L₁ * L₂ ⊆` here
     intro w hyp
     rw [← eq_L₁] at hyp 
     rw [← eq_L₂] at hyp 
-    exact in_big_of_in_concatenated hyp
--/
+    sorry -- exact in_big_of_in_concatenated hyp

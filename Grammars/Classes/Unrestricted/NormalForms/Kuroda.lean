@@ -25,5 +25,5 @@ def grammar_of_kurodaGrammar {T : Type} (k : KurodaGrammar T) : Grammar T :=
   Grammar.mk k.nt k.initial (List.map grule_of_kurodaRule k.rules)
 
 theorem kurodaGrammar_always_exists {T : Type} (L : Language T) :
-    IsRE L → ∃ k : KurodaGrammar T, Grammar.Language (grammar_of_kurodaGrammar k) = L :=
-  sorry
+  IsRE L → ∃ k : KurodaGrammar T, Grammar.Language (grammar_of_kurodaGrammar k) = L :=
+sorry

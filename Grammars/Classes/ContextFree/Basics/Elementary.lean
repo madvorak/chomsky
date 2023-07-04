@@ -9,7 +9,7 @@ def cfgEmptyLang : CFgrammar T :=
   CFgrammar.mk (Fin 1) 0 []
 
 /-- Characterization of the empty language. -/
-theorem language_of_cfgEmptyLang : CFgrammar.Language (@cfgEmptyLang T) = 0 :=
+lemma language_of_cfgEmptyLang : CFgrammar.Language (@cfgEmptyLang T) = 0 :=
   by
   unfold CFgrammar.Language
   ext1 w
@@ -38,7 +38,7 @@ def cfgEmptyWord : CFgrammar T :=
   CFgrammar.mk (Fin 1) 0 [(0, [])]
 
 /-- Characterization of the singleton language. -/
-theorem language_of_cfgEmptyWord : CFgrammar.Language (@cfgEmptyWord T) = singleton [] :=
+lemma language_of_cfgEmptyWord : CFgrammar.Language (@cfgEmptyWord T) = singleton [] :=
   by
   unfold CFgrammar.Language
   ext1 w
@@ -141,7 +141,7 @@ def cfgSymbolStar (a : T) : CFgrammar T :=
 /- ./././Mathport/Syntax/Translate/Tactic/Builtin.lean:73:14: unsupported tactic `trim #[] -/
 /- ./././Mathport/Syntax/Translate/Expr.lean:177:8: unsupported: ambiguous notation -/
 /-- Characterization of the `{a}.star` language. -/
-theorem language_of_cfgSymbolStar (a : T) :
+lemma language_of_cfgSymbolStar (a : T) :
     (cfgSymbolStar a).Language = fun w => ∃ n : ℕ, w = List.replicate n a :=
   by sorry /-
   apply Set.eq_of_subset_of_subset

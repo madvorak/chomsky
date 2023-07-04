@@ -34,7 +34,7 @@ private def big_CF_grammar (g₁ g₂ : CFGrammar T) : CFGrammar T :=
         (cFRulesForTerminals₁ g₂.Nt g₁ ++ cFRulesForTerminals₂ g₁.Nt g₂))
 
 /- ./././Mathport/Syntax/Translate/Tactic/Builtin.lean:73:14: unsupported tactic `trim #[] -/
-private theorem big_CF_grammar_same_language (g₁ g₂ : CFGrammar T) :
+private lemma big_CF_grammar_same_language (g₁ g₂ : CFGrammar T) :
     cFLanguage (bigCFGrammar g₁ g₂) =
       grammarLanguage (bigGrammar (grammarOfCfg g₁) (grammarOfCfg g₂)) :=
   by
@@ -56,10 +56,10 @@ private theorem big_CF_grammar_same_language (g₁ g₂ : CFGrammar T) :
       finish
 
 /-- The class of context-free languages is closed under concatenation.
-    This theorem is proved by translation from general grammars.
+    This lemma is proved by translation from general grammars.
     Compare to `classes.context_free.closure_properties.concatenation.lean` which uses
     a simpler and more effective construction (based on context-gree grammars only). -/
-private theorem bonus_CF_of_CF_c_CF (L₁ : Language T) (L₂ : Language T) :
+private lemma bonus_CF_of_CF_c_CF (L₁ : Language T) (L₂ : Language T) :
     IsCF L₁ ∧ IsCF L₂ → IsCF (L₁ * L₂) :=
   by
   rintro ⟨⟨g₁, eq_L₁⟩, ⟨g₂, eq_L₂⟩⟩

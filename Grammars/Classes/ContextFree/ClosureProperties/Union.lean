@@ -204,7 +204,7 @@ end LiftedGrammars
 section LemmataSubset
 
 /- ./././Mathport/Syntax/Translate/Tactic/Builtin.lean:69:18: unsupported non-interactive tactic five_steps -/
-private theorem deri₁_more (w : List (Symbol T g₁.Nt)) :
+private lemma deri₁_more (w : List (Symbol T g₁.Nt)) :
     CFDerives g₁ [Symbol.nonterminal g₁.initial] w →
       CFDerives (unionGrammar g₁ g₂) (lsTNOfLsTN₁ [Symbol.nonterminal g₁.initial])
         (lsTNOfLsTN₁ w) :=
@@ -223,7 +223,7 @@ private theorem deri₁_more (w : List (Symbol T g₁.Nt)) :
   exact lift_deri ass
 
 /- ./././Mathport/Syntax/Translate/Tactic/Builtin.lean:69:18: unsupported non-interactive tactic five_steps -/
-private theorem deri₂_more (w : List (Symbol T g₂.Nt)) :
+private lemma deri₂_more (w : List (Symbol T g₂.Nt)) :
     CFDerives g₂ [Symbol.nonterminal g₂.initial] w →
       CFDerives (unionGrammar g₁ g₂) (lsTNOfLsTN₂ [Symbol.nonterminal g₂.initial])
         (lsTNOfLsTN₂ w) :=
@@ -243,7 +243,7 @@ private theorem deri₂_more (w : List (Symbol T g₂.Nt)) :
 
 /- ./././Mathport/Syntax/Translate/Expr.lean:177:8: unsupported: ambiguous notation -/
 /- ./././Mathport/Syntax/Translate/Expr.lean:177:8: unsupported: ambiguous notation -/
-private theorem in_union_of_in_first (w : List T) :
+private lemma in_union_of_in_first (w : List T) :
     w ∈ cFLanguage g₁ → w ∈ cFLanguage (unionGrammar g₁ g₂) :=
   by
   intro assum
@@ -302,7 +302,7 @@ private theorem in_union_of_in_first (w : List T) :
 
 /- ./././Mathport/Syntax/Translate/Expr.lean:177:8: unsupported: ambiguous notation -/
 /- ./././Mathport/Syntax/Translate/Expr.lean:177:8: unsupported: ambiguous notation -/
-private theorem in_union_of_in_second (w : List T) :
+private lemma in_union_of_in_second (w : List T) :
     w ∈ cFLanguage g₂ → w ∈ cFLanguage (unionGrammar g₁ g₂) :=
   by
   intro assum
@@ -371,7 +371,7 @@ unsafe def good_singleton : tactic Unit :=
 /- ./././Mathport/Syntax/Translate/Expr.lean:177:8: unsupported: ambiguous notation -/
 /- ./././Mathport/Syntax/Translate/Expr.lean:177:8: unsupported: ambiguous notation -/
 /- ./././Mathport/Syntax/Translate/Tactic/Builtin.lean:69:18: unsupported non-interactive tactic good_singleton -/
-private theorem in_language_left_case_of_union {w : List T}
+private lemma in_language_left_case_of_union {w : List T}
     (hypo :
       CFDerives (unionGrammar g₁ g₂) [Symbol.nonterminal (some (Sum.inl g₁.initial))]
         (List.map Symbol.terminal w)) :
@@ -420,7 +420,7 @@ private theorem in_language_left_case_of_union {w : List T}
 /- ./././Mathport/Syntax/Translate/Expr.lean:177:8: unsupported: ambiguous notation -/
 /- ./././Mathport/Syntax/Translate/Expr.lean:177:8: unsupported: ambiguous notation -/
 /- ./././Mathport/Syntax/Translate/Tactic/Builtin.lean:69:18: unsupported non-interactive tactic good_singleton -/
-private theorem in_language_right_case_of_union {w : List T}
+private lemma in_language_right_case_of_union {w : List T}
     (hypo :
       CFDerives (unionGrammar g₁ g₂) [Symbol.nonterminal (some (Sum.inr g₂.initial))]
         (List.map Symbol.terminal w)) :
@@ -466,7 +466,7 @@ private theorem in_language_right_case_of_union {w : List T}
           use g₂.initial
           rfl)).left
 
-private theorem both_empty (u v : List (Symbol T (unionGrammar g₁ g₂).Nt))
+private lemma both_empty (u v : List (Symbol T (unionGrammar g₁ g₂).Nt))
     (a : Symbol T (unionGrammar g₁ g₂).Nt)
     (bef : [Symbol.nonterminal (unionGrammar g₁ g₂).initial] = u ++ [a] ++ v) : u = [] ∧ v = [] :=
   by
@@ -498,7 +498,7 @@ private theorem both_empty (u v : List (Symbol T (unionGrammar g₁ g₂).Nt))
             _ = 0 + 1 + 1 := (Eq.symm (add_assoc 0 1 1))
             _ = 2 := rfl)
 
-private theorem in_language_impossible_case_of_union (w : List T)
+private lemma in_language_impossible_case_of_union (w : List T)
     (r : (unionGrammar g₁ g₂).Nt × List (Symbol T (unionGrammar g₁ g₂).Nt))
     (u v : List (Symbol T (unionGrammar g₁ g₂).Nt)) (hu : u = []) (hv : v = [])
     (bef : [Symbol.nonterminal (unionGrammar g₁ g₂).initial] = u ++ [Symbol.nonterminal r.fst] ++ v)
@@ -526,7 +526,7 @@ private theorem in_language_impossible_case_of_union (w : List T)
     unfold Prod.fst at rule_root 
     exact Option.noConfusion rule_root
 
-private theorem in_language_of_in_union (w : List T) :
+private lemma in_language_of_in_union (w : List T) :
     w ∈ cFLanguage (unionGrammar g₁ g₂) → w ∈ cFLanguage g₁ ∨ w ∈ cFLanguage g₂ :=
   by
   intro ass
@@ -563,7 +563,7 @@ private theorem in_language_of_in_union (w : List T) :
 end LemmataSupset
 
 /-- The class of context-free languages is closed under union. -/
-theorem CF_of_CF_u_CF {T : Type} (L₁ : Language T) (L₂ : Language T) :
+lemma CF_of_CF_u_CF {T : Type} (L₁ : Language T) (L₂ : Language T) :
     IsCF L₁ ∧ IsCF L₂ → IsCF (L₁ + L₂) :=
   by
   rintro ⟨⟨g₁, eq_L₁⟩, ⟨g₂, eq_L₂⟩⟩

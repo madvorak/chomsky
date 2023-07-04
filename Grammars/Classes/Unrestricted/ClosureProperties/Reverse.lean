@@ -9,23 +9,24 @@ section Auxiliary
 private def reversalGrule {N : Type} (r : Grule T N) : Grule T N :=
   Grule.mk r.inputR.reverse r.inputN r.inputL.reverse r.outputString.reverse
 
-private theorem dual_of_reversal_grule {N : Type} (r : Grule T N) :
-    reversalGrule (reversalGrule r) = r := by
+private lemma dual_of_reversal_grule {N : Type} (r : Grule T N) :
+  reversalGrule (reversalGrule r) = r :=
+by
   cases r
   unfold reversalGrule
   dsimp only
   simp [List.reverse_reverse]
 
-private theorem reversal_grule_reversal_grule {N : Type} :
-    @reversalGrule T N ∘ @reversalGrule T N = id :=
-  by
+private lemma reversal_grule_reversal_grule {N : Type} :
+  @reversalGrule T N ∘ @reversalGrule T N = id :=
+by
   ext
   apply dual_of_reversal_grule
 
 private def reversalGrammar (g : Grammar T) : Grammar T :=
   Grammar.mk g.nt g.initial (List.map reversalGrule g.rules)
 
-private theorem dual_of_reversalGrammar (g : Grammar T) :
+private lemma dual_of_reversalGrammar (g : Grammar T) :
     reversalGrammar (reversalGrammar g) = g :=
   by
   cases g
@@ -35,10 +36,10 @@ private theorem dual_of_reversalGrammar (g : Grammar T) :
   rw [reversal_grule_reversal_grule]
   rw [List.map_id]
 
-private theorem derives_reversed (g : Grammar T) (v : List (Symbol T g.nt)) :
-    (reversalGrammar g).Derives [Symbol.nonterminal (reversalGrammar g).initial] v →
-      g.Derives [Symbol.nonterminal g.initial] v.reverse :=
-  by
+private lemma derives_reversed (g : Grammar T) (v : List (Symbol T g.nt)) :
+  (reversalGrammar g).Derives [Symbol.nonterminal (reversalGrammar g).initial] v →
+    g.Derives [Symbol.nonterminal g.initial] v.reverse :=
+by
   intro hv
   induction' hv with u w _ orig ih
   · rw [List.reverse_singleton]
@@ -82,9 +83,10 @@ private theorem derives_reversed (g : Grammar T) (v : List (Symbol T g.nt)) :
     rw [← List.reverse_append_append]
     exact congr_arg List.reverse aft
 
-private theorem reversed_word_in_original_language {g : Grammar T} {w : List T}
-    (hyp : w ∈ (reversalGrammar g).Language) : w.reverse ∈ g.Language :=
-  by
+private lemma reversed_word_in_original_language {g : Grammar T} {w : List T}
+    (hyp : w ∈ (reversalGrammar g).Language) :
+  w.reverse ∈ g.Language :=
+by
   unfold Grammar.Language at *
   have almost_done := derives_reversed g (List.map Symbol.terminal w) hyp
   rw [← List.map_reverse] at almost_done 
@@ -93,8 +95,9 @@ private theorem reversed_word_in_original_language {g : Grammar T} {w : List T}
 end Auxiliary
 
 /-- The class of resursively-enumerable languages is closed under reversal. -/
-theorem RE_of_reverse_RE (L : Language T) : IsRE L → IsRE (reverseLang L) :=
-  by
+theorem RE_of_reverse_RE (L : Language T) :
+  IsRE L  →  IsRE (reverseLang L)  :=
+by
   rintro ⟨g, hgL⟩
   rw [← hgL]
   use reversalGrammar g

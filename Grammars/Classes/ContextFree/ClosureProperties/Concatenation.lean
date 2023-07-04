@@ -190,7 +190,7 @@ private def oT_of_sTN₃ {g₃ : CFGrammar T} : Symbol T g₃.Nt → Option T
 private def liT_of_lsTN₃ {g₃ : CFGrammar T} : List (Symbol T g₃.Nt) → List T :=
   List.filterMap oTOfSTN₃
 
-private theorem u_eq_take_map_w {g₁ g₂ : CFGrammar T} (u : List (Symbol T g₁.Nt))
+private lemma u_eq_take_map_w {g₁ g₂ : CFGrammar T} (u : List (Symbol T g₁.Nt))
     (v : List (Symbol T g₂.Nt)) (w : List T) (len : u.length ≤ w.length)
     (hyp :
       List.take u.length (List.map sTNOfSTN₁ u ++ lsTNOfLsTN₂ v) =
@@ -248,7 +248,7 @@ private theorem u_eq_take_map_w {g₁ g₂ : CFGrammar T} (u : List (Symbol T g�
     exact min_le_of_left_le h
   rfl
 
-private theorem v_eq_drop_map_w {g₁ g₂ : CFGrammar T} (u : List (Symbol T g₁.Nt))
+private lemma v_eq_drop_map_w {g₁ g₂ : CFGrammar T} (u : List (Symbol T g₁.Nt))
     (v : List (Symbol T g₂.Nt)) (w : List T) (total_len : u.length + v.length = w.length)
     (hyp :
       List.drop u.length (List.map sTNOfSTN₁ u ++ List.map sTNOfSTN₂ v) =
@@ -342,13 +342,13 @@ private def lsTN₂_of_lsTN {g₁ g₂ : CFGrammar T} (lis : List (Symbol T (Opt
     List (Symbol T g₂.Nt) :=
   List.filterMap sTN₂OfSTN lis
 
-private theorem self_of_sTN₁ {g₁ g₂ : CFGrammar T} (a : Symbol T g₁.Nt) :
+private lemma self_of_sTN₁ {g₁ g₂ : CFGrammar T} (a : Symbol T g₁.Nt) :
     sTN₁OfSTN (@sTNOfSTN₁ _ _ g₂ a) = a := by cases a <;> rfl
 
-private theorem self_of_sTN₂ {g₁ g₂ : CFGrammar T} (a : Symbol T g₂.Nt) :
+private lemma self_of_sTN₂ {g₁ g₂ : CFGrammar T} (a : Symbol T g₂.Nt) :
     sTN₂OfSTN (@sTNOfSTN₂ _ g₁ _ a) = a := by cases a <;> rfl
 
-private theorem self_of_lsTN₁ {g₁ g₂ : CFGrammar T} (stri : List (Symbol T g₁.Nt)) :
+private lemma self_of_lsTN₁ {g₁ g₂ : CFGrammar T} (stri : List (Symbol T g₁.Nt)) :
     lsTN₁OfLsTN (@lsTNOfLsTN₁ _ _ g₂ stri) = stri :=
   by
   unfold lsTNOfLsTN₁
@@ -369,7 +369,7 @@ private theorem self_of_lsTN₁ {g₁ g₂ : CFGrammar T} (stri : List (Symbol T
     rfl
   apply List.filterMap_some
 
-private theorem self_of_lsTN₂ {g₁ g₂ : CFGrammar T} (stri : List (Symbol T g₂.Nt)) :
+private lemma self_of_lsTN₂ {g₁ g₂ : CFGrammar T} (stri : List (Symbol T g₂.Nt)) :
     lsTN₂OfLsTN (@lsTNOfLsTN₂ _ g₁ _ stri) = stri :=
   by
   unfold lsTNOfLsTN₂
@@ -393,7 +393,7 @@ private theorem self_of_lsTN₂ {g₁ g₂ : CFGrammar T} (stri : List (Symbol T
 /- ./././Mathport/Syntax/Translate/Expr.lean:177:8: unsupported: ambiguous notation -/
 /- ./././Mathport/Syntax/Translate/Tactic/Builtin.lean:73:14: unsupported tactic `trim #[] -/
 /- ./././Mathport/Syntax/Translate/Tactic/Builtin.lean:73:14: unsupported tactic `trim #[] -/
-private theorem in_concatenated_of_in_combined {g₁ g₂ : CFGrammar T} {w : List T}
+private lemma in_concatenated_of_in_combined {g₁ g₂ : CFGrammar T} {w : List T}
     (hyp : w ∈ cFLanguage (combinedGrammar g₁ g₂)) : w ∈ cFLanguage g₁ * cFLanguage g₂ :=
   by
   rw [Language.mem_mul]
@@ -1178,7 +1178,7 @@ private theorem in_concatenated_of_in_combined {g₁ g₂ : CFGrammar T} {w : Li
   rw [bundle_unbundle]
   rw [List.filterMap_some]
 
-private theorem in_combined_of_in_concatenated {g₁ g₂ : CFGrammar T} {w : List T}
+private lemma in_combined_of_in_concatenated {g₁ g₂ : CFGrammar T} {w : List T}
     (hyp : w ∈ cFLanguage g₁ * cFLanguage g₂) : w ∈ cFLanguage (combinedGrammar g₁ g₂) :=
   by
   rw [Language.mem_mul] at hyp 
@@ -1250,7 +1250,7 @@ private theorem in_combined_of_in_concatenated {g₁ g₂ : CFGrammar T} {w : Li
     exact lift_deri hv
 
 /-- The class of context-free languages is closed under concatenation. -/
-theorem CF_of_CF_c_CF (L₁ : Language T) (L₂ : Language T) : IsCF L₁ ∧ IsCF L₂ → IsCF (L₁ * L₂) :=
+lemma CF_of_CF_c_CF (L₁ : Language T) (L₂ : Language T) : IsCF L₁ ∧ IsCF L₂ → IsCF (L₁ * L₂) :=
   by
   rintro ⟨⟨g₁, eq_L₁⟩, ⟨g₂, eq_L₂⟩⟩
   use combined_grammar g₁ g₂

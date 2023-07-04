@@ -33,7 +33,7 @@ structure LiftedGrammar where
       (r ∈ g.rules ∧ ∃ n₀ : g₀.nt, liftNt n₀ = r.fst) → ∃ r₀ ∈ g₀.rules, liftRule liftNt r₀ = r
   liftNt_sink : ∀ n₀ : g₀.nt, sinkNt (liftNt n₀) = some n₀
 
-private theorem lifted_grammar_inverse (lg : @LiftedGrammar T) :
+private lemma lifted_grammar_inverse (lg : @LiftedGrammar T) :
     ∀ x : lg.g.nt, (∃ val, lg.sinkNt x = some val) → Option.map lg.liftNt (lg.sinkNt x) = x :=
   by
   intro x h
@@ -50,7 +50,7 @@ private theorem lifted_grammar_inverse (lg : @LiftedGrammar T) :
   rw [ass] at case_none 
   exact Option.noConfusion case_none
 
-private theorem lift_tran {lg : LiftedGrammar} {w₁ w₂ : List (Symbol T lg.g₀.nt)}
+private lemma lift_tran {lg : LiftedGrammar} {w₁ w₂ : List (Symbol T lg.g₀.nt)}
     (hyp : CFTransforms lg.g₀ w₁ w₂) :
     CFTransforms lg.g (liftString lg.liftNt w₁) (liftString lg.liftNt w₂) :=
   by
@@ -70,7 +70,7 @@ private theorem lift_tran {lg : LiftedGrammar} {w₁ w₂ : List (Symbol T lg.g�
     rw [List.map_append_append] at lift_aft 
     exact lift_aft
 
-theorem lift_deri {lg : LiftedGrammar} {w₁ w₂ : List (Symbol T lg.g₀.nt)}
+lemma lift_deri {lg : LiftedGrammar} {w₁ w₂ : List (Symbol T lg.g₀.nt)}
     (hyp : CFDerives lg.g₀ w₁ w₂) :
     CFDerives lg.g (liftString lg.liftNt w₁) (liftString lg.liftNt w₂) :=
   by
@@ -87,7 +87,7 @@ def GoodLetter {lg : @LiftedGrammar T} : Symbol T lg.g.nt → Prop
 def GoodString {lg : @LiftedGrammar T} (s : List (Symbol T lg.g.nt)) :=
   ∀ a ∈ s, GoodLetter a
 
-private theorem sink_tran {lg : LiftedGrammar} {w₁ w₂ : List (Symbol T lg.g.nt)}
+private lemma sink_tran {lg : LiftedGrammar} {w₁ w₂ : List (Symbol T lg.g.nt)}
     (hyp : CFTransforms lg.g w₁ w₂) (ok_input : GoodString w₁) :
     CFTransforms lg.g₀ (sinkString lg.sinkNt w₁) (sinkString lg.sinkNt w₂) :=
   by
@@ -153,7 +153,7 @@ private theorem sink_tran {lg : LiftedGrammar} {w₁ w₂ : List (Symbol T lg.g.
     rw [correct_inverse]
     rw [List.filterMap_some]
 
-theorem sink_deri (lg : LiftedGrammar) (w₁ w₂ : List (Symbol T lg.g.nt))
+lemma sink_deri (lg : LiftedGrammar) (w₁ w₂ : List (Symbol T lg.g.nt))
     (hyp : CFDerives lg.g w₁ w₂) (ok_input : GoodString w₁) :
     CFDerives lg.g₀ (sinkString lg.sinkNt w₁) (sinkString lg.sinkNt w₂) ∧ GoodString w₂ :=
   by

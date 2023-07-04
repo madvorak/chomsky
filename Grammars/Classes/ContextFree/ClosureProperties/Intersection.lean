@@ -23,19 +23,19 @@ private def b : Symbol (Fin 3) (Fin 1) :=
 private def c : Symbol (Fin 3) (Fin 1) :=
   Symbol.terminal c_
 
-private theorem neq_ab : a_ ≠ b_ := by decide
+private lemma neq_ab : a_ ≠ b_ := by decide
 
-private theorem neq_ba : b_ ≠ a_ :=
+private lemma neq_ba : b_ ≠ a_ :=
   neq_ab.symm
 
-private theorem neq_ac : a_ ≠ c_ := by decide
+private lemma neq_ac : a_ ≠ c_ := by decide
 
-private theorem neq_ca : c_ ≠ a_ :=
+private lemma neq_ca : c_ ≠ a_ :=
   neq_ac.symm
 
-private theorem neq_bc : b_ ≠ c_ := by decide
+private lemma neq_bc : b_ ≠ c_ := by decide
 
-private theorem neq_cb : c_ ≠ b_ :=
+private lemma neq_cb : c_ ≠ b_ :=
   neq_bc.symm
 
 private def lang_eq_any : Language (Fin 3) := fun w =>
@@ -51,7 +51,7 @@ end DefsOverFin3
 
 section NotCF
 
-private theorem false_of_uvvxyyz {_a _b _c : Fin 3} {n : ℕ} {u v x y z : List (Fin 3)}
+private lemma false_of_uvvxyyz {_a _b _c : Fin 3} {n : ℕ} {u v x y z : List (Fin 3)}
     (elimin : ∀ s : Fin 3, s ≠ _a → s ≠ _b → s ≠ _c → False) (no_a : _a ∉ v ++ y)
     (nonempty : (v ++ y).length > 0)
     (counts_ab : ∀ w : List (Fin 3), w ∈ langEqEq → List.countIn w _a = List.countIn w _b)
@@ -164,7 +164,7 @@ private theorem false_of_uvvxyyz {_a _b _c : Fin 3} {n : ℕ} {u v x y z : List 
     rw [hac] at count_c 
     exact LT.lt.false count_c
 
-private theorem notCF_lang_eq_eq : ¬IsCF langEqEq :=
+private lemma notCF_lang_eq_eq : ¬IsCF langEqEq :=
   by
   intro h
   have pum := CF_pumping h
@@ -462,7 +462,7 @@ private def lang_aux_ab : Language (Fin 3) := fun w =>
 
 /- ./././Mathport/Syntax/Translate/Tactic/Builtin.lean:69:18: unsupported non-interactive tactic split_ile -/
 /- ./././Mathport/Syntax/Translate/Tactic/Builtin.lean:69:18: unsupported non-interactive tactic split_ile -/
-private theorem CF_lang_aux_ab : IsCF langAuxAb :=
+private lemma CF_lang_aux_ab : IsCF langAuxAb :=
   by
   let S_ : Fin 1 := 0
   let S : Symbol (Fin 3) (Fin 1) := Symbol.nonterminal S_
@@ -691,13 +691,13 @@ private theorem CF_lang_aux_ab : IsCF langAuxAb :=
 
 private def lang_aux_c : Language (Fin 3) := fun w => ∃ n : ℕ, w = List.replicate n c_
 
-private theorem CF_lang_aux_c : IsCF langAuxC :=
+private lemma CF_lang_aux_c : IsCF langAuxC :=
   by
   use cfgSymbolStar c_
   unfold lang_aux_c
   apply language_of_cfgSymbolStar
 
-private theorem CF_lang_eq_any : IsCF langEqAny :=
+private lemma CF_lang_eq_any : IsCF langEqAny :=
   by
   have concatenated : lang_eq_any = lang_aux_ab * lang_aux_c :=
     by
@@ -722,7 +722,7 @@ private theorem CF_lang_eq_any : IsCF langEqAny :=
 
 private def lang_aux_a : Language (Fin 3) := fun w => ∃ n : ℕ, w = List.replicate n a_
 
-private theorem CF_lang_aux_a : IsCF langAuxA :=
+private lemma CF_lang_aux_a : IsCF langAuxA :=
   by
   use cfgSymbolStar a_
   unfold lang_aux_a
@@ -740,7 +740,7 @@ private def permut : Equiv.Perm (Fin 3) :=
       intro x
       fin_cases x <;> rfl)
 
-private theorem CF_lang_aux_bc : IsCF langAuxBc :=
+private lemma CF_lang_aux_bc : IsCF langAuxBc :=
   by
   have permuted : lang_aux_bc = permuteLang lang_aux_ab permut :=
     by
@@ -764,7 +764,7 @@ private theorem CF_lang_aux_bc : IsCF langAuxBc :=
   rw [permuted]
   exact CF_of_permute_CF permut lang_aux_ab CF_lang_aux_ab
 
-private theorem CF_lang_any_eq : IsCF langAnyEq :=
+private lemma CF_lang_any_eq : IsCF langAnyEq :=
   by
   have concatenated : lang_any_eq = lang_aux_a * lang_aux_bc :=
     by
@@ -792,7 +792,7 @@ end YesCF
 
 section IntersectionInclusions
 
-private theorem intersection_of_lang_eq_eq {w : List (Fin 3)} :
+private lemma intersection_of_lang_eq_eq {w : List (Fin 3)} :
     w ∈ langEqEq → w ∈ langEqAny ⊓ langAnyEq :=
   by
   intro h
@@ -802,7 +802,7 @@ private theorem intersection_of_lang_eq_eq {w : List (Fin 3)} :
       use n
       exact hyp
 
-private theorem doubled_le_singled (n₁ m₁ n₂ m₂ : ℕ) (n₁pos : n₁ > 0) (a_ b_ c_ : Fin 3)
+private lemma doubled_le_singled (n₁ m₁ n₂ m₂ : ℕ) (n₁pos : n₁ > 0) (a_ b_ c_ : Fin 3)
     (a_neq_b : a_ ≠ b_) (a_neq_c : a_ ≠ c_)
     (equ :
       List.replicate n₁ a_ ++ List.replicate n₁ b_ ++ List.replicate m₁ c_ =
@@ -873,7 +873,7 @@ private theorem doubled_le_singled (n₁ m₁ n₂ m₂ : ℕ) (n₁pos : n₁ >
   rw [← n₁th] at n₁th₂ 
   exact false_of_ne n₁th₂
 
-private theorem doubled_ge_singled (n₁ m₁ n₂ m₂ : ℕ) (n₂pos : n₂ > 0) (a_ b_ c_ : Fin 3)
+private lemma doubled_ge_singled (n₁ m₁ n₂ m₂ : ℕ) (n₂pos : n₂ > 0) (a_ b_ c_ : Fin 3)
     (a_neq_b : a_ ≠ b_) (a_neq_c : a_ ≠ c_)
     (equ :
       List.replicate n₁ a_ ++ List.replicate n₁ b_ ++ List.replicate m₁ c_ =
@@ -944,7 +944,7 @@ private theorem doubled_ge_singled (n₁ m₁ n₂ m₂ : ℕ) (n₂pos : n₂ >
   rw [n₂th] at n₂th₁ 
   exact false_of_ne n₂th₁
 
-private theorem lang_eq_eq_of_intersection {w : List (Fin 3)} :
+private lemma lang_eq_eq_of_intersection {w : List (Fin 3)} :
     w ∈ langEqAny ⊓ langAnyEq → w ∈ langEqEq :=
   by
   rintro ⟨⟨n₁, m₁, w_eq₁⟩, ⟨n₂, m₂, w_eq₂⟩⟩
@@ -1091,7 +1091,7 @@ private theorem lang_eq_eq_of_intersection {w : List (Fin 3)} :
 end IntersectionInclusions
 
 /-- The class of context-free languages isn't closed under intersection. -/
-theorem nnyCF_of_CF_i_CF :
+lemma nnyCF_of_CF_i_CF :
     ¬∀ T : Type, ∀ L₁ : Language T, ∀ L₂ : Language T, IsCF L₁ ∧ IsCF L₂ → IsCF (L₁ ⊓ L₂) :=
   by
   by_contra contra

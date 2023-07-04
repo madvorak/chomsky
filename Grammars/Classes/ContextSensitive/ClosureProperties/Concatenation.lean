@@ -34,7 +34,7 @@ private def big_CS_grammar (g₁ g₂ : CSGrammar T) : CSGrammar T :=
           List.map (wrapCSRule₂ g₁.Nt) g₂.rules ++
         (cSRulesForTerminals₁ g₂.Nt g₁ ++ cSRulesForTerminals₂ g₁.Nt g₂))
 
-private theorem big_CS_grammar_same_language (g₁ g₂ : CSGrammar T) :
+private lemma big_CS_grammar_same_language (g₁ g₂ : CSGrammar T) :
     cSLanguage (bigCSGrammar g₁ g₂) =
       grammarLanguage (bigGrammar (grammarOfCsg g₁) (grammarOfCsg g₂)) :=
   by
@@ -69,7 +69,7 @@ private theorem big_CS_grammar_same_language (g₁ g₂ : CSGrammar T) :
       unfold grammarOfCsg
       finish
 
-private theorem bonus_CS_of_CS_c_CS (L₁ : Language T) (L₂ : Language T) :
+private lemma bonus_CS_of_CS_c_CS (L₁ : Language T) (L₂ : Language T) :
     IsCS L₁ ∧ IsCS L₂ → IsCS (L₁ * L₂) :=
   by
   rintro ⟨⟨g₁, eq_L₁⟩, ⟨g₂, eq_L₂⟩⟩

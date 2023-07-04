@@ -5,7 +5,7 @@ import Grammars.Utilities.ListUtils
 
 variable {α β : Type}
 
-theorem list_take_one_drop {l : List α} {i : ℕ} (hil : i < l.length) :
+lemma list_take_one_drop {l : List α} {i : ℕ} (hil : i < l.length) :
     List.take 1 (List.drop i l) = [l.nthLe i hil] :=
   by
   have l_split : l = List.take i l ++ List.drop i l := by rw [List.take_append_drop]
@@ -20,13 +20,13 @@ theorem list_take_one_drop {l : List α} {i : ℕ} (hil : i < l.length) :
     · rfl
   · apply List.length_take_le
 
-theorem list_drop_take_succ {l : List α} {i : ℕ} (hil : i < l.length) :
+lemma list_drop_take_succ {l : List α} {i : ℕ} (hil : i < l.length) :
     List.drop i (List.take (i + 1) l) = [l.nthLe i hil] :=
   by
   rw [List.drop_take]
   apply list_take_one_drop
 
-theorem list_forall₂_nthLe {R : α → β → Prop} :
+lemma list_forall₂_nthLe {R : α → β → Prop} :
     ∀ {x : List α},
       ∀ {y : List β},
         List.Forall₂ R x y →
@@ -46,7 +46,7 @@ theorem list_forall₂_nthLe {R : α → β → Prop} :
     apply list_forall₂_nthLe
     exact ass.2
 
-theorem list_filterMap_eq_of_map_eq_map_some {f : α → Option β} :
+lemma list_filterMap_eq_of_map_eq_map_some {f : α → Option β} :
     ∀ {x : List α}, ∀ {y : List β}, List.map f x = List.map Option.some y → List.filterMap f x = y
   | [], [] => fun _ => rfl
   | a₁::l₁, [] => by intro hyp; exfalso; apply List.cons_ne_nil; exact hyp
@@ -112,7 +112,7 @@ end TheConstruction
 
 section EasyDirection
 
-theorem grammar_generates_only_legit_terminals {g : Grammar T} {w : List (Symbol T g.nt)}
+lemma grammar_generates_only_legit_terminals {g : Grammar T} {w : List (Symbol T g.nt)}
     (ass : g.Derives [Symbol.nonterminal g.initial] w) {s : Symbol T g.nt}
     (symbol_derived : s ∈ w) :
     (∃ r : Grule T g.nt, r ∈ g.rules ∧ s ∈ r.outputString) ∨ s = Symbol.nonterminal g.initial :=
@@ -144,7 +144,7 @@ theorem grammar_generates_only_legit_terminals {g : Grammar T} {w : List (Symbol
     right
     exact s_in_v
 
-private theorem first_transformation {g₁ g₂ : Grammar T} :
+private lemma first_transformation {g₁ g₂ : Grammar T} :
     (bigGrammar g₁ g₂).Transforms [Symbol.nonterminal (bigGrammar g₁ g₂).initial]
       [Symbol.nonterminal (Sum.inl (some (Sum.inl g₁.initial))),
         Symbol.nonterminal (Sum.inl (some (Sum.inr g₂.initial)))] :=
@@ -156,7 +156,7 @@ private theorem first_transformation {g₁ g₂ : Grammar T} :
   use [], []
   constructor <;> rfl
 
-private theorem substitute_terminals {g₁ g₂ : Grammar T} {side : T → Sum T T} {w : List T}
+private lemma substitute_terminals {g₁ g₂ : Grammar T} {side : T → Sum T T} {w : List T}
     (rule_for_each_terminal :
       ∀ t ∈ w,
         Grule.mk [] (Sum.inr (side t)) [] [Symbol.terminal t] ∈
@@ -194,7 +194,7 @@ private theorem substitute_terminals {g₁ g₂ : Grammar T} {side : T → Sum T
 
 /- ./././Mathport/Syntax/Translate/Expr.lean:177:8: unsupported: ambiguous notation -/
 /- ./././Mathport/Syntax/Translate/Expr.lean:177:8: unsupported: ambiguous notation -/
-protected theorem in_big_of_in_concatenated {g₁ g₂ : Grammar T} {w : List T}
+lemma in_big_of_in_concatenated {g₁ g₂ : Grammar T} {w : List T}
     (ass : w ∈ grammarLanguage g₁ * grammarLanguage g₂) : w ∈ grammarLanguage (bigGrammar g₁ g₂) :=
   by
   rw [Language.mem_mul] at ass 
@@ -391,13 +391,13 @@ private def corresponding_symbols {N₁ N₂ : Type} : Nst T N₁ N₂ → Nst T
   | Symbol.nonterminal (Sum.inl none), Symbol.nonterminal (Sum.inl none) => True
   | _, _ => False
 
-private theorem corresponding_symbols_self {N₁ N₂ : Type} (s : Nst T N₁ N₂) :
+private lemma corresponding_symbols_self {N₁ N₂ : Type} (s : Nst T N₁ N₂) :
     CorrespondingSymbols s s := by
   repeat'
     try cases s
     try unfold corresponding_symbols
 
-private theorem corresponding_symbols_never₁ {N₁ N₂ : Type} {s₁ : Symbol T N₁} {s₂ : Symbol T N₂} :
+private lemma corresponding_symbols_never₁ {N₁ N₂ : Type} {s₁ : Symbol T N₁} {s₂ : Symbol T N₂} :
     ¬CorrespondingSymbols (wrapSymbol₁ N₂ s₁) (wrapSymbol₂ N₁ s₂) := by
   cases s₁ <;> cases s₂ <;>
     · unfold wrapSymbol₁
@@ -405,7 +405,7 @@ private theorem corresponding_symbols_never₁ {N₁ N₂ : Type} {s₁ : Symbol
       unfold corresponding_symbols
       exact not_false
 
-private theorem corresponding_symbols_never₂ {N₁ N₂ : Type} {s₁ : Symbol T N₁} {s₂ : Symbol T N₂} :
+private lemma corresponding_symbols_never₂ {N₁ N₂ : Type} {s₁ : Symbol T N₁} {s₂ : Symbol T N₂} :
     ¬CorrespondingSymbols (wrapSymbol₂ N₁ s₂) (wrapSymbol₁ N₂ s₁) := by
   cases s₁ <;> cases s₂ <;>
     · unfold wrapSymbol₁
@@ -416,14 +416,14 @@ private theorem corresponding_symbols_never₂ {N₁ N₂ : Type} {s₁ : Symbol
 private def corresponding_strings {N₁ N₂ : Type} : List (Nst T N₁ N₂) → List (Nst T N₁ N₂) → Prop :=
   List.Forall₂ CorrespondingSymbols
 
-private theorem corresponding_strings_self {N₁ N₂ : Type} {x : List (Nst T N₁ N₂)} :
+private lemma corresponding_strings_self {N₁ N₂ : Type} {x : List (Nst T N₁ N₂)} :
     CorrespondingStrings x x := by
   unfold corresponding_strings
   rw [List.forall₂_same]
   intro s trash
   exact corresponding_symbols_self s
 
-private theorem corresponding_strings_singleton {N₁ N₂ : Type} {s₁ s₂ : Nst T N₁ N₂}
+private lemma corresponding_strings_singleton {N₁ N₂ : Type} {s₁ s₂ : Nst T N₁ N₂}
     (ass : CorrespondingSymbols s₁ s₂) : CorrespondingStrings [s₁] [s₂] :=
   by
   unfold corresponding_strings
@@ -432,53 +432,53 @@ private theorem corresponding_strings_singleton {N₁ N₂ : Type} {s₁ s₂ : 
   · exact ass
   · exact List.Forall₂.nil
 
-private theorem corresponding_strings_append {N₁ N₂ : Type} {x₁ x₂ y₁ y₂ : List (Nst T N₁ N₂)}
+private lemma corresponding_strings_append {N₁ N₂ : Type} {x₁ x₂ y₁ y₂ : List (Nst T N₁ N₂)}
     (ass₁ : CorrespondingStrings x₁ y₁) (ass₂ : CorrespondingStrings x₂ y₂) :
     CorrespondingStrings (x₁ ++ x₂) (y₁ ++ y₂) :=
   by
   unfold corresponding_strings at *
   exact List.rel_append ass₁ ass₂
 
-private theorem corresponding_strings_length {N₁ N₂ : Type} {x y : List (Nst T N₁ N₂)}
+private lemma corresponding_strings_length {N₁ N₂ : Type} {x y : List (Nst T N₁ N₂)}
     (ass : CorrespondingStrings x y) : x.length = y.length :=
   by
   unfold corresponding_strings at ass 
   exact List.Forall₂.length_eq ass
 
-private theorem corresponding_strings_nth_le {N₁ N₂ : Type} {x y : List (Nst T N₁ N₂)} {i : ℕ}
+private lemma corresponding_strings_nth_le {N₁ N₂ : Type} {x y : List (Nst T N₁ N₂)} {i : ℕ}
     (i_lt_len_x : i < x.length) (i_lt_len_y : i < y.length) (ass : CorrespondingStrings x y) :
     CorrespondingSymbols (x.nthLe i i_lt_len_x) (y.nthLe i i_lt_len_y) :=
   by
   apply list_forall₂_nthLe
   exact ass
 
-private theorem corresponding_strings_reverse {N₁ N₂ : Type} {x y : List (Nst T N₁ N₂)}
+private lemma corresponding_strings_reverse {N₁ N₂ : Type} {x y : List (Nst T N₁ N₂)}
     (ass : CorrespondingStrings x y) : CorrespondingStrings x.reverse y.reverse :=
   by
   unfold corresponding_strings at *
   rw [List.forall₂_reverse_iff]
   exact ass
 
-private theorem corresponding_strings_of_reverse {N₁ N₂ : Type} {x y : List (Nst T N₁ N₂)}
+private lemma corresponding_strings_of_reverse {N₁ N₂ : Type} {x y : List (Nst T N₁ N₂)}
     (ass : CorrespondingStrings x.reverse y.reverse) : CorrespondingStrings x y :=
   by
   unfold corresponding_strings at *
   rw [List.forall₂_reverse_iff] at ass 
   exact ass
 
-private theorem corresponding_strings_take {N₁ N₂ : Type} {x y : List (Nst T N₁ N₂)} (n : ℕ)
+private lemma corresponding_strings_take {N₁ N₂ : Type} {x y : List (Nst T N₁ N₂)} (n : ℕ)
     (ass : CorrespondingStrings x y) : CorrespondingStrings (List.take n x) (List.take n y) :=
   by
   unfold corresponding_strings at *
   exact List.forall₂_take n ass
 
-private theorem corresponding_strings_drop {N₁ N₂ : Type} {x y : List (Nst T N₁ N₂)} (n : ℕ)
+private lemma corresponding_strings_drop {N₁ N₂ : Type} {x y : List (Nst T N₁ N₂)} (n : ℕ)
     (ass : CorrespondingStrings x y) : CorrespondingStrings (List.drop n x) (List.drop n y) :=
   by
   unfold corresponding_strings at *
   exact List.forall₂_drop n ass
 
-private theorem corresponding_strings_split {N₁ N₂ : Type} {x y : List (Nst T N₁ N₂)} (n : ℕ)
+private lemma corresponding_strings_split {N₁ N₂ : Type} {x y : List (Nst T N₁ N₂)} (n : ℕ)
     (ass : CorrespondingStrings x y) :
     CorrespondingStrings (List.take n x) (List.take n y) ∧
       CorrespondingStrings (List.drop n x) (List.drop n y) :=
@@ -507,33 +507,33 @@ private def unwrap_symbol₂ {N₁ N₂ : Type} : Nst T N₁ N₂ → Option (Sy
   | Symbol.nonterminal (Sum.inl (some (Sum.inr n))) => some (Symbol.nonterminal n)
   | Symbol.nonterminal (Sum.inl none) => none
 
-private theorem unwrap_wrap₁_symbol {N₁ N₂ : Type} :
+private lemma unwrap_wrap₁_symbol {N₁ N₂ : Type} :
     @unwrapSymbol₁ T N₁ N₂ ∘ wrapSymbol₁ N₂ = Option.some :=
   by
   ext1 a
   cases a <;> rfl
 
-private theorem unwrap_wrap₂_symbol {N₁ N₂ : Type} :
+private lemma unwrap_wrap₂_symbol {N₁ N₂ : Type} :
     @unwrapSymbol₂ T N₁ N₂ ∘ wrapSymbol₂ N₁ = Option.some :=
   by
   ext1 a
   cases a <;> rfl
 
-private theorem unwrap_wrap₁_string {N₁ N₂ : Type} {w : List (Symbol T N₁)} :
+private lemma unwrap_wrap₁_string {N₁ N₂ : Type} {w : List (Symbol T N₁)} :
     List.filterMap unwrapSymbol₁ (List.map (wrapSymbol₁ N₂) w) = w :=
   by
   rw [List.filterMap_map]
   rw [unwrap_wrap₁_symbol]
   apply List.filterMap_some
 
-private theorem unwrap_wrap₂_string {N₁ N₂ : Type} {w : List (Symbol T N₂)} :
+private lemma unwrap_wrap₂_string {N₁ N₂ : Type} {w : List (Symbol T N₂)} :
     List.filterMap unwrapSymbol₂ (List.map (wrapSymbol₂ N₁) w) = w :=
   by
   rw [List.filterMap_map]
   rw [unwrap_wrap₂_symbol]
   apply List.filterMap_some
 
-private theorem unwrap_eq_some_of_corresponding_symbols₁ {N₁ N₂ : Type} {s₁ : Symbol T N₁}
+private lemma unwrap_eq_some_of_corresponding_symbols₁ {N₁ N₂ : Type} {s₁ : Symbol T N₁}
     {s : Nst T N₁ N₂} (ass : CorrespondingSymbols (wrapSymbol₁ N₂ s₁) s) :
     unwrapSymbol₁ s = some s₁ := by
   cases s₁ <;>
@@ -549,7 +549,7 @@ private theorem unwrap_eq_some_of_corresponding_symbols₁ {N₁ N₂ : Type} {s
           exfalso
           exact ass
 
-private theorem unwrap_eq_some_of_corresponding_symbols₂ {N₁ N₂ : Type} {s₂ : Symbol T N₂}
+private lemma unwrap_eq_some_of_corresponding_symbols₂ {N₁ N₂ : Type} {s₂ : Symbol T N₂}
     {s : Nst T N₁ N₂} (ass : CorrespondingSymbols (wrapSymbol₂ N₁ s₂) s) :
     unwrapSymbol₂ s = some s₂ := by
   cases s₂ <;>
@@ -569,7 +569,7 @@ private theorem unwrap_eq_some_of_corresponding_symbols₂ {N₁ N₂ : Type} {s
 /- ./././Mathport/Syntax/Translate/Expr.lean:177:8: unsupported: ambiguous notation -/
 /- ./././Mathport/Syntax/Translate/Expr.lean:177:8: unsupported: ambiguous notation -/
 /- ./././Mathport/Syntax/Translate/Expr.lean:177:8: unsupported: ambiguous notation -/
-private theorem map_unwrap_eq_map_some_of_corresponding_strings₁ {N₁ N₂ : Type} :
+private lemma map_unwrap_eq_map_some_of_corresponding_strings₁ {N₁ N₂ : Type} :
     ∀ {v : List (Symbol T N₁)},
       ∀ {w : List (Nst T N₁ N₂)},
         CorrespondingStrings (List.map (wrapSymbol₁ N₂) v) w →
@@ -595,7 +595,7 @@ private theorem map_unwrap_eq_map_some_of_corresponding_strings₁ {N₁ N₂ : 
 /- ./././Mathport/Syntax/Translate/Expr.lean:177:8: unsupported: ambiguous notation -/
 /- ./././Mathport/Syntax/Translate/Expr.lean:177:8: unsupported: ambiguous notation -/
 /- ./././Mathport/Syntax/Translate/Expr.lean:177:8: unsupported: ambiguous notation -/
-private theorem map_unwrap_eq_map_some_of_corresponding_strings₂ {N₁ N₂ : Type} :
+private lemma map_unwrap_eq_map_some_of_corresponding_strings₂ {N₁ N₂ : Type} :
     ∀ {v : List (Symbol T N₂)},
       ∀ {w : List (Nst T N₁ N₂)},
         CorrespondingStrings (List.map (wrapSymbol₂ N₁) v) w →
@@ -617,14 +617,14 @@ private theorem map_unwrap_eq_map_some_of_corresponding_strings₂ {N₁ N₂ : 
     · apply map_unwrap_eq_map_some_of_corresponding_strings₂
       exact ass.2
 
-private theorem filter_map_unwrap_of_corresponding_strings₁ {N₁ N₂ : Type} {v : List (Symbol T N₁)}
+private lemma filter_map_unwrap_of_corresponding_strings₁ {N₁ N₂ : Type} {v : List (Symbol T N₁)}
     {w : List (Nst T N₁ N₂)} (ass : CorrespondingStrings (List.map (wrapSymbol₁ N₂) v) w) :
     List.filterMap unwrapSymbol₁ w = v :=
   by
   apply list_filterMap_eq_of_map_eq_map_some
   exact map_unwrap_eq_map_some_of_corresponding_strings₁ ass
 
-private theorem filter_map_unwrap_of_corresponding_strings₂ {N₁ N₂ : Type} {v : List (Symbol T N₂)}
+private lemma filter_map_unwrap_of_corresponding_strings₂ {N₁ N₂ : Type} {v : List (Symbol T N₂)}
     {w : List (Nst T N₁ N₂)} (ass : CorrespondingStrings (List.map (wrapSymbol₂ N₁) v) w) :
     List.filterMap unwrapSymbol₂ w = v :=
   by
@@ -637,7 +637,7 @@ private theorem filter_map_unwrap_of_corresponding_strings₂ {N₁ N₂ : Type}
 /- ./././Mathport/Syntax/Translate/Expr.lean:177:8: unsupported: ambiguous notation -/
 /- ./././Mathport/Syntax/Translate/Expr.lean:177:8: unsupported: ambiguous notation -/
 /- ./././Mathport/Syntax/Translate/Expr.lean:177:8: unsupported: ambiguous notation -/
-private theorem corresponding_string_after_wrap_unwrap_self₁ {N₁ N₂ : Type} {w : List (Nst T N₁ N₂)}
+private lemma corresponding_string_after_wrap_unwrap_self₁ {N₁ N₂ : Type} {w : List (Nst T N₁ N₂)}
     (ass : ∃ z : List (Symbol T N₁), CorrespondingStrings (List.map (wrapSymbol₁ N₂) z) w) :
     CorrespondingStrings (List.map (wrapSymbol₁ N₂) (List.filterMap unwrapSymbol₁ w)) w :=
   by
@@ -722,7 +722,7 @@ private theorem corresponding_string_after_wrap_unwrap_self₁ {N₁ N₂ : Type
 /- ./././Mathport/Syntax/Translate/Expr.lean:177:8: unsupported: ambiguous notation -/
 /- ./././Mathport/Syntax/Translate/Expr.lean:177:8: unsupported: ambiguous notation -/
 /- ./././Mathport/Syntax/Translate/Expr.lean:177:8: unsupported: ambiguous notation -/
-private theorem corresponding_string_after_wrap_unwrap_self₂ {N₁ N₂ : Type} {w : List (Nst T N₁ N₂)}
+private lemma corresponding_string_after_wrap_unwrap_self₂ {N₁ N₂ : Type} {w : List (Nst T N₁ N₂)}
     (ass : ∃ z : List (Symbol T N₂), CorrespondingStrings (List.map (wrapSymbol₂ N₁) z) w) :
     CorrespondingStrings (List.map (wrapSymbol₂ N₁) (List.filterMap unwrapSymbol₂ w)) w :=
   by
@@ -805,7 +805,7 @@ end UnwrappingNst
 
 section VeryComplicated
 
-private theorem induction_step_for_lifted_rule_from_g₁ {g₁ g₂ : Grammar T}
+private lemma induction_step_for_lifted_rule_from_g₁ {g₁ g₂ : Grammar T}
     {a b u v : List (Nst T g₁.Nt g₂.Nt)} {x : List (Symbol T g₁.Nt)} {y : List (Symbol T g₂.Nt)}
     {r : Grule T (Nnn T g₁.Nt g₂.Nt)} (rin : r ∈ List.map (wrapGrule₁ g₂.Nt) g₁.rules)
     (bef : a = u ++ r.inputL ++ [Symbol.nonterminal r.inputN] ++ r.inputR ++ v)
@@ -1398,7 +1398,7 @@ private theorem induction_step_for_lifted_rule_from_g₁ {g₁ g₂ : Grammar T}
     rw [List.length_map]
   exact the_part
 
-private theorem induction_step_for_lifted_rule_from_g₂ {g₁ g₂ : Grammar T}
+private lemma induction_step_for_lifted_rule_from_g₂ {g₁ g₂ : Grammar T}
     {a b u v : List (Nst T g₁.Nt g₂.Nt)} {x : List (Symbol T g₁.Nt)} {y : List (Symbol T g₂.Nt)}
     {r : Grule T (Nnn T g₁.Nt g₂.Nt)} (rin : r ∈ List.map (wrapGrule₂ g₁.Nt) g₂.rules)
     (bef : a = u ++ r.inputL ++ [Symbol.nonterminal r.inputN] ++ r.inputR ++ v)
@@ -1633,7 +1633,7 @@ private theorem induction_step_for_lifted_rule_from_g₂ {g₁ g₂ : Grammar T}
     rw [← List.map_take] at tdc 
     exact ⟨_, tdc⟩
 
-private theorem big_induction {g₁ g₂ : Grammar T} {w : List (Nst T g₁.Nt g₂.Nt)}
+private lemma big_induction {g₁ g₂ : Grammar T} {w : List (Nst T g₁.Nt g₂.Nt)}
     (ass :
       GrammarDerives (bigGrammar g₁ g₂)
         [Symbol.nonterminal (Sum.inl (some (Sum.inl g₁.initial))),
@@ -1950,7 +1950,7 @@ private theorem big_induction {g₁ g₂ : Grammar T} {w : List (Nst T g₁.Nt g
             rw [middle_nt_elem]
             unfold corresponding_symbols
 
-protected theorem in_concatenated_of_in_big {g₁ g₂ : Grammar T} {w : List T}
+lemma in_concatenated_of_in_big {g₁ g₂ : Grammar T} {w : List T}
     (ass : w ∈ grammarLanguage (bigGrammar g₁ g₂)) : w ∈ grammarLanguage g₁ * grammarLanguage g₂ :=
   by
   rw [Language.mem_mul]
@@ -2257,7 +2257,7 @@ end VeryComplicated
 end HardDirection
 
 /-- The class of recursively-enumerable languages is closed under concatenation. -/
-theorem RE_of_RE_c_RE (L₁ : Language T) (L₂ : Language T) : IsRE L₁ ∧ IsRE L₂ → IsRE (L₁ * L₂) :=
+lemma RE_of_RE_c_RE (L₁ : Language T) (L₂ : Language T) : IsRE L₁ ∧ IsRE L₂ → IsRE (L₁ * L₂) :=
   by
   rintro ⟨⟨g₁, eq_L₁⟩, ⟨g₂, eq_L₂⟩⟩
   use bigGrammar g₁ g₂

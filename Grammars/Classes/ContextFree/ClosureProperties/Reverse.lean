@@ -10,7 +10,7 @@ private def reversal_grammar (g : CFGrammar T) : CFGrammar T :=
   CFGrammar.mk g.Nt g.initial
     (List.map (fun r : g.Nt × List (Symbol T g.Nt) => (r.fst, List.reverse r.snd)) g.rules)
 
-private theorem dual_of_reversal_grammar (g : CFGrammar T) :
+private lemma dual_of_reversal_grammar (g : CFGrammar T) :
     reversalGrammar (reversalGrammar g) = g :=
   by
   cases g
@@ -31,7 +31,7 @@ private theorem dual_of_reversal_grammar (g : CFGrammar T) :
   · simp [List.reverse_reverse]
   · simp
 
-private theorem derives_reversed (g : CFGrammar T) (v : List (Symbol T g.Nt)) :
+private lemma derives_reversed (g : CFGrammar T) (v : List (Symbol T g.Nt)) :
     CFDerives (reversalGrammar g) [Symbol.nonterminal (reversalGrammar g).initial] v →
       CFDerives g [Symbol.nonterminal g.initial] v.reverse :=
   by
@@ -64,7 +64,7 @@ private theorem derives_reversed (g : CFGrammar T) (v : List (Symbol T g.Nt)) :
     rw [← List.reverse_append_append]
     exact congr_arg List.reverse aft
 
-private theorem reversed_word_in_original_language {g : CFGrammar T} {w : List T}
+private lemma reversed_word_in_original_language {g : CFGrammar T} {w : List T}
     (hyp : w ∈ cFLanguage (reversalGrammar g)) : w.reverse ∈ cFLanguage g :=
   by
   unfold cFLanguage at *
@@ -77,7 +77,7 @@ private theorem reversed_word_in_original_language {g : CFGrammar T} {w : List T
 end Auxiliary
 
 /-- The class of context-free languages is closed under reversal. -/
-theorem CF_of_reverse_CF (L : Language T) : IsCF L → IsCF (reverseLang L) :=
+lemma CF_of_reverse_CF (L : Language T) : IsCF L → IsCF (reverseLang L) :=
   by
   rintro ⟨g, hgL⟩
   rw [← hgL]

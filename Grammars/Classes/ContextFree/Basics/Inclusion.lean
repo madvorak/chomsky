@@ -12,7 +12,7 @@ def grammar_of_cfg (g : CFgrammar T) : Grammar T :=
   Grammar.mk g.nt g.initial (
     List.map (fun r : g.nt × List (Symbol T g.nt) => Grule.mk [] r.fst [] r.snd) g.rules)
 
-theorem grammar_of_cfg_well_defined (g : CFgrammar T) :
+lemma grammar_of_cfg_well_defined (g : CFgrammar T) :
   grammar_of_csg (csg_of_cfg g) = grammar_of_cfg g :=
 by
   unfold grammar_of_cfg
@@ -29,13 +29,13 @@ by
   apply congr_arg Option.some
   simp [List.append_nil] -/
 
-theorem grammarOfCsg_of_cfg :
+lemma grammarOfCsg_of_cfg :
   grammar_of_csg ∘ csg_of_cfg = @grammar_of_cfg T :=
 by
   ext
   apply grammar_of_cfg_well_defined
 
-theorem cfLanguage_eq_csLanguage (g : CFgrammar T) :
+lemma cfLanguage_eq_csLanguage (g : CFgrammar T) :
   g.Language = (csg_of_cfg g).Language :=
 by
   unfold CFgrammar.Language
@@ -105,7 +105,7 @@ by
       constructor <;> assumption
     exact indu (List.map Symbol.terminal w) -/
 
-theorem cfLanguage_eq_grammarLanguage (g : CFgrammar T) :
+lemma cfLanguage_eq_grammarLanguage (g : CFgrammar T) :
   g.Language = (grammar_of_cfg g).Language :=
 by
   rw [← grammar_of_cfg_well_defined]
@@ -121,5 +121,5 @@ by
   rw [cfLanguage_eq_csLanguage]
 
 theorem CF_subclass_RE {L : Language T} :
-  IsCF L → IsRE L :=
+  IsCF L  →  IsRE L  :=
 CS_subclass_RE ∘ CF_subclass_CS

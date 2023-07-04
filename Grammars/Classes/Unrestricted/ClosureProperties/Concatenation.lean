@@ -1,5 +1,7 @@
 import Grammars.Classes.Unrestricted.Basics.Toolbox
 import Grammars.Utilities.ListUtils
+import Mathlib.Tactic.Linarith
+
 
 section ListTechnicalities
 
@@ -53,6 +55,7 @@ lemma list_filterMap_eq_of_map_eq_map_some {f : α → Option β} :
 
 end ListTechnicalities
 
+
 -- new nonterminal type
 def nnn (T N₁ N₂ : Type) : Type :=
   Sum (Option (Sum N₁ N₂)) (Sum T T)
@@ -99,6 +102,7 @@ def bigGrammar (g₁ g₂ : Grammar T) : Grammar T :=
     (rulesForTerminals₁ g₂.nt g₁ ++ rulesForTerminals₂ g₁.nt g₂))
 
 end TheConstruction
+
 
 section EasyDirection
 
@@ -207,7 +211,7 @@ by
               (List.map (wrapSymbol₁ g₂.nt) w)
       · clear * -
         intro w deri₁
-        induction' deri₁ with x y trash orig ih
+        induction' deri₁ with x y _ orig ih
         · apply Grammar.deri_self
         apply Grammar.deri_of_deri_tran ih
         clear * - orig
@@ -284,7 +288,7 @@ by
               (List.map (wrapSymbol₂ g₁.nt) w)
       · clear * -
         intro w deri₁
-        induction' deri₁ with x y trash orig ih
+        induction' deri₁ with x y _ orig ih
         · apply Grammar.deri_self
         apply Grammar.deri_of_deri_tran ih
         clear * - orig
@@ -353,6 +357,7 @@ by
 
 end EasyDirection
 
+
 section HardDirection
 
 section CorrespondenceForTerminals
@@ -409,12 +414,14 @@ by
       exact not_false
 
 private lemma correspondingSymbols_never₂ {N₁ N₂ : Type} {s₁ : Symbol T N₁} {s₂ : Symbol T N₂} :
-    ¬ correspondingSymbols (wrapSymbol₂ N₁ s₂) (wrapSymbol₁ N₂ s₁) := by
+  ¬ correspondingSymbols (wrapSymbol₂ N₁ s₂) (wrapSymbol₁ N₂ s₁) :=
+by
   cases s₁ <;> cases s₂ <;>
     · unfold wrapSymbol₁
       unfold wrapSymbol₂
       unfold correspondingSymbols
       exact not_false
+
 
 private def correspondingStrings {N₁ N₂ : Type} : List (nst T N₁ N₂) → List (nst T N₁ N₂) → Prop :=
   List.Forall₂ correspondingSymbols
@@ -427,12 +434,16 @@ by
   intros s _
   exact correspondingSymbols_self s
 
+private lemma correspondingStrings_cons {N₁ N₂ : Type} {d₁ d₂ : nst T N₁ N₂} {l₁ l₂ : List (nst T N₁ N₂)} :
+  correspondingStrings (d₁::l₁) (d₂::l₂)  ↔  correspondingSymbols d₁ d₂  ∧  correspondingStrings l₁ l₂  :=
+by
+  apply List.forall₂_cons
+
 private lemma correspondingStrings_singleton {N₁ N₂ : Type} {s₁ s₂ : nst T N₁ N₂}
     (ass : correspondingSymbols s₁ s₂) :
   correspondingStrings [s₁] [s₂] :=
 by
-  unfold correspondingStrings
-  rw [List.forall₂_cons]
+  rw [correspondingStrings_cons]
   constructor
   · exact ass
   · exact List.Forall₂.nil
@@ -451,7 +462,7 @@ by
   unfold correspondingStrings at ass 
   exact List.Forall₂.length_eq ass
 
-private lemma correspondingStrings_nth_le {N₁ N₂ : Type} {x y : List (nst T N₁ N₂)} {i : ℕ}
+private lemma correspondingStrings_nthLe {N₁ N₂ : Type} {x y : List (nst T N₁ N₂)} {i : ℕ}
     (i_lt_len_x : i < x.length) (i_lt_len_y : i < y.length) (ass : correspondingStrings x y) :
   correspondingSymbols (x.nthLe i i_lt_len_x) (y.nthLe i i_lt_len_y) :=
 by
@@ -499,187 +510,204 @@ by
 
 end CorrespondenceForTerminals
 
-/-section UnwrappingNst
+section UnwrappingNst
 
-private def unwrap_symbol₁ {N₁ N₂ : Type} : nst T N₁ N₂ → Option (Symbol T N₁)
+private def unwrapSymbol₁ {N₁ N₂ : Type} : nst T N₁ N₂ → Option (Symbol T N₁)
   | Symbol.terminal t => some (Symbol.terminal t)
   | Symbol.nonterminal (Sum.inr (Sum.inl a)) => some (Symbol.terminal a)
   | Symbol.nonterminal (Sum.inr (Sum.inr _)) => none
   | Symbol.nonterminal (Sum.inl (some (Sum.inl n))) => some (Symbol.nonterminal n)
-  | Symbol.nonterminal (Sum.inl (some (Sum.inr n))) => none
+  | Symbol.nonterminal (Sum.inl (some (Sum.inr _))) => none
   | Symbol.nonterminal (Sum.inl none) => none
 
-private def unwrap_symbol₂ {N₁ N₂ : Type} : nst T N₁ N₂ → Option (Symbol T N₂)
+private def unwrapSymbol₂ {N₁ N₂ : Type} : nst T N₁ N₂ → Option (Symbol T N₂)
   | Symbol.terminal t => some (Symbol.terminal t)
   | Symbol.nonterminal (Sum.inr (Sum.inl _)) => none
   | Symbol.nonterminal (Sum.inr (Sum.inr a)) => some (Symbol.terminal a)
-  | Symbol.nonterminal (Sum.inl (some (Sum.inl n))) => none
+  | Symbol.nonterminal (Sum.inl (some (Sum.inl _))) => none
   | Symbol.nonterminal (Sum.inl (some (Sum.inr n))) => some (Symbol.nonterminal n)
   | Symbol.nonterminal (Sum.inl none) => none
 
 private lemma unwrap_wrap₁_symbol {N₁ N₂ : Type} :
-    @unwrapSymbol₁ T N₁ N₂ ∘ wrapSymbol₁ N₂ = Option.some :=
-  by
+  @unwrapSymbol₁ T N₁ N₂ ∘ wrapSymbol₁ N₂ = Option.some :=
+by
   ext1 a
   cases a <;> rfl
 
 private lemma unwrap_wrap₂_symbol {N₁ N₂ : Type} :
-    @unwrapSymbol₂ T N₁ N₂ ∘ wrapSymbol₂ N₁ = Option.some :=
-  by
+  @unwrapSymbol₂ T N₁ N₂ ∘ wrapSymbol₂ N₁ = Option.some :=
+by
   ext1 a
   cases a <;> rfl
 
 private lemma unwrap_wrap₁_string {N₁ N₂ : Type} {w : List (Symbol T N₁)} :
-    List.filterMap unwrapSymbol₁ (List.map (wrapSymbol₁ N₂) w) = w :=
-  by
+  List.filterMap unwrapSymbol₁ (List.map (wrapSymbol₁ N₂) w) = w :=
+by
   rw [List.filterMap_map]
   rw [unwrap_wrap₁_symbol]
   apply List.filterMap_some
 
 private lemma unwrap_wrap₂_string {N₁ N₂ : Type} {w : List (Symbol T N₂)} :
-    List.filterMap unwrapSymbol₂ (List.map (wrapSymbol₂ N₁) w) = w :=
-  by
+  List.filterMap unwrapSymbol₂ (List.map (wrapSymbol₂ N₁) w) = w :=
+by
   rw [List.filterMap_map]
   rw [unwrap_wrap₂_symbol]
   apply List.filterMap_some
 
-private lemma unwrap_eq_some_of_corresponding_symbols₁ {N₁ N₂ : Type} {s₁ : Symbol T N₁}
-    {s : Nst T N₁ N₂} (ass : CorrespondingSymbols (wrapSymbol₁ N₂ s₁) s) :
-    unwrapSymbol₁ s = some s₁ := by
-  cases s₁ <;>
-    · unfold wrapSymbol₁ at ass 
-      repeat'
-        try cases s
-        try
-          unfold corresponding_symbols at ass 
-          rw [ass]
+private lemma unwrap_eq_some_of_correspondingSymbols₁ {N₁ N₂ : Type} {s₁ : Symbol T N₁}
+    {s : nst T N₁ N₂} (ass : correspondingSymbols (wrapSymbol₁ N₂ s₁) s) :
+  unwrapSymbol₁ s = some s₁ :=
+by
+  cases' s₁ with t₁ n₁
+  · cases' s with t n
+    · rw [show t = t₁ by convert ass]
+      rfl
+    · cases' n with o t
+      · cases' o with n'
+        · simp [wrapSymbol₁, correspondingSymbols] at ass
+        · simp [wrapSymbol₁, correspondingSymbols] at ass
+      · cases' t with t' t''
+        · rw [show t₁ = t' by convert ass]
           rfl
-        try
-          unfold corresponding_symbols at ass 
-          exfalso
-          exact ass
+        · simp [wrapSymbol₁, correspondingSymbols] at ass
+  · cases' s with t n
+    · simp [wrapSymbol₁, correspondingSymbols] at ass
+    · cases' n with o t
+      · cases' o with n'
+        · simp [wrapSymbol₁, correspondingSymbols] at ass
+        · cases' n' with n'₁ n'₂
+          · rw [show n₁ = n'₁ by convert ass]
+            rfl
+          · simp [wrapSymbol₁, correspondingSymbols] at ass
+      · cases' t with t' t''
+        · simp [wrapSymbol₁, correspondingSymbols] at ass
+        · simp [wrapSymbol₁, correspondingSymbols] at ass
 
-private lemma unwrap_eq_some_of_corresponding_symbols₂ {N₁ N₂ : Type} {s₂ : Symbol T N₂}
-    {s : Nst T N₁ N₂} (ass : CorrespondingSymbols (wrapSymbol₂ N₁ s₂) s) :
-    unwrapSymbol₂ s = some s₂ := by
-  cases s₂ <;>
-    · unfold wrapSymbol₂ at ass 
-      repeat'
-        try cases s
-        try
-          unfold corresponding_symbols at ass 
-          rw [ass]
+private lemma unwrap_eq_some_of_correspondingSymbols₂ {N₁ N₂ : Type} {s₂ : Symbol T N₂}
+    {s : nst T N₁ N₂} (ass : correspondingSymbols (wrapSymbol₂ N₁ s₂) s) :
+  unwrapSymbol₂ s = some s₂ :=
+by
+  cases' s₂ with t₂ n₂
+  · cases' s with t n
+    · rw [show t = t₂ by convert ass]
+      rfl
+    · cases' n with o t
+      · cases' o with n'
+        · simp [wrapSymbol₂, correspondingSymbols] at ass
+        · simp [wrapSymbol₂, correspondingSymbols] at ass
+      · cases' t with t' t''
+        · simp [wrapSymbol₂, correspondingSymbols] at ass
+        · rw [show t₂ = t'' by convert ass]
           rfl
-        try
-          unfold corresponding_symbols at ass 
-          exfalso
-          exact ass
+  · cases' s with t n
+    · simp [wrapSymbol₂, correspondingSymbols] at ass
+    · cases' n with o t
+      · cases' o with n'
+        · simp [wrapSymbol₂, correspondingSymbols] at ass
+        · cases' n' with n'₁ n'₂
+          · simp [wrapSymbol₂, correspondingSymbols] at ass
+          · rw [show n₂ = n'₂ by convert ass]
+            rfl
+      · cases' t with t' t''
+        · simp [wrapSymbol₂, correspondingSymbols] at ass
+        · simp [wrapSymbol₂, correspondingSymbols] at ass
 
-/- ./././Mathport/Syntax/Translate/Expr.lean:177:8: unsupported: ambiguous notation -/
-/- ./././Mathport/Syntax/Translate/Expr.lean:177:8: unsupported: ambiguous notation -/
-/- ./././Mathport/Syntax/Translate/Expr.lean:177:8: unsupported: ambiguous notation -/
-/- ./././Mathport/Syntax/Translate/Expr.lean:177:8: unsupported: ambiguous notation -/
-private lemma map_unwrap_eq_map_some_of_corresponding_strings₁ {N₁ N₂ : Type} :
-    ∀ {v : List (Symbol T N₁)},
-      ∀ {w : List (Nst T N₁ N₂)},
-        CorrespondingStrings (List.map (wrapSymbol₁ N₂) v) w →
-          List.map unwrapSymbol₁ w = List.map Option.some v
-  | [], [] => fun _ => rfl
-  | [], b::y => by intro hyp; exfalso; unfold corresponding_strings at hyp ;
-    unfold List.map at hyp ; finish
-  | a::x, [] => by intro hyp; exfalso; unfold corresponding_strings at hyp ;
-    unfold List.map at hyp ; finish
+private lemma map_unwrap_eq_map_some_of_correspondingStrings₁ {N₁ N₂ : Type} :
+  ∀ {v : List (Symbol T N₁)}, ∀ {w : List (nst T N₁ N₂)},
+    correspondingStrings (List.map (wrapSymbol₁ N₂) v) w →
+      List.map unwrapSymbol₁ w = List.map Option.some v
+  | [], [] => by
+      intro _
+      rw [List.map_nil, List.map_nil]
+  | [], b::y => by
+      intro hyp
+      exfalso
+      simp [correspondingStrings] at hyp
+  | a::x, [] => by 
+      intro hyp
+      exfalso
+      simp [correspondingStrings] at hyp
   | a::x, b::y => by
-    intro ass
-    unfold corresponding_strings at ass 
-    rw [List.map_cons] at ass 
-    rw [List.forall₂_cons] at ass 
-    rw [List.map]
-    rw [List.map]
-    apply congr_arg₂
-    · exact unwrap_eq_some_of_corresponding_symbols₁ ass.1
-    · apply map_unwrap_eq_map_some_of_corresponding_strings₁
-      exact ass.2
+      intro ass
+      unfold correspondingStrings at ass 
+      rw [List.map_cons, List.forall₂_cons] at ass 
+      rw [List.map, List.map]
+      apply congr_arg₂
+      · exact unwrap_eq_some_of_correspondingSymbols₁ ass.1
+      · apply map_unwrap_eq_map_some_of_correspondingStrings₁
+        exact ass.2
 
-/- ./././Mathport/Syntax/Translate/Expr.lean:177:8: unsupported: ambiguous notation -/
-/- ./././Mathport/Syntax/Translate/Expr.lean:177:8: unsupported: ambiguous notation -/
-/- ./././Mathport/Syntax/Translate/Expr.lean:177:8: unsupported: ambiguous notation -/
-/- ./././Mathport/Syntax/Translate/Expr.lean:177:8: unsupported: ambiguous notation -/
-private lemma map_unwrap_eq_map_some_of_corresponding_strings₂ {N₁ N₂ : Type} :
-    ∀ {v : List (Symbol T N₂)},
-      ∀ {w : List (Nst T N₁ N₂)},
-        CorrespondingStrings (List.map (wrapSymbol₂ N₁) v) w →
-          List.map unwrapSymbol₂ w = List.map Option.some v
-  | [], [] => fun _ => rfl
-  | [], b::y => by intro hyp; exfalso; unfold corresponding_strings at hyp ;
-    unfold List.map at hyp ; finish
-  | a::x, [] => by intro hyp; exfalso; unfold corresponding_strings at hyp ;
-    unfold List.map at hyp ; finish
+private lemma map_unwrap_eq_map_some_of_correspondingStrings₂ {N₁ N₂ : Type} :
+  ∀ {v : List (Symbol T N₂)}, ∀ {w : List (nst T N₁ N₂)},
+    correspondingStrings (List.map (wrapSymbol₂ N₁) v) w →
+      List.map unwrapSymbol₂ w = List.map Option.some v
+  | [], [] => by
+      intro _
+      rw [List.map_nil, List.map_nil]
+  | [], b::y => by
+      intro hyp
+      exfalso
+      simp [correspondingStrings] at hyp
+  | a::x, [] => by 
+      intro hyp
+      exfalso
+      simp [correspondingStrings] at hyp
   | a::x, b::y => by
-    intro ass
-    unfold corresponding_strings at ass 
-    rw [List.map_cons] at ass 
-    rw [List.forall₂_cons] at ass 
-    rw [List.map]
-    rw [List.map]
-    apply congr_arg₂
-    · exact unwrap_eq_some_of_corresponding_symbols₂ ass.1
-    · apply map_unwrap_eq_map_some_of_corresponding_strings₂
-      exact ass.2
+      intro ass
+      unfold correspondingStrings at ass 
+      rw [List.map_cons, List.forall₂_cons] at ass 
+      rw [List.map, List.map]
+      apply congr_arg₂
+      · exact unwrap_eq_some_of_correspondingSymbols₂ ass.1
+      · apply map_unwrap_eq_map_some_of_correspondingStrings₂
+        exact ass.2
 
-private lemma filter_map_unwrap_of_corresponding_strings₁ {N₁ N₂ : Type} {v : List (Symbol T N₁)}
-    {w : List (Nst T N₁ N₂)} (ass : CorrespondingStrings (List.map (wrapSymbol₁ N₂) v) w) :
-    List.filterMap unwrapSymbol₁ w = v :=
-  by
+private lemma filterMap_unwrap_of_correspondingStrings₁ {N₁ N₂ : Type} {v : List (Symbol T N₁)}
+    {w : List (nst T N₁ N₂)} (ass : correspondingStrings (List.map (wrapSymbol₁ N₂) v) w) :
+  List.filterMap unwrapSymbol₁ w = v :=
+by
   apply list_filterMap_eq_of_map_eq_map_some
-  exact map_unwrap_eq_map_some_of_corresponding_strings₁ ass
+  exact map_unwrap_eq_map_some_of_correspondingStrings₁ ass
 
-private lemma filter_map_unwrap_of_corresponding_strings₂ {N₁ N₂ : Type} {v : List (Symbol T N₂)}
-    {w : List (Nst T N₁ N₂)} (ass : CorrespondingStrings (List.map (wrapSymbol₂ N₁) v) w) :
-    List.filterMap unwrapSymbol₂ w = v :=
-  by
+private lemma filterMap_unwrap_of_correspondingStrings₂ {N₁ N₂ : Type} {v : List (Symbol T N₂)}
+    {w : List (nst T N₁ N₂)} (ass : correspondingStrings (List.map (wrapSymbol₂ N₁) v) w) :
+  List.filterMap unwrapSymbol₂ w = v :=
+by
   apply list_filterMap_eq_of_map_eq_map_some
-  exact map_unwrap_eq_map_some_of_corresponding_strings₂ ass
+  exact map_unwrap_eq_map_some_of_correspondingStrings₂ ass
 
-/- ./././Mathport/Syntax/Translate/Expr.lean:177:8: unsupported: ambiguous notation -/
-/- ./././Mathport/Syntax/Translate/Expr.lean:177:8: unsupported: ambiguous notation -/
-/- ./././Mathport/Syntax/Translate/Expr.lean:177:8: unsupported: ambiguous notation -/
-/- ./././Mathport/Syntax/Translate/Expr.lean:177:8: unsupported: ambiguous notation -/
-/- ./././Mathport/Syntax/Translate/Expr.lean:177:8: unsupported: ambiguous notation -/
-/- ./././Mathport/Syntax/Translate/Expr.lean:177:8: unsupported: ambiguous notation -/
-private lemma corresponding_string_after_wrap_unwrap_self₁ {N₁ N₂ : Type} {w : List (Nst T N₁ N₂)}
-    (ass : ∃ z : List (Symbol T N₁), CorrespondingStrings (List.map (wrapSymbol₁ N₂) z) w) :
-    CorrespondingStrings (List.map (wrapSymbol₁ N₂) (List.filterMap unwrapSymbol₁ w)) w :=
-  by
+private lemma correspondingStrings_after_wrap_unwrap_self₁ {N₁ N₂ : Type} {w : List (nst T N₁ N₂)}
+    (ass : ∃ z : List (Symbol T N₁), correspondingStrings (List.map (wrapSymbol₁ N₂) z) w) :
+  correspondingStrings (List.map (wrapSymbol₁ N₂) (List.filterMap unwrapSymbol₁ w)) w :=
+by
   induction' w with d l ih
-  · unfold corresponding_strings
+  · unfold correspondingStrings
     unfold List.filterMap
     unfold List.map
     exact List.Forall₂.nil
-  specialize
-    ih
-      (by
-        cases' ass with z hyp
-        unfold corresponding_strings at *
-        cases' z with z₀ z'
-        · exfalso
-          finish
-        · use z'
-          finish)
-  unfold corresponding_strings
-  cases d
+  specialize ih (by
+    cases' ass with z hyp
+    cases' z with z₀ z'
+    · exfalso
+      simp [correspondingStrings, wrapSymbol₁] at hyp
+    · use z'
+      rw [List.map_cons, correspondingStrings_cons] at hyp
+      exact hyp.2
+  )
+  cases' d with t n
   · have unwrap_first_t :
-      List.filterMap unwrap_symbol₁ (Symbol.terminal d::l) =
-        Symbol.terminal d::List.filterMap unwrap_symbol₁ l :=
-      by rfl
+      List.filterMap unwrapSymbol₁ (Symbol.terminal t :: l) =
+      Symbol.terminal t :: List.filterMap unwrapSymbol₁ l
+    · rfl
     rw [unwrap_first_t]
     unfold List.map
-    unfold wrapSymbol₁
-    rw [List.forall₂_cons]
+    --unfold wrapSymbol₁
+    rw [correspondingStrings_cons]
     constructor
-    · unfold corresponding_symbols
+    · sorry
     · exact ih
-  cases d
+  sorry
+  /-cases' n with ? ??
   cases d; swap
   cases d
   · have unwrap_first_nlsl :
@@ -689,7 +717,7 @@ private lemma corresponding_string_after_wrap_unwrap_self₁ {N₁ N₂ : Type} 
     rw [unwrap_first_nlsl]
     unfold List.map
     unfold wrapSymbol₁
-    rw [List.forall₂_cons]
+    rw [List.forall₂_cons] -- correspondingStrings_cons
     constructor
     · unfold corresponding_symbols
     · exact ih
@@ -702,7 +730,7 @@ private lemma corresponding_string_after_wrap_unwrap_self₁ {N₁ N₂ : Type} 
     rw [unwrap_first_nrl]
     unfold List.map
     unfold wrapSymbol₁
-    rw [List.forall₂_cons]
+    rw [List.forall₂_cons] -- correspondingStrings_cons
     constructor
     · unfold corresponding_symbols
     · exact ih
@@ -710,7 +738,7 @@ private lemma corresponding_string_after_wrap_unwrap_self₁ {N₁ N₂ : Type} 
     exfalso
     cases' ass with z hyp
     cases' z with z₀ z'
-    · have imposs := corresponding_strings_length hyp
+    · have imposs := correspondingStrings_length hyp
       clear * - imposs
       rw [List.length] at imposs 
       rw [List.length_map] at imposs 
@@ -718,25 +746,19 @@ private lemma corresponding_string_after_wrap_unwrap_self₁ {N₁ N₂ : Type} 
       linarith
     · rw [List.map_cons] at hyp 
       unfold corresponding_strings at hyp 
-      rw [List.forall₂_cons] at hyp 
+      rw [List.forall₂_cons] at hyp -- correspondingStrings_cons
       have impos := hyp.left
       clear * - impos
       cases z₀ <;>
         · unfold wrapSymbol₁ at impos 
           unfold corresponding_symbols at impos 
-          exact impos
+          exact impos-/
 
-/- ./././Mathport/Syntax/Translate/Expr.lean:177:8: unsupported: ambiguous notation -/
-/- ./././Mathport/Syntax/Translate/Expr.lean:177:8: unsupported: ambiguous notation -/
-/- ./././Mathport/Syntax/Translate/Expr.lean:177:8: unsupported: ambiguous notation -/
-/- ./././Mathport/Syntax/Translate/Expr.lean:177:8: unsupported: ambiguous notation -/
-/- ./././Mathport/Syntax/Translate/Expr.lean:177:8: unsupported: ambiguous notation -/
-/- ./././Mathport/Syntax/Translate/Expr.lean:177:8: unsupported: ambiguous notation -/
-private lemma corresponding_string_after_wrap_unwrap_self₂ {N₁ N₂ : Type} {w : List (Nst T N₁ N₂)}
-    (ass : ∃ z : List (Symbol T N₂), CorrespondingStrings (List.map (wrapSymbol₂ N₁) z) w) :
-    CorrespondingStrings (List.map (wrapSymbol₂ N₁) (List.filterMap unwrapSymbol₂ w)) w :=
-  by
-  induction' w with d l ih
+private lemma correspondingStrings_after_wrap_unwrap_self₂ {N₁ N₂ : Type} {w : List (nst T N₁ N₂)}
+    (ass : ∃ z : List (Symbol T N₂), correspondingStrings (List.map (wrapSymbol₂ N₁) z) w) :
+  correspondingStrings (List.map (wrapSymbol₂ N₁) (List.filterMap unwrapSymbol₂ w)) w :=
+by sorry
+/-induction' w with d l ih
   · unfold corresponding_strings
     unfold List.filterMap
     unfold List.map
@@ -760,7 +782,7 @@ private lemma corresponding_string_after_wrap_unwrap_self₂ {N₁ N₂ : Type} 
     rw [unwrap_first_t]
     unfold List.map
     unfold wrapSymbol₂
-    rw [List.forall₂_cons]
+    rw [List.forall₂_cons] -- correspondingStrings_cons
     constructor
     · unfold corresponding_symbols
     · exact ih
@@ -774,7 +796,7 @@ private lemma corresponding_string_after_wrap_unwrap_self₂ {N₁ N₂ : Type} 
     rw [unwrap_first_nlsr]
     unfold List.map
     unfold wrapSymbol₂
-    rw [List.forall₂_cons]
+    rw [List.forall₂_cons] -- correspondingStrings_cons
     constructor
     · unfold corresponding_symbols
     · exact ih
@@ -787,7 +809,7 @@ private lemma corresponding_string_after_wrap_unwrap_self₂ {N₁ N₂ : Type} 
     rw [unwrap_first_nrr]
     unfold List.map
     unfold wrapSymbol₂
-    rw [List.forall₂_cons]
+    rw [List.forall₂_cons] -- correspondingStrings_cons
     constructor
     · unfold corresponding_symbols
     · exact ih
@@ -803,17 +825,17 @@ private lemma corresponding_string_after_wrap_unwrap_self₂ {N₁ N₂ : Type} 
       linarith
     · rw [List.map_cons] at hyp 
       unfold corresponding_strings at hyp 
-      rw [List.forall₂_cons] at hyp 
+      rw [List.forall₂_cons] at hyp  -- correspondingStrings_cons
       have impos := hyp.left
       clear * - impos
       cases z₀ <;>
         · unfold wrapSymbol₂ at impos 
           unfold corresponding_symbols at impos 
-          exact impos
+          exact impos-/
 
 end UnwrappingNst
 
-section VeryComplicated
+/-section VeryComplicated
 
 private lemma induction_step_for_lifted_rule_from_g₁ {g₁ g₂ : Grammar T}
     {a b u v : List (Nst T g₁.Nt g₂.Nt)} {x : List (Symbol T g₁.Nt)} {y : List (Symbol T g₂.Nt)}
@@ -920,7 +942,7 @@ private lemma induction_step_for_lifted_rule_from_g₁ {g₁ g₂ : Grammar T}
         rw [add_assoc]
         rw [add_assoc] at contra 
         exact contra
-      have clash := corresponding_strings_nth_le inequality_map inequality_cat ih_concat
+      have clash := correspondingStrings_nthLe inequality_map inequality_cat ih_concat
       rw [List.nthLe_append inequality_cat inequality_m1] at clash 
       rw [List.nthLe_append_right inequality_map_opp inequality_map] at clash 
       rw [List.nthLe_map] at clash ; swap
@@ -1460,7 +1482,7 @@ private lemma induction_step_for_lifted_rule_from_g₂ {g₁ g₂ : Grammar T}
       rw [List.length_singleton]
       clear * -
       linarith
-    have ulth := corresponding_strings_nth_le ul_lt_ihls ul_lt_ihrs ih_concat
+    have ulth := correspondingStrings_nthLe ul_lt_ihls ul_lt_ihrs ih_concat
     rw [List.nthLe_append ul_lt_ihls] at ulth ; swap
     · rw [List.length_map]
       exact ul_lt_xl
@@ -1667,10 +1689,10 @@ private lemma big_induction {g₁ g₂ : Grammar T} {w : List (Nst T g₁.Nt g�
       unfold wrapSymbol₂
       rw [List.singleton_append]
       unfold corresponding_strings
-      rw [List.forall₂_cons]
+      rw [List.forall₂_cons] -- correspondingStrings_cons
       constructor
       · unfold corresponding_symbols
-      rw [List.forall₂_cons]
+      rw [List.forall₂_cons] -- correspondingStrings_cons
       constructor
       · unfold corresponding_symbols
       exact List.Forall₂.nil
@@ -1703,7 +1725,7 @@ private lemma big_induction {g₁ g₂ : Grammar T} {w : List (Nst T g₁.Nt g�
       linarith
     have ulen_tauto : u.length ≤ u.length := by rfl
     rw [List.append_assoc] at ih_concat 
-    have eqi_symb := corresponding_strings_nth_le ulen₁ ulen₂ ih_concat
+    have eqi_symb := correspondingStrings_nthLe ulen₁ ulen₂ ih_concat
     rw [List.nthLe_append_right ulen_tauto] at eqi_symb 
     simp only [Nat.sub_self, List.singleton_append, List.nthLe] at eqi_symb 
     have eq_none :
@@ -1797,7 +1819,7 @@ private lemma big_induction {g₁ g₂ : Grammar T} {w : List (Nst T g₁.Nt g�
         have same_len := corresponding_strings_length ih_concat
         rw [same_len]
         exact ul_lt_len_umv
-      have middle_nt := corresponding_strings_nth_le ul_lt_len_xy ul_lt_len_umv ih_concat
+      have middle_nt := correspondingStrings_nthLe ul_lt_len_xy ul_lt_len_umv ih_concat
       rw [List.nthLe_append ul_lt_len_umv ul_lt_len_um] at middle_nt 
       rw [List.nthLe_append_right (by rfl) ul_lt_len_um] at middle_nt 
       have middle_nt_elem :
@@ -1900,7 +1922,7 @@ private lemma big_induction {g₁ g₂ : Grammar T} {w : List (Nst T g₁.Nt g�
         have same_len := corresponding_strings_length ih_concat
         rw [same_len]
         exact ul_lt_len_umv
-      have middle_nt := corresponding_strings_nth_le ul_lt_len_xy ul_lt_len_umv ih_concat
+      have middle_nt := correspondingStrings_nthLe ul_lt_len_xy ul_lt_len_umv ih_concat
       rw [List.nthLe_append ul_lt_len_umv ul_lt_len_um] at middle_nt 
       rw [List.nthLe_append_right (by rfl) ul_lt_len_um] at middle_nt 
       have middle_nt_elem :
@@ -2110,7 +2132,7 @@ lemma in_concatenated_of_in_big {g₁ g₂ : Grammar T} {w : List T}
         (List.nthLe (List.map (wrapSymbol₁ g₂.nt) x ++ List.map (wrapSymbol₂ g₁.nt) y) i i_lt_len₁)
         (List.nthLe (List.map Symbol.terminal w) i i_lt_len₂) :=
       by
-      apply corresponding_strings_nth_le
+      apply correspondingStrings_nthLe
       exact concat_xy
     rw [List.nthLe_map] at equivalent_ith ; swap
     · exact i_lt_len_w
@@ -2219,7 +2241,7 @@ lemma in_concatenated_of_in_big {g₁ g₂ : Grammar T} {w : List T}
       rw [Nat.add_zero]
       rfl
     have eqiv_symb :=
-      corresponding_strings_nth_le i_lt_len_lwy i_lt_len_dlmxw equivalent_second_parts
+      correspondingStrings_nthLe i_lt_len_lwy i_lt_len_dlmxw equivalent_second_parts
     have goal_as_ith_drop :
       y.nth_le i i_lt_len_y =
         (List.drop x.length (List.map Symbol.terminal w)).nthLe i i_lt_len_dxw :=

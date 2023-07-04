@@ -1,5 +1,6 @@
 import Grammars.Classes.Unrestricted.Basics.Lifting
 import Grammars.Utilities.ListUtils
+import Mathlib.Tactic.Linarith
 
 variable {T : Type}
 

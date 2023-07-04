@@ -1,4 +1,5 @@
-import Grammars.Utilities.ListTakeJoin
+import Mathlib.Data.List.Join
+import Mathlib.Algebra.Order.WithZero
 
 namespace List
 
@@ -73,6 +74,12 @@ by
   rw [drop, drop, nthLe]
   apply ih
 
+theorem take_join_of_lt {L : List (List α)} {n : ℕ} (notall : n < L.join.length) :
+  ∃ m k : ℕ,
+    ∃ mlt : m < L.length,
+      k < (L.nthLe m mlt).length ∧ L.join.take n = (L.take m).join ++ (L.nthLe m mlt).take k :=
+sorry
+
 theorem drop_join_of_lt {L : List (List α)} {n : ℕ} (notall : n < L.join.length) :
   ∃ m k : ℕ, ∃ mlt : m < L.length,
     k < (L.nthLe m mlt).length ∧
@@ -87,9 +94,8 @@ by
   have important := Eq.trans whole L_two_parts.symm
   rw [append_assoc] at important 
   have right_side := append_left_cancel important
-  have auxi : (drop m L).join = (L.nthLe m mlt :: drop m.succ L).join :=
-    by
-    apply congr_arg
+  have auxi : (drop m L).join = (L.nthLe m mlt :: drop m.succ L).join
+  · apply congr_arg
     apply cons_drop_succ
   rw [join] at auxi 
   rw [auxi] at right_side 

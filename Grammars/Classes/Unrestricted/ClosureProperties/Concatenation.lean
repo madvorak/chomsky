@@ -701,12 +701,26 @@ by
     · rfl
     rw [unwrap_first_t]
     unfold List.map
-    --unfold wrapSymbol₁
     rw [correspondingStrings_cons]
     constructor
-    · sorry
+    · simp [wrapSymbol₁, correspondingSymbols]
     · exact ih
-  sorry
+  cases' n with o t' -- probably throw away from here on
+  · cases' o with n'
+    · sorry
+    · sorry
+  rw [List.map_filterMap]
+  convert_to
+    correspondingStrings
+      (List.filterMap Option.some (Symbol.nonterminal (Sum.inr t') :: l))
+      (Symbol.nonterminal (Sum.inr t') :: l)
+  · congr
+    ext1 a
+    cases' a with t n
+    · sorry
+    · sorry
+  rw [List.filterMap_some]
+  apply correspondingStrings_self
   /-cases' n with ? ??
   cases d; swap
   cases d
@@ -835,9 +849,9 @@ by sorry
 
 end UnwrappingNst
 
-/-section VeryComplicated
+section VeryComplicated
 
-private lemma induction_step_for_lifted_rule_from_g₁ {g₁ g₂ : Grammar T}
+/-private lemma induction_step_for_lifted_rule_from_g₁ {g₁ g₂ : Grammar T}
     {a b u v : List (Nst T g₁.Nt g₂.Nt)} {x : List (Symbol T g₁.Nt)} {y : List (Symbol T g₂.Nt)}
     {r : Grule T (Nnn T g₁.Nt g₂.Nt)} (rin : r ∈ List.map (wrapGrule₁ g₂.Nt) g₁.rules)
     (bef : a = u ++ r.inputL ++ [Symbol.nonterminal r.inputN] ++ r.inputR ++ v)
@@ -1663,22 +1677,20 @@ private lemma induction_step_for_lifted_rule_from_g₂ {g₁ g₂ : Grammar T}
     rw [List.drop_left'] at tdc ; swap
     · apply List.length_map
     rw [← List.map_take] at tdc 
-    exact ⟨_, tdc⟩
+    exact ⟨_, tdc⟩-/
 
-private lemma big_induction {g₁ g₂ : Grammar T} {w : List (Nst T g₁.Nt g₂.Nt)}
-    (ass :
-      GrammarDerives (bigGrammar g₁ g₂)
+private lemma big_induction {g₁ g₂ : Grammar T} {w : List (nst T g₁.nt g₂.nt)}
+    (ass : (bigGrammar g₁ g₂).Derives
         [Symbol.nonterminal (Sum.inl (some (Sum.inl g₁.initial))),
-          Symbol.nonterminal (Sum.inl (some (Sum.inr g₂.initial)))]
+         Symbol.nonterminal (Sum.inl (some (Sum.inr g₂.initial)))]
         w) :
-    ∃ x : List (Symbol T g₁.Nt),
-      ∃ y : List (Symbol T g₂.Nt),
-        And
-          (And (GrammarDerives g₁ [Symbol.nonterminal g₁.initial] x)
-            (GrammarDerives g₂ [Symbol.nonterminal g₂.initial] y))
-          (CorrespondingStrings (List.map (wrapSymbol₁ g₂.Nt) x ++ List.map (wrapSymbol₂ g₁.Nt) y)
-            w) :=
-  by
+  ∃ x : List (Symbol T g₁.nt), ∃ y : List (Symbol T g₂.nt),
+    g₁.Derives [Symbol.nonterminal g₁.initial] x  ∧
+    g₂.Derives [Symbol.nonterminal g₂.initial] y  ∧
+    correspondingStrings
+      (List.map (wrapSymbol₁ g₂.nt) x ++ List.map (wrapSymbol₂ g₁.nt) y)
+      w :=
+  by sorry/-
   induction' ass with a b trash orig ih
   · use [Symbol.nonterminal g₁.initial], [Symbol.nonterminal g₂.initial]
     constructor
@@ -1980,15 +1992,16 @@ private lemma big_induction {g₁ g₂ : Grammar T} {w : List (Nst T g₁.Nt g�
             exact middle_nt_elem
           · unfold corresponding_symbols at middle_nt_elem 
             rw [middle_nt_elem]
-            unfold corresponding_symbols
+            unfold corresponding_symbols-/
 
 lemma in_concatenated_of_in_big {g₁ g₂ : Grammar T} {w : List T}
-    (ass : w ∈ grammarLanguage (bigGrammar g₁ g₂)) : w ∈ grammarLanguage g₁ * grammarLanguage g₂ :=
-  by
+    (ass : w ∈ (bigGrammar g₁ g₂).Language) :
+  w ∈ g₁.Language * g₂.Language :=
+by
   rw [Language.mem_mul]
-  cases Grammar.tran_or_id_of_deri ass
+  cases' Grammar.tran_or_id_of_deri ass with case_id case_step
   · exfalso
-    have nonmatch := congr_fun (congr_arg List.get? h) 0
+    have nonmatch := congr_fun (congr_arg List.get? case_id) 0
     clear * - nonmatch
     unfold List.get? at nonmatch 
     cases w
@@ -1999,13 +2012,11 @@ lemma in_concatenated_of_in_big {g₁ g₂ : Grammar T} {w : List T}
       have imposs := Option.some.inj nonmatch
       exact Symbol.noConfusion imposs
   clear ass
-  rcases h with ⟨w₁, hyp_tran, hyp_deri⟩
-  have w₁eq :
-    w₁ =
+  rcases case_step with ⟨w₁, hyp_tran, hyp_deri⟩
+  have w₁eq : w₁ =
       [Symbol.nonterminal (Sum.inl (some (Sum.inl g₁.initial))),
-        Symbol.nonterminal (Sum.inl (some (Sum.inr g₂.initial)))] :=
-    by
-    clear * - hyp_tran
+       Symbol.nonterminal (Sum.inl (some (Sum.inr g₂.initial)))]
+  · clear * - hyp_tran
     -- only the first rule is applicable
     rcases hyp_tran with ⟨r, rin, u, v, bef, aft⟩
     have bef_len := congr_arg List.length bef
@@ -2013,13 +2024,15 @@ lemma in_concatenated_of_in_big {g₁ g₂ : Grammar T} {w : List T}
     rw [List.length_append_append] at bef_len 
     rw [List.length_singleton] at bef_len 
     rw [List.length_singleton] at bef_len 
+    sorry /-
     have u_nil : u = []; swap
     have v_nil : v = []; swap
-    have rif_nil : r.input_L = []; swap
-    any_goals
-      clear * - bef_len
-      rw [← List.length_eq_zero]
-      linarith
+    have rif_nil : r.input_L = []
+    --any_goals
+    clear * - bef_len
+    rw [← List.length_eq_zero]
+    linarith
+    --
     change _ ∈ List.cons _ _ at rin 
     rw [List.mem_cons] at rin 
     cases rin
@@ -2067,25 +2080,25 @@ lemma in_concatenated_of_in_big {g₁ g₂ : Grammar T} {w : List T}
         rcases rin with ⟨t, htg₂, tt_eq_r⟩
         rw [← tt_eq_r] at nt_match 
         have inl_eq_inr := Symbol.nonterminal.inj nt_match
-        exact Sum.noConfusion inl_eq_inr
+        exact Sum.noConfusion inl_eq_inr-/
   clear hyp_tran
   rw [w₁eq] at hyp_deri 
   have hope_result := big_induction hyp_deri
   clear * - hope_result
-  rcases hope_result with ⟨x, y, ⟨deri_x, deri_y⟩, concat_xy⟩
+  rcases hope_result with ⟨x, y, deri_x, deri_y, concat_xy⟩
   use List.take x.length w
   use List.drop x.length w
   constructor
   · clear deri_y
-    unfold grammarLanguage
+    unfold Grammar.Language
     rw [Set.mem_setOf_eq]
-    unfold GrammarGenerates
+    unfold Grammar.Generates
     convert deri_x
     clear deri_x
-    have xylen := corresponding_strings_length concat_xy
+    have xylen := correspondingStrings_length concat_xy
     rw [List.length_append] at xylen 
     repeat' rw [List.length_map] at xylen 
-    ext1 i
+    sorry /-ext1 i
     by_cases i ≥ x.length
     · convert_to none = none
       · have xlen :
@@ -2149,18 +2162,18 @@ lemma in_concatenated_of_in_big {g₁ g₂ : Grammar T} {w : List T}
       rw [Option.map_some']
       exact congr_arg Option.some symbol_ith
     · exfalso
-      exact equivalent_ith
+      exact equivalent_ith-/
   constructor
   · clear deri_x
-    unfold grammarLanguage
+    unfold Grammar.Language
     rw [Set.mem_setOf_eq]
-    unfold GrammarGenerates
+    unfold Grammar.Generates
     convert deri_y
     clear deri_y
-    have xylen := corresponding_strings_length concat_xy
+    have xylen := correspondingStrings_length concat_xy
     rw [List.length_append] at xylen 
     repeat' rw [List.length_map] at xylen 
-    ext1 i
+    sorry /-ext1 i
     by_cases i ≥ y.length
     · convert_to none = none
       · have ylen :
@@ -2169,7 +2182,7 @@ lemma in_concatenated_of_in_big {g₁ g₂ : Grammar T} {w : List T}
           clear * - xylen
           rw [List.length_map]
           rw [List.length_drop]
-          omega
+          sorry
         rw [ylen] at h 
         clear * - h
         rw [List.get?_eq_none]
@@ -2281,10 +2294,10 @@ lemma in_concatenated_of_in_big {g₁ g₂ : Grammar T} {w : List T}
     rw [← List.nthLe_get? i_lt_len_y] at goal_as_some_ith 
     rw [← List.nthLe_get? i_lt_len_mtw] at goal_as_some_ith 
     convert goal_as_some_ith
-    rw [List.get?_map]
+    rw [List.get?_map]-/
   apply List.take_append_drop
 
-end VeryComplicated-/
+end VeryComplicated
 
 end HardDirection
 
@@ -2299,9 +2312,9 @@ by
     intro w hyp
     rw [← eq_L₁]
     rw [← eq_L₂]
-    sorry -- exact in_concatenated_of_in_big hyp
+    exact in_concatenated_of_in_big hyp
   · -- prove `L₁ * L₂ ⊆` here
     intro w hyp
     rw [← eq_L₁] at hyp 
     rw [← eq_L₂] at hyp 
-    sorry -- exact in_big_of_in_concatenated hyp
+    exact in_big_of_in_concatenated hyp

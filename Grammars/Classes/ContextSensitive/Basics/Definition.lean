@@ -20,9 +20,9 @@ variable {T : Type}
 def CSgrammar.Transforms (g : CSgrammar T) (w₁ w₂ : List (Symbol T g.nt)) : Prop :=
   ∃ r : CSrule T g.nt,
     r ∈ g.rules  ∧
-      ∃ u v : List (Symbol T g.nt),
-        w₁ = u ++ r.contextLeft ++ [Symbol.nonterminal r.inputNonterminal] ++ r.contextRight ++ v  ∧
-        w₂ = u ++ r.contextLeft ++ r.outputString ++ r.contextRight ++ v
+    ∃ u v : List (Symbol T g.nt),
+      w₁ = u ++ r.contextLeft ++ [Symbol.nonterminal r.inputNonterminal] ++ r.contextRight ++ v  ∧
+      w₂ = u ++ r.contextLeft ++ r.outputString ++ r.contextRight ++ v
 
 /-- Any number of steps of context-sensitive transformation. -/
 def CSgrammar.Derives (g : CSgrammar T) : List (Symbol T g.nt) → List (Symbol T g.nt) → Prop :=

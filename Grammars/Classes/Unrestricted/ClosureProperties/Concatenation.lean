@@ -8,37 +8,39 @@ section ListTechnicalities
 variable {α β : Type}
 
 lemma list_take_one_drop {l : List α} {i : ℕ} (hil : i < l.length) :
-  List.take 1 (List.drop i l) = [l.nthLe i hil] :=
+  List.take 1 (List.drop i l) = [l.get ⟨i, hil⟩] :=
 by
   have l_split : l = List.take i l ++ List.drop i l := by rw [List.take_append_drop]
-  rw [List.nthLe_of_eq l_split]
-  rw [List.nthLe_append_right]
-  · have smaller_i : min i l.length = i := min_eq_left (le_of_lt hil)
-    simp only [List.length_take, smaller_i, Nat.sub_self]
-    sorry
-  · apply List.length_take_le
+  rw [List.get_of_eq l_split]
+  rw [List.get_append_right]
+  sorry
+  · dsimp only
+    push_neg
+    apply List.length_take_le
+  · sorry
 
 lemma list_drop_take_succ {l : List α} {i : ℕ} (hil : i < l.length) :
-  List.drop i (List.take (i + 1) l) = [l.nthLe i hil] :=
+  List.drop i (List.take (i + 1) l) = [l.get ⟨i, hil⟩] :=
 by
   rw [List.drop_take]
   apply list_take_one_drop
 
-lemma list_forall₂_nthLe {R : α → β → Prop} :
+lemma list_forall₂_get {R : α → β → Prop} :
   ∀ {x : List α}, ∀ {y : List β},
       List.Forall₂ R x y → ∀ {i : ℕ}, ∀ i_lt_len_x : i < x.length, ∀ i_lt_len_y : i < y.length,
-        R (x.nthLe i i_lt_len_x) (y.nthLe i i_lt_len_y)
-| [], [] => by intro hyp i hx; exfalso; apply Nat.not_lt_zero; exact hx
+        R (x.get ⟨i, i_lt_len_x⟩) (y.get ⟨i, i_lt_len_y⟩)
+| [], [] => by intro _ i hx; exfalso; apply Nat.not_lt_zero; exact hx
 | [], a₂::l₂ => by intro hyp; exfalso; cases hyp
 | a₁::l₁, [] => by intro hyp; exfalso; cases hyp
 | a₁::l₁, a₂::l₂ => by
     intro ass i i_lt_len_x i_lt_len_y
     rw [List.forall₂_cons] at ass 
     cases i
-    · unfold List.nthLe
+    · unfold List.get
       exact ass.1
-    unfold List.nthLe
-    sorry
+    unfold List.get
+    apply list_forall₂_get
+    exact ass.2
 
 lemma list_filterMap_eq_of_map_eq_map_some {f : α → Option β} :
   ∀ {x : List α}, ∀ {y : List β},
@@ -144,7 +146,7 @@ private lemma first_transformation {g₁ g₂ : Grammar T} :
     [Symbol.nonterminal (Sum.inl (some (Sum.inl g₁.initial))),
      Symbol.nonterminal (Sum.inl (some (Sum.inr g₂.initial)))] :=
 by
-  use (bigGrammar g₁ g₂).rules.nthLe 0 (by sorry)
+  use (bigGrammar g₁ g₂).rules.get ⟨0, by sorry⟩
   sorry
 
 private lemma substitute_terminals {g₁ g₂ : Grammar T} {side : T → Sum T T} {w : List T}
@@ -462,11 +464,11 @@ by
   unfold correspondingStrings at ass 
   exact List.Forall₂.length_eq ass
 
-private lemma correspondingStrings_nthLe {N₁ N₂ : Type} {x y : List (nst T N₁ N₂)} {i : ℕ}
+private lemma correspondingStrings_get {N₁ N₂ : Type} {x y : List (nst T N₁ N₂)} {i : ℕ}
     (i_lt_len_x : i < x.length) (i_lt_len_y : i < y.length) (ass : correspondingStrings x y) :
-  correspondingSymbols (x.nthLe i i_lt_len_x) (y.nthLe i i_lt_len_y) :=
+  correspondingSymbols (x.get ⟨i, i_lt_len_x⟩) (y.get ⟨i, i_lt_len_y⟩) :=
 by
-  apply list_forall₂_nthLe
+  apply list_forall₂_get
   exact ass
 
 private lemma correspondingStrings_reverse {N₁ N₂ : Type} {x y : List (nst T N₁ N₂)}

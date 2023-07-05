@@ -62,28 +62,28 @@ end ListReplicate
 section ListJoin
 
 private lemma cons_drop_succ {m : ℕ} (mlt : m < x.length) :
-  drop m x = x.nthLe m mlt :: drop m.succ x :=
+  drop m x = x.get ⟨m, mlt⟩ :: drop m.succ x :=
 by
   induction' x with d l ih generalizing m
   · exfalso
     rw [length] at mlt 
     exact Nat.not_lt_zero m mlt
   cases m
-  · rw [List.nthLe]
+  · rw [get]
     simp
-  rw [drop, drop, nthLe]
+  rw [drop, drop, get]
   apply ih
 
 lemma take_join_of_lt {L : List (List α)} {n : ℕ} (notall : n < L.join.length) :
-  ∃ m k : ℕ,
-    ∃ mlt : m < L.length,
-      k < (L.nthLe m mlt).length ∧ L.join.take n = (L.take m).join ++ (L.nthLe m mlt).take k :=
+  ∃ m k : ℕ, ∃ mlt : m < L.length,
+    k < (L.get ⟨m, mlt⟩).length  ∧
+    L.join.take n = (L.take m).join ++ (L.get ⟨m, mlt⟩).take k :=
 sorry
 
 lemma drop_join_of_lt {L : List (List α)} {n : ℕ} (notall : n < L.join.length) :
   ∃ m k : ℕ, ∃ mlt : m < L.length,
-    k < (L.nthLe m mlt).length ∧
-    L.join.drop n = (L.nthLe m mlt).drop k ++ (L.drop m.succ).join :=
+    k < (L.get ⟨m, mlt⟩).length  ∧
+    L.join.drop n = (L.get ⟨m, mlt⟩).drop k ++ (L.drop m.succ).join :=
 by
   obtain ⟨m, k, mlt, klt, left_half⟩ := take_join_of_lt notall
   use m, k, mlt, klt
@@ -94,14 +94,15 @@ by
   have important := Eq.trans whole L_two_parts.symm
   rw [append_assoc] at important 
   have right_side := append_left_cancel important
-  have auxi : (drop m L).join = (L.nthLe m mlt :: drop m.succ L).join
+  have auxi : (drop m L).join = (L.get ⟨m, mlt⟩ :: drop m.succ L).join
   · apply congr_arg
     apply cons_drop_succ
   rw [join] at auxi 
   rw [auxi] at right_side 
   have near_result :
-    take k (L.nthLe m mlt) ++ drop n L.join =
-      take k (L.nthLe m mlt) ++ drop k (L.nthLe m mlt) ++ (drop m.succ L).join
+    take k (L.get ⟨m, mlt⟩) ++ drop n L.join =
+    take k (L.get ⟨m, mlt⟩) ++ drop k (L.get ⟨m, mlt⟩) ++
+      (drop m.succ L).join
   · convert right_side
     rw [List.take_append_drop]
   rw [append_assoc] at near_result 

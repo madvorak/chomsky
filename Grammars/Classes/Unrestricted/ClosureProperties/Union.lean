@@ -70,7 +70,7 @@ def lg₁ : LiftedGrammar T :=
     )
     (by
       rintro r ⟨rin, n₁, rnt⟩
-      simp [unionGrammar] at rin
+      simp only [unionGrammar, List.mem_cons, List.mem_append, List.mem_map] at rin
       rcases rin with req₁ | req₂ | rin₁ | rin₂
       · exfalso
         rw [req₁] at rnt
@@ -131,7 +131,7 @@ def lg₂ : LiftedGrammar T :=
     )
     (by
       rintro r ⟨rin, n₁, rnt⟩
-      simp [unionGrammar] at rin
+      simp only [unionGrammar, List.mem_cons, List.mem_append, List.mem_map] at rin
       rcases rin with req₁ | req₂ | rin₁ | rin₂
       · exfalso
         rw [req₁] at rnt

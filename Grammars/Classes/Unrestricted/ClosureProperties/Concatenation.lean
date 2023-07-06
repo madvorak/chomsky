@@ -80,11 +80,11 @@ def wrapSymbol₂ {N₂ : Type} (N₁ : Type) : Symbol T N₂ → nst T N₁ N�
 
 private def wrapGrule₁ {N₁ : Type} (N₂ : Type) (r : Grule T N₁) : Grule T (nnn T N₁ N₂) :=
   Grule.mk (List.map (wrapSymbol₁ N₂) r.inputL) (Sum.inl (some (Sum.inl r.inputN)))
-    (List.map (wrapSymbol₁ N₂) r.inputR) (List.map (wrapSymbol₁ N₂) r.outputString)
+    (List.map (wrapSymbol₁ N₂) r.inputR) (List.map (wrapSymbol₁ N₂) r.output)
 
 private def wrapGrule₂ {N₂ : Type} (N₁ : Type) (r : Grule T N₂) : Grule T (nnn T N₁ N₂) :=
   Grule.mk (List.map (wrapSymbol₂ N₁) r.inputL) (Sum.inl (some (Sum.inr r.inputN)))
-    (List.map (wrapSymbol₂ N₁) r.inputR) (List.map (wrapSymbol₂ N₁) r.outputString)
+    (List.map (wrapSymbol₂ N₁) r.inputR) (List.map (wrapSymbol₂ N₁) r.output)
 
 def rulesForTerminals₁ (N₂ : Type) (g : Grammar T) : List (Grule T (nnn T g.nt N₂)) :=
   List.map (fun t => Grule.mk [] (Sum.inr (Sum.inl t)) [] [Symbol.terminal t]) (allUsedTerminals g)
@@ -93,15 +93,18 @@ def rulesForTerminals₂ (N₁ : Type) (g : Grammar T) : List (Grule T (nnn T N�
   List.map (fun t => Grule.mk [] (Sum.inr (Sum.inr t)) [] [Symbol.terminal t]) (allUsedTerminals g)
 
 
--- the grammar for concatenation of `g₁` and `g₂` languages
+-- grammar for concatenation of `g₁.Language` with `g₂.Language`
 def bigGrammar (g₁ g₂ : Grammar T) : Grammar T :=
   Grammar.mk (nnn T g₁.nt g₂.nt) (Sum.inl none) (
     @Grule.mk T (nnn T g₁.nt g₂.nt) [] (Sum.inl none) [] [
       Symbol.nonterminal (Sum.inl (some (Sum.inl g₁.initial))),
-      Symbol.nonterminal (Sum.inl (some (Sum.inr g₂.initial)))] ::
-    List.map (wrapGrule₁ g₂.nt) g₁.rules ++
-    List.map (wrapGrule₂ g₁.nt) g₂.rules ++
-    (rulesForTerminals₁ g₂.nt g₁ ++ rulesForTerminals₂ g₁.nt g₂))
+      Symbol.nonterminal (Sum.inl (some (Sum.inr g₂.initial)))
+    ] :: ((
+      List.map (wrapGrule₁ g₂.nt) g₁.rules ++
+      List.map (wrapGrule₂ g₁.nt) g₂.rules
+    ) ++ (
+      rulesForTerminals₁ g₂.nt g₁ ++
+      rulesForTerminals₂ g₁.nt g₂)))
 
 end TheConstruction
 
@@ -111,7 +114,7 @@ section EasyDirection
 lemma grammar_generates_only_legit_terminals {g : Grammar T} {w : List (Symbol T g.nt)}
     (ass : g.Derives [Symbol.nonterminal g.initial] w)
     (s : Symbol T g.nt) (symbol_derived : s ∈ w) :
-  (∃ r : Grule T g.nt, r ∈ g.rules ∧ s ∈ r.outputString) ∨ (s = Symbol.nonterminal g.initial) :=
+  (∃ r : Grule T g.nt, r ∈ g.rules ∧ s ∈ r.output) ∨ (s = Symbol.nonterminal g.initial) :=
 by
   induction' ass with x y _ orig ih
   · rw [List.mem_singleton] at symbol_derived 
@@ -246,7 +249,7 @@ by
       exact upgraded
     · have legit_terminals₁ :
         ∀ t ∈ u, ∃ r : Grule T g₁.nt,
-          r ∈ g₁.rules ∧ Symbol.terminal t ∈ r.outputString
+          r ∈ g₁.rules ∧ Symbol.terminal t ∈ r.output
       · intro t tin
         have legit := grammar_generates_only_legit_terminals hu (Symbol.terminal t) (by
           rw [List.mem_map]
@@ -272,7 +275,7 @@ by
           constructor
           · rw [List.mem_join]
             obtain ⟨r, rin, sttin⟩ := legit_terminals₁ t tin
-            use r.outputString
+            use r.output
             constructor
             · apply List.mem_map_of_mem
               exact rin
@@ -325,7 +328,7 @@ by
       exact upgraded
     · have legit_terminals₂ :
         ∀ t ∈ v, ∃ r : Grule T g₂.nt,
-          r ∈ g₂.rules ∧ Symbol.terminal t ∈ r.outputString
+          r ∈ g₂.rules ∧ Symbol.terminal t ∈ r.output
       · intro t tin
         have legit := grammar_generates_only_legit_terminals hv (Symbol.terminal t) (by
           rw [List.mem_map]
@@ -351,7 +354,7 @@ by
           constructor
           · rw [List.mem_join]
             obtain ⟨r, rin, sttin⟩ := legit_terminals₂ t tin
-            use r.outputString
+            use r.output
             constructor
             · apply List.mem_map_of_mem
               exact rin
@@ -438,6 +441,11 @@ by
   intros s _
   exact correspondingSymbols_self s
 
+private lemma correspondingStrings_nil {N₁ N₂ : Type} :
+  @correspondingStrings T N₁ N₂ [] [] :=
+by
+  apply List.Forall₂.nil
+
 private lemma correspondingStrings_cons {N₁ N₂ : Type} {d₁ d₂ : nst T N₁ N₂} {l₁ l₂ : List (nst T N₁ N₂)} :
   correspondingStrings (d₁::l₁) (d₂::l₂)  ↔  correspondingSymbols d₁ d₂  ∧  correspondingStrings l₁ l₂  :=
 by
@@ -450,7 +458,7 @@ by
   rw [correspondingStrings_cons]
   constructor
   · exact ass
-  · exact List.Forall₂.nil
+  · exact correspondingStrings_nil
 
 private lemma correspondingStrings_append {N₁ N₂ : Type} {x₁ x₂ y₁ y₂ : List (nst T N₁ N₂)}
     (ass₁ : correspondingStrings x₁ y₁) (ass₂ : correspondingStrings x₂ y₂) :
@@ -688,7 +696,7 @@ by
   · unfold correspondingStrings
     unfold List.filterMap
     unfold List.map
-    exact List.Forall₂.nil
+    exact correspondingStrings_nil
   specialize ih (by
     cases' ass with z hyp
     cases' z with z₀ z'
@@ -780,7 +788,7 @@ by sorry
   · unfold corresponding_strings
     unfold List.filterMap
     unfold List.map
-    exact List.Forall₂.nil
+    exact correspondingStrings_nil
   specialize
     ih
       (by
@@ -855,23 +863,24 @@ end UnwrappingNst
 
 section VeryComplicated
 
-/-private lemma induction_step_for_lifted_rule_from_g₁ {g₁ g₂ : Grammar T}
-    {a b u v : List (Nst T g₁.Nt g₂.Nt)} {x : List (Symbol T g₁.Nt)} {y : List (Symbol T g₂.Nt)}
-    {r : Grule T (Nnn T g₁.Nt g₂.Nt)} (rin : r ∈ List.map (wrapGrule₁ g₂.Nt) g₁.rules)
-    (bef : a = u ++ r.inputL ++ [Symbol.nonterminal r.inputN] ++ r.inputR ++ v)
-    (aft : b = u ++ r.outputString ++ v)
-    (ih_x : GrammarDerives g₁ [Symbol.nonterminal g₁.initial] x)
-    (ih_y : GrammarDerives g₂ [Symbol.nonterminal g₂.initial] y)
-    (ih_concat :
-      CorrespondingStrings (List.map (wrapSymbol₁ g₂.Nt) x ++ List.map (wrapSymbol₂ g₁.Nt) y) a) :
-    ∃ x' : List (Symbol T g₁.Nt),
-      And
-        (And (GrammarDerives g₁ [Symbol.nonterminal g₁.initial] x')
-          (GrammarDerives g₂ [Symbol.nonterminal g₂.initial] y))
-        (CorrespondingStrings (List.map (wrapSymbol₁ g₂.Nt) x' ++ List.map (wrapSymbol₂ g₁.Nt) y)
-          b) :=
-  by
-  rw [List.mem_map] at rin 
+private lemma induction_step_for_lifted_rule_from_g₁ {g₁ g₂ : Grammar T}
+    {a b u v : List (nst T g₁.nt g₂.nt)} {x : List (Symbol T g₁.nt)} {y : List (Symbol T g₂.nt)}
+    {r : Grule T (nnn T g₁.nt g₂.nt)} (rin : r ∈ List.map (wrapGrule₁ g₂.nt) g₁.rules)
+    (bef : a = u ++ ↑r.inputL ++ ↑[Symbol.nonterminal r.inputN] ++ ↑r.inputR ++ v)
+    (aft : b = u ++ ↑r.output ++ v)
+    (ih_x : g₁.Derives [Symbol.nonterminal g₁.initial] x)
+    (ih_y : g₂.Derives [Symbol.nonterminal g₂.initial] y)
+    (ih_concat : correspondingStrings
+        (List.map (wrapSymbol₁ g₂.nt) x ++ List.map (wrapSymbol₂ g₁.nt) y)
+        a)   :
+  ∃ x' : List (Symbol T g₁.nt),
+    g₁.Derives [Symbol.nonterminal g₁.initial] x'  ∧
+    g₂.Derives [Symbol.nonterminal g₂.initial] y   ∧
+    correspondingStrings
+      (List.map (wrapSymbol₁ g₂.nt) x' ++ List.map (wrapSymbol₂ g₁.nt) y)
+      b   :=
+by sorry
+  /-rw [List.mem_map] at rin 
   rcases rin with ⟨r₁, rin₁, wrap_r₁_eq_r⟩
   rw [← wrap_r₁_eq_r] at *
   clear wrap_r₁_eq_r
@@ -1446,25 +1455,26 @@ section VeryComplicated
   rw [List.take_all_of_le] at the_part ; swap
   · rw [List.length_reverse]
     rw [List.length_map]
-  exact the_part
+  exact the_part-/
 
 private lemma induction_step_for_lifted_rule_from_g₂ {g₁ g₂ : Grammar T}
-    {a b u v : List (Nst T g₁.Nt g₂.Nt)} {x : List (Symbol T g₁.Nt)} {y : List (Symbol T g₂.Nt)}
-    {r : Grule T (Nnn T g₁.Nt g₂.Nt)} (rin : r ∈ List.map (wrapGrule₂ g₁.Nt) g₂.rules)
-    (bef : a = u ++ r.inputL ++ [Symbol.nonterminal r.inputN] ++ r.inputR ++ v)
-    (aft : b = u ++ r.outputString ++ v)
-    (ih_x : GrammarDerives g₁ [Symbol.nonterminal g₁.initial] x)
-    (ih_y : GrammarDerives g₂ [Symbol.nonterminal g₂.initial] y)
-    (ih_concat :
-      CorrespondingStrings (List.map (wrapSymbol₁ g₂.Nt) x ++ List.map (wrapSymbol₂ g₁.Nt) y) a) :
-    ∃ y' : List (Symbol T g₂.Nt),
-      And
-        (And (GrammarDerives g₁ [Symbol.nonterminal g₁.initial] x)
-          (GrammarDerives g₂ [Symbol.nonterminal g₂.initial] y'))
-        (CorrespondingStrings (List.map (wrapSymbol₁ g₂.Nt) x ++ List.map (wrapSymbol₂ g₁.Nt) y')
-          b) :=
-  by
-  rw [List.mem_map] at rin 
+    {a b u v : List (nst T g₁.nt g₂.nt)} {x : List (Symbol T g₁.nt)} {y : List (Symbol T g₂.nt)}
+    {r : Grule T (nnn T g₁.nt g₂.nt)} (rin : r ∈ List.map (wrapGrule₂ g₁.nt) g₂.rules)
+    (bef : a = u ++ ↑r.inputL ++ ↑[Symbol.nonterminal r.inputN] ++ ↑r.inputR ++ v)
+    (aft : b = u ++ ↑r.output ++ v)
+    (ih_x : g₁.Derives [Symbol.nonterminal g₁.initial] x)
+    (ih_y : g₂.Derives [Symbol.nonterminal g₂.initial] y)
+    (ih_concat : correspondingStrings
+        (List.map (wrapSymbol₁ g₂.nt) x ++ List.map (wrapSymbol₂ g₁.nt) y)
+        a)   :
+  ∃ y' : List (Symbol T g₂.nt),
+    g₁.Derives [Symbol.nonterminal g₁.initial] x   ∧
+    g₂.Derives [Symbol.nonterminal g₂.initial] y'  ∧
+    correspondingStrings
+      (List.map (wrapSymbol₁ g₂.nt) x ++ List.map (wrapSymbol₂ g₁.nt) y')
+      b   :=
+by sorry
+  /-rw [List.mem_map] at rin 
   rcases rin with ⟨r₂, rin₂, wrap_r₂_eq_r⟩
   rw [← wrap_r₂_eq_r] at *
   clear wrap_r₂_eq_r
@@ -1693,57 +1703,47 @@ private lemma big_induction {g₁ g₂ : Grammar T} {w : List (nst T g₁.nt g�
     g₂.Derives [Symbol.nonterminal g₂.initial] y  ∧
     correspondingStrings
       (List.map (wrapSymbol₁ g₂.nt) x ++ List.map (wrapSymbol₂ g₁.nt) y)
-      w :=
-  by sorry/-
-  induction' ass with a b trash orig ih
+      w   :=
+by
+  induction' ass with a b _ orig ih
   · use [Symbol.nonterminal g₁.initial], [Symbol.nonterminal g₂.initial]
     constructor
-    · constructor <;> apply Grammar.deri_self
-    · rw [List.map_singleton]
-      rw [List.map_singleton]
-      unfold wrapSymbol₁
-      unfold wrapSymbol₂
-      rw [List.singleton_append]
-      unfold corresponding_strings
-      rw [List.forall₂_cons] -- correspondingStrings_cons
-      constructor
-      · unfold corresponding_symbols
-      rw [List.forall₂_cons] -- correspondingStrings_cons
-      constructor
-      · unfold corresponding_symbols
-      exact List.Forall₂.nil
-  rcases ih with ⟨x, y, ⟨ih_x, ih_y⟩, ih_concat⟩
+    · apply Grammar.deri_self
+    constructor
+    · apply Grammar.deri_self
+    simp only [wrapSymbol₁, wrapSymbol₂, List.map_singleton, List.singleton_append]
+    rw [correspondingStrings_cons]
+    constructor
+    · rfl
+    rw [correspondingStrings_cons]
+    constructor
+    · rfl
+    exact correspondingStrings_nil
+  rcases ih with ⟨x, y, ih_x, ih_y, ih_concat⟩
   rcases orig with ⟨r, rin, u, v, bef, aft⟩
-  change _ ∈ List.cons _ _ at rin 
-  rw [List.mem_cons_eq] at rin 
-  cases rin
+  simp only [bigGrammar, List.mem_cons, List.mem_append, or_assoc] at rin
+  rcases rin with rinit | rin₁ | rin₂ | rte₁ | rte₂
   · exfalso
-    rw [rin] at bef 
+    rw [rinit] at bef 
     clear * - ih_concat bef
     simp only [List.append_nil] at bef 
     rw [bef] at ih_concat 
-    have same_lengths := corresponding_strings_length ih_concat
+    have same_lengths := correspondingStrings_length ih_concat
     clear bef
-    have ulen₁ :
-      u.length < (List.map (wrapSymbol₁ g₂.nt) x ++ List.map (wrapSymbol₂ g₁.nt) y).length :=
-      by
-      rw [List.length_append _ v] at same_lengths 
+    have ulen₁ : u.length < (List.map (wrapSymbol₁ g₂.nt) x ++ List.map (wrapSymbol₂ g₁.nt) y).length
+    · rw [List.length_append _ v] at same_lengths 
       rw [List.length_append u _] at same_lengths 
       rw [List.length_singleton] at same_lengths 
       clear * - same_lengths
       linarith
-    have ulen₂ : u.length < (u ++ ([Symbol.nonterminal (Sum.inl none)] ++ v)).length :=
-      by
-      rw [List.length_append]
-      rw [List.length_append]
-      rw [List.length_singleton]
+    rw [List.append_assoc] at ih_concat 
+    have eqi_symb := correspondingStrings_get ulen₁ ?_ ih_concat ; swap
+    · rw [List.length_append, List.length_append, List.length_singleton]
       clear * -
       linarith
-    have ulen_tauto : u.length ≤ u.length := by rfl
-    rw [List.append_assoc] at ih_concat 
-    have eqi_symb := correspondingStrings_nthLe ulen₁ ulen₂ ih_concat
-    rw [List.nthLe_append_right ulen_tauto] at eqi_symb 
-    simp only [Nat.sub_self, List.singleton_append, List.nthLe] at eqi_symb 
+    sorry
+    /-rw [List.get_append_right] at eqi_symb 
+    simp only [Nat.sub_self, List.singleton_append, List.get] at eqi_symb 
     have eq_none :
       (List.map (wrapSymbol₁ g₂.nt) x ++ List.map (wrapSymbol₂ g₁.nt) y).nthLe u.length ulen₁ =
         Symbol.nonterminal (Sum.inl none) :=
@@ -1753,7 +1753,7 @@ private lemma big_induction {g₁ g₂ : Grammar T} {w : List (nst T g₁.nt g�
         (List.map (wrapSymbol₁ g₂.nt) x ++ List.map (wrapSymbol₂ g₁.nt) y).nthLe u.length ulen₁ with
         t s
       · exfalso
-        unfold corresponding_symbols at eqi_symb 
+        unfold correspondingSymbols at eqi_symb 
         exact eqi_symb
       cases s
       · cases s
@@ -1781,17 +1781,16 @@ private lemma big_induction {g₁ g₂ : Grammar T} {w : List (nst T g₁.nt g�
         · have imposs := Symbol.nonterminal.inj contradic
           exact Sum.noConfusion imposs
         · have impos := Sum.inl.inj (Symbol.nonterminal.inj contradic)
-          exact Option.noConfusion impos
-  rw [List.mem_append] at rin 
-  cases rin
-  · rw [List.mem_append] at rin 
-    cases rin
-    · cases' induction_step_for_lifted_rule_from_g₁ rin bef aft ih_x ih_y ih_concat with x' pros
-      exact ⟨x', y, pros⟩
-    · use x
-      exact induction_step_for_lifted_rule_from_g₂ rin bef aft ih_x ih_y ih_concat
+          exact Option.noConfusion impos-/
+  · cases' induction_step_for_lifted_rule_from_g₁ rin₁ bef aft ih_x ih_y ih_concat with x' pros
+    exact ⟨x', y, pros⟩
+  · use x
+    exact induction_step_for_lifted_rule_from_g₂ rin₂ bef aft ih_x ih_y ih_concat
   · use x, y
-    constructor
+    sorry
+  · use x, y
+    sorry
+  /-constructor
     · constructor
       · exact ih_x
       · exact ih_y
@@ -1845,7 +1844,7 @@ private lemma big_induction {g₁ g₂ : Grammar T} {w : List (nst T g₁.nt g�
           (Symbol.nonterminal (Sum.inr (Sum.inl t))) :=
         by
         convert middle_nt
-        finish
+        sorry
       have xy_split_nt :
         List.drop u.length (List.map (wrapSymbol₁ g₂.nt) x ++ List.map (wrapSymbol₂ g₁.nt) y) =
           List.take 1
@@ -1948,7 +1947,7 @@ private lemma big_induction {g₁ g₂ : Grammar T} {w : List (nst T g₁.nt g�
           (Symbol.nonterminal (Sum.inr (Sum.inr t))) :=
         by
         convert middle_nt
-        finish
+        sorry
       have xy_split_nt :
         List.take (u.length + 1)
             (List.map (wrapSymbol₁ g₂.nt) x ++ List.map (wrapSymbol₂ g₁.nt) y) =
@@ -2043,7 +2042,7 @@ by
       rw [u_nil, rif_nil] at bef_fst 
       rw [← Option.some_inj]
       exact bef_fst
-    simp [bigGrammar, List.mem_cons] at rin -- TODO
+    simp only [bigGrammar, List.mem_cons, List.mem_append, or_assoc, List.mem_map] at rin
     rcases rin with rinit | rin₁ | rin₂ | rte₁ | rte₂
     · rw [rinit] at bef aft 
       dsimp only at bef aft 
@@ -2106,14 +2105,6 @@ by
     have i_lt_lenr : i < (List.map Symbol.terminal w).length
     · sorry
     have equivalent_ith := correspondingStrings_get i_lt_lenl i_lt_lenr concat_xy
-    /-have iltwxl : i < (List.map (wrapSymbol₁ g₂.nt) x).length
-    · rw [List.length_map]
-      exact iltxl
-    have aaaa :
-      List.get (List.map (wrapSymbol₁ g₂.nt) x ++ List.map (wrapSymbol₂ g₁.nt) y) ⟨i, i_lt_lenl⟩ =
-      List.get (List.map (wrapSymbol₁ g₂.nt) x) ⟨i, iltwxl⟩
-    · sorry
-    rw [aaaa] at equivalent_ith-/
     have asdf :
       List.get (List.map (wrapSymbol₁ g₂.nt) x ++ List.map (wrapSymbol₂ g₁.nt) y) ⟨i, i_lt_lenl⟩ =
       wrapSymbol₁ g₂.nt (x.get ⟨i, iltxl⟩)

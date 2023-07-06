@@ -77,4 +77,4 @@ def asTerminal {N : Type} : Symbol T N → Option T
   | Symbol.nonterminal _ => none
 
 def allUsedTerminals (g : Grammar T) : List T :=
-  List.filterMap asTerminal (List.join (List.map Grule.outputString g.rules))
+  List.filterMap asTerminal (List.join (List.map Grule.output g.rules))

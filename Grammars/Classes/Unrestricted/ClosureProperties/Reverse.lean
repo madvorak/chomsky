@@ -7,7 +7,7 @@ variable {T : Type}
 section Auxiliary
 
 private def reversalGrule {N : Type} (r : Grule T N) : Grule T N :=
-  Grule.mk r.inputR.reverse r.inputN r.inputL.reverse r.outputString.reverse
+  Grule.mk r.inputR.reverse r.inputN r.inputL.reverse r.output.reverse
 
 private lemma dual_of_reversal_grule {N : Type} (r : Grule T N) :
   reversalGrule (reversalGrule r) = r :=
@@ -71,7 +71,7 @@ by
     rw [rid₁, rid₂, rid₃, ← List.reverse_append_append, ← List.reverse_append_append, ←
       List.append_assoc, ← List.append_assoc]
     congr
-  · have snd_from_r : r₀.outputString = r.outputString.reverse
+  · have snd_from_r : r₀.output = r.output.reverse
     · rw [← r_from_r₀]
       unfold reversalGrule
       rw [List.reverse_reverse]

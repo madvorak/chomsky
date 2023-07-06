@@ -25,7 +25,7 @@ def liftRule (liftN : N₀ → N) : Grule T N₀ → Grule T N :=
     (liftString liftN r.inputL)
     (liftN r.inputN)
     (liftString liftN r.inputR)
-    (liftString liftN r.outputString)
+    (liftString liftN r.output)
 
 end FunctionsLiftSink
 

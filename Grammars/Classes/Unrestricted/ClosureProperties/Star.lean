@@ -29,21 +29,24 @@ private lemma Z_neq_H {N : Type} : Z ≠ @H T N :=
 by
   intro ass
   have imposs := Sum.inr.inj (Symbol.nonterminal.inj ass)
-  have zero_ne_one : (0 : Fin 3) ≠ (1 : Fin 3); decide
+  have zero_ne_one : (0 : Fin 3) ≠ (1 : Fin 3)
+  · decide
   exact zero_ne_one imposs
 
 private lemma Z_neq_R {N : Type} : Z ≠ @R T N :=
 by
   intro ass
   have imposs := Sum.inr.inj (Symbol.nonterminal.inj ass)
-  have zero_ne_two : (0 : Fin 3) ≠ (2 : Fin 3); decide
+  have zero_ne_two : (0 : Fin 3) ≠ (2 : Fin 3)
+  · decide
   exact zero_ne_two imposs
 
 private lemma H_neq_R {N : Type} : H ≠ @R T N :=
 by
   intro ass
   have imposs := Sum.inr.inj (Symbol.nonterminal.inj ass)
-  have one_ne_two : (1 : Fin 3) ≠ (2 : Fin 3); decide
+  have one_ne_two : (1 : Fin 3) ≠ (2 : Fin 3)
+  · decide
   exact one_ne_two imposs
 
 end SpecificSymbols
@@ -56,21 +59,22 @@ private def wrapSym {N : Type} : Symbol T N → ns T N
 
 private def wrapGr {N : Type} (r : Grule T N) : Grule T (nn N) :=
   Grule.mk (List.map wrapSym r.inputL) (Sum.inl r.inputN) (List.map wrapSym r.inputR)
-      (List.map wrapSym r.outputString)
+      (List.map wrapSym r.output)
 
 private def rulesThatScanTerminals (g : Grammar T) : List (Grule T (nn g.nt)) :=
   List.map (fun t => Grule.mk [] (Sum.inr 2) [Symbol.terminal t] [Symbol.terminal t, R])
       (allUsedTerminals g)
 
 
+-- grammar for iteration of `g.Language`
 private def star_grammar (g : Grammar T) : Grammar T :=
   Grammar.mk (nn g.nt) (Sum.inr 0) (
-    Grule.mk [] (Sum.inr 0) [] [Z, S, H] ::
-    Grule.mk [] (Sum.inr 0) [] [R, H] ::
-    Grule.mk [] (Sum.inr 2) [H] [R] ::
-    Grule.mk [] (Sum.inr 2) [H] [] :: 
-    -- List.map wrapGr g.rules ++
-    rulesThatScanTerminals g)
+    Grule.mk [] (Sum.inr 0) [] [Z, S, H] :: (
+    Grule.mk [] (Sum.inr 0) [] [R, H] :: (
+    Grule.mk [] (Sum.inr 2) [H] [R] :: (
+    Grule.mk [] (Sum.inr 2) [H] [] :: (
+    List.map wrapGr g.rules ++
+    rulesThatScanTerminals g)))))
 
 end Construction
 
@@ -82,7 +86,7 @@ private lemma short_induction {g : Grammar T} {w : List (List T)}
     (ass : ∀ wᵢ ∈ w.reverse, GrammarGenerates g wᵢ) :
     GrammarDerives (starGrammar g) [z]
         (z::List.join (List.map (· ++ [h]) (List.map (List.map Symbol.terminal) w.reverse))) ∧
-      ∀ p ∈ w, ∀ t ∈ p, Symbol.terminal t ∈ List.join (List.map Grule.outputString g.rules) :=
+      ∀ p ∈ w, ∀ t ∈ p, Symbol.terminal t ∈ List.join (List.map Grule.output g.rules) :=
   by
   induction' w with v x ih
   · constructor
@@ -239,7 +243,7 @@ private lemma short_induction {g : Grammar T} {w : List (List T)}
 private lemma terminal_scan_ind {g : Grammar T} {w : List (List T)} (n : ℕ)
     (n_lt_wl : n ≤ w.length)
     (terminals :
-      ∀ v ∈ w, ∀ t ∈ v, Symbol.terminal t ∈ List.join (List.map Grule.outputString g.rules)) :
+      ∀ v ∈ w, ∀ t ∈ v, Symbol.terminal t ∈ List.join (List.map Grule.output g.rules)) :
     GrammarDerives (starGrammar g)
       ((List.map (fun u => List.map Symbol.terminal u) (List.take (w.length - n) w)).join ++ [r] ++
           (List.map (fun v => [h] ++ List.map Symbol.terminal v)
@@ -389,7 +393,7 @@ private lemma terminal_scan_ind {g : Grammar T} {w : List (List T)} (n : ℕ)
 
 private lemma terminal_scan_aux {g : Grammar T} {w : List (List T)}
     (terminals :
-      ∀ v ∈ w, ∀ t ∈ v, Symbol.terminal t ∈ List.join (List.map Grule.outputString g.rules)) :
+      ∀ v ∈ w, ∀ t ∈ v, Symbol.terminal t ∈ List.join (List.map Grule.output g.rules)) :
     GrammarDerives (starGrammar g)
       ([r] ++ (List.map (fun v => [h] ++ v) (List.map (List.map Symbol.terminal) w)).join ++ [h])
       (List.map Symbol.terminal w.join ++ [r, h]) :=
@@ -3086,7 +3090,7 @@ lemma RE_of_star_RE (L : Language T) : IsRE L → IsRE (KStar.kstar L) :=
       ·
         trace
           "./././Mathport/Syntax/Translate/Tactic/Builtin.lean:73:14: unsupported tactic `trim #[]"
-      · have out_nil : ((star_grammar g).rules.nthLe 3 _).outputString = [] := by rfl
+      · have out_nil : ((star_grammar g).rules.nthLe 3 _).output = [] := by rfl
         rw [List.append_nil, out_nil, List.append_nil]
     apply grammar_deri_of_deri_tran _ final_step
     convert_to

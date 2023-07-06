@@ -146,8 +146,13 @@ private lemma first_transformation {g₁ g₂ : Grammar T} :
     [Symbol.nonterminal (Sum.inl (some (Sum.inl g₁.initial))),
      Symbol.nonterminal (Sum.inl (some (Sum.inr g₂.initial)))] :=
 by
-  use (bigGrammar g₁ g₂).rules.get ⟨0, by sorry⟩
-  sorry
+  use (bigGrammar g₁ g₂).rules.get ⟨0, by simp [bigGrammar]⟩
+  constructor
+  · simp [bigGrammar]
+  use [], []
+  constructor
+  · rfl
+  · rfl
 
 private lemma substitute_terminals {g₁ g₂ : Grammar T} {side : T → Sum T T} {w : List T}
   (rule_for_each_terminal : ∀ t ∈ w,
@@ -159,10 +164,7 @@ private lemma substitute_terminals {g₁ g₂ : Grammar T} {side : T → Sum T T
 by
   induction' w with d l ih
   · apply Grammar.deri_self
-  rw [List.map]
-  rw [List.map]
-  rw [← List.singleton_append]
-  rw [← List.singleton_append]
+  rw [List.map_cons, List.map_cons, ← List.singleton_append, ← List.singleton_append]
   have step_head :
     (bigGrammar g₁ g₂).Transforms
       ([(Symbol.nonterminal ∘ Sum.inr ∘ side) d] ++
@@ -707,7 +709,7 @@ by
     constructor
     · simp [wrapSymbol₁, correspondingSymbols]
     · exact ih
-  cases' n with o t' -- probably throw away from here on
+  cases' n with o t' -- probably throw away from here down
   · cases' o with n'
     · sorry
     · sorry
@@ -2022,67 +2024,60 @@ by
     -- only the first rule is applicable
     rcases hyp_tran with ⟨r, rin, u, v, bef, aft⟩
     have bef_len := congr_arg List.length bef
-    rw [List.length_append_append] at bef_len 
-    rw [List.length_append_append] at bef_len 
-    rw [List.length_singleton] at bef_len 
-    rw [List.length_singleton] at bef_len 
-    sorry /-
-    have u_nil : u = []; swap
-    have v_nil : v = []; swap
-    have rif_nil : r.input_L = []
-    --any_goals
-    clear * - bef_len
-    rw [← List.length_eq_zero]
-    linarith
-    --
-    change _ ∈ List.cons _ _ at rin 
-    rw [List.mem_cons] at rin 
-    cases rin
-    · rw [rin] at bef aft 
+    rw [List.length_append_append, List.length_append_append,
+        List.length_singleton, List.length_singleton] at bef_len 
+    have u_nil : u = []
+    · clear * - bef_len
+      rw [← List.length_eq_zero]
+      linarith
+    have v_nil : v = []
+    · clear * - bef_len
+      rw [← List.length_eq_zero]
+      linarith
+    have rif_nil : r.inputL = []
+    · clear * - bef_len
+      rw [← List.length_eq_zero]
+      linarith
+    have nt_match : Symbol.nonterminal (bigGrammar g₁ g₂).initial = Symbol.nonterminal r.inputN
+    · have bef_fst := congr_fun (congr_arg List.get? bef) 0
+      rw [u_nil, rif_nil] at bef_fst 
+      rw [← Option.some_inj]
+      exact bef_fst
+    simp [bigGrammar, List.mem_cons] at rin -- TODO
+    rcases rin with rinit | rin₁ | rin₂ | rte₁ | rte₂
+    · rw [rinit] at bef aft 
       dsimp only at bef aft 
       rw [u_nil, v_nil] at aft 
       rw [List.nil_append, List.append_nil] at aft 
       exact aft
-    exfalso
-    have nt_match : Symbol.nonterminal (bigGrammar g₁ g₂).initial = Symbol.nonterminal r.input_N :=
-      by
-      have bef_fst := congr_fun (congr_arg List.get? bef) 0
-      rw [u_nil, rif_nil] at bef_fst 
-      rw [← Option.some_inj]
-      exact bef_fst
-    clear * - rin nt_match
-    repeat' rw [List.mem_append] at rin 
-    cases rin
-    · cases rin
-      · rw [List.mem_map] at rin 
-        rcases rin with ⟨r₀, hr₀g₁, wrap_eq_r⟩
-        rw [← wrap_eq_r] at nt_match 
-        unfold wrap_grule₁ at nt_match 
-        have inl_match := Symbol.nonterminal.inj nt_match
-        change Sum.inl none = Sum.inl (some (Sum.inl r₀.input_N)) at inl_match 
-        have none_eq_some := Sum.inl.inj inl_match
-        exact Option.noConfusion none_eq_some
-      · rw [List.mem_map] at rin 
-        rcases rin with ⟨r₀, hr₀g₂, wrap_eq_r⟩
-        rw [← wrap_eq_r] at nt_match 
-        unfold wrap_grule₂ at nt_match 
-        have inl_match := Symbol.nonterminal.inj nt_match
-        change Sum.inl none = Sum.inl (some (Sum.inr r₀.input_N)) at inl_match 
-        have none_eq_some := Sum.inl.inj inl_match
-        exact Option.noConfusion none_eq_some
-    · cases rin
-      · unfold rulesForTerminals₁ at rin 
-        rw [List.mem_map] at rin 
-        rcases rin with ⟨t, htg₁, tt_eq_r⟩
-        rw [← tt_eq_r] at nt_match 
-        have inl_eq_inr := Symbol.nonterminal.inj nt_match
-        exact Sum.noConfusion inl_eq_inr
-      · unfold rulesForTerminals₂ at rin 
-        rw [List.mem_map] at rin 
-        rcases rin with ⟨t, htg₂, tt_eq_r⟩
-        rw [← tt_eq_r] at nt_match 
-        have inl_eq_inr := Symbol.nonterminal.inj nt_match
-        exact Sum.noConfusion inl_eq_inr-/
+    · exfalso
+      rcases rin₁ with ⟨r₀, hr₀g₁, wrap_eq_r⟩
+      rw [← wrap_eq_r] at nt_match 
+      unfold wrapGrule₁ at nt_match 
+      have inl_match := Symbol.nonterminal.inj nt_match
+      change Sum.inl none = Sum.inl (some (Sum.inl r₀.inputN)) at inl_match 
+      have none_eq_some := Sum.inl.inj inl_match
+      exact Option.noConfusion none_eq_some
+    · exfalso
+      rcases rin₂ with ⟨r₀, hr₀g₂, wrap_eq_r⟩
+      rw [← wrap_eq_r] at nt_match 
+      unfold wrapGrule₂ at nt_match 
+      have inl_match := Symbol.nonterminal.inj nt_match
+      change Sum.inl none = Sum.inl (some (Sum.inr r₀.inputN)) at inl_match 
+      have none_eq_some := Sum.inl.inj inl_match
+      exact Option.noConfusion none_eq_some
+    · unfold rulesForTerminals₁ at rte₁ 
+      rw [List.mem_map] at rte₁ 
+      rcases rte₁ with ⟨t, htg₁, tt_eq_r⟩
+      rw [← tt_eq_r] at nt_match 
+      have inl_eq_inr := Symbol.nonterminal.inj nt_match
+      exact Sum.noConfusion inl_eq_inr
+    · unfold rulesForTerminals₂ at rte₂ 
+      rw [List.mem_map] at rte₂ 
+      rcases rte₂ with ⟨t, htg₂, tt_eq_r⟩
+      rw [← tt_eq_r] at nt_match 
+      have inl_eq_inr := Symbol.nonterminal.inj nt_match
+      exact Sum.noConfusion inl_eq_inr
   clear hyp_tran
   rw [w₁eq] at hyp_deri 
   have hope_result := big_induction hyp_deri
@@ -2100,6 +2095,34 @@ by
     have xylen := correspondingStrings_length concat_xy
     rw [List.length_append] at xylen 
     repeat' rw [List.length_map] at xylen 
+    apply List.ext_get
+    · rw [List.length_map, List.length_take_of_le]
+      exact le_trans (Nat.le_add_right x.length y.length) (le_of_eq xylen)
+    intros i iltwl iltxl
+    rw [List.get_map]
+    have i_lt_lenl : i < (List.map (wrapSymbol₁ g₂.nt) x ++ List.map (wrapSymbol₂ g₁.nt) y).length
+    · rw [List.length_append]
+      sorry
+    have i_lt_lenr : i < (List.map Symbol.terminal w).length
+    · sorry
+    have equivalent_ith := correspondingStrings_get i_lt_lenl i_lt_lenr concat_xy
+    /-have iltwxl : i < (List.map (wrapSymbol₁ g₂.nt) x).length
+    · rw [List.length_map]
+      exact iltxl
+    have aaaa :
+      List.get (List.map (wrapSymbol₁ g₂.nt) x ++ List.map (wrapSymbol₂ g₁.nt) y) ⟨i, i_lt_lenl⟩ =
+      List.get (List.map (wrapSymbol₁ g₂.nt) x) ⟨i, iltwxl⟩
+    · sorry
+    rw [aaaa] at equivalent_ith-/
+    have asdf :
+      List.get (List.map (wrapSymbol₁ g₂.nt) x ++ List.map (wrapSymbol₂ g₁.nt) y) ⟨i, i_lt_lenl⟩ =
+      wrapSymbol₁ g₂.nt (x.get ⟨i, iltxl⟩)
+    · sorry
+    rw [asdf, List.get_map] at equivalent_ith
+    set I : Fin x.length := ⟨i, iltxl⟩
+    cases' x.get I with t n₁
+    · simp [wrapSymbol₁, correspondingSymbols] at equivalent_ith
+      sorry
     sorry /-ext1 i
     by_cases i ≥ x.length
     · convert_to none = none

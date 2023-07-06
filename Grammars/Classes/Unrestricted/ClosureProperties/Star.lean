@@ -1,4 +1,4 @@
-/-import Grammars.Classes.Unrestricted.Basics.Lifting
+import Grammars.Classes.Unrestricted.Basics.Lifting
 import Grammars.Classes.Unrestricted.ClosureProperties.Concatenation
 
 -- new nonterminal type
@@ -26,20 +26,21 @@ private def S {g : Grammar T} : ns T g.nt :=
   Symbol.nonterminal (Sum.inl g.initial)
 
 private lemma Z_neq_H {N : Type} : Z ≠ @H T N :=
-  by
+by
   intro ass
   have imposs := Sum.inr.inj (Symbol.nonterminal.inj ass)
-  exact Fin.zero_ne_one imposs
+  have zero_ne_one : (0 : Fin 3) ≠ (1 : Fin 3); decide
+  exact zero_ne_one imposs
 
 private lemma Z_neq_R {N : Type} : Z ≠ @R T N :=
-  by
+by
   intro ass
   have imposs := Sum.inr.inj (Symbol.nonterminal.inj ass)
   have zero_ne_two : (0 : Fin 3) ≠ (2 : Fin 3); decide
   exact zero_ne_two imposs
 
 private lemma H_neq_R {N : Type} : H ≠ @R T N :=
-  by
+by
   intro ass
   have imposs := Sum.inr.inj (Symbol.nonterminal.inj ass)
   have one_ne_two : (1 : Fin 3) ≠ (2 : Fin 3); decide
@@ -49,31 +50,31 @@ end SpecificSymbols
 
 section Construction
 
-private def wrap_sym {N : Type} : Symbol T N → Ns T N
+private def wrapSym {N : Type} : Symbol T N → ns T N
   | Symbol.terminal t => Symbol.terminal t
   | Symbol.nonterminal n => Symbol.nonterminal (Sum.inl n)
 
-private def wrap_gr {N : Type} (r : Grule T N) : Grule T (Nn N) :=
+private def wrapGr {N : Type} (r : Grule T N) : Grule T (nn N) :=
   Grule.mk (List.map wrapSym r.inputL) (Sum.inl r.inputN) (List.map wrapSym r.inputR)
-    (List.map wrapSym r.outputString)
+      (List.map wrapSym r.outputString)
 
-private def rules_that_scan_terminals (g : Grammar T) : List (Grule T (Nn g.Nt)) :=
-  List.map (fun t => Grule.mk [] (Sum.inr 2) [Symbol.terminal t] [Symbol.terminal t, r])
-    (allUsedTerminals g)
+private def rulesThatScanTerminals (g : Grammar T) : List (Grule T (nn g.nt)) :=
+  List.map (fun t => Grule.mk [] (Sum.inr 2) [Symbol.terminal t] [Symbol.terminal t, R])
+      (allUsedTerminals g)
 
 
 private def star_grammar (g : Grammar T) : Grammar T :=
-  Grammar.mk (Nn g.Nt) (Sum.inr 0) (
+  Grammar.mk (nn g.nt) (Sum.inr 0) (
     Grule.mk [] (Sum.inr 0) [] [Z, S, H] ::
     Grule.mk [] (Sum.inr 0) [] [R, H] ::
     Grule.mk [] (Sum.inr 2) [H] [R] ::
     Grule.mk [] (Sum.inr 2) [H] [] :: 
-    List.map wrapGr g.rules ++
+    -- List.map wrapGr g.rules ++
     rulesThatScanTerminals g)
 
 end Construction
 
-section EasyDirection
+/-section EasyDirection
 
 /- ./././Mathport/Syntax/Translate/Expr.lean:177:8: unsupported: ambiguous notation -/
 /- ./././Mathport/Syntax/Translate/Expr.lean:177:8: unsupported: ambiguous notation -/

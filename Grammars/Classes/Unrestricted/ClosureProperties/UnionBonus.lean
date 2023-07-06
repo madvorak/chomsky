@@ -12,8 +12,6 @@ private def liftCFrule₂ (N₁ : Type) {N₂ : Type} (r : N₂ × List (Symbol 
   Option (Sum N₁ N₂) × List (Symbol T (Option (Sum N₁ N₂))) :=
 (some (Sum.inr r.fst), liftString (Option.some ∘ Sum.inr) r.snd)
 
-/- ./././Mathport/Syntax/Translate/Expr.lean:177:8: unsupported: ambiguous notation -/
-/- ./././Mathport/Syntax/Translate/Expr.lean:177:8: unsupported: ambiguous notation -/
 private def unionCFgrammar (g₁ g₂ : CFgrammar T) : CFgrammar T :=
   CFgrammar.mk (Option (Sum g₁.nt g₂.nt)) none (
     (none, [Symbol.nonterminal (some (Sum.inl g₁.initial))]) ::
@@ -34,10 +32,6 @@ by
   simp
   sorry
 
-/-- The class of context-free languages is closed under union.
-    This lemma is proved by translation from general grammars.
-    Compare to `classes.context_free.closure_properties.union.lean`
-    which uses a direct proof for context-free grammars. -/
 private theorem bonus_CF_of_CF_u_CF (L₁ : Language T) (L₂ : Language T) :
   IsCF L₁  ∧  IsCF L₂  →  IsCF (L₁ + L₂)  :=
 by

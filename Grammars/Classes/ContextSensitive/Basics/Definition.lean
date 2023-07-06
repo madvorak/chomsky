@@ -1,6 +1,6 @@
 import Grammars.Classes.Unrestricted.Basics.Definition
 
-/-- Transformation rule for a context-sensitive grammar. -/
+/-- Rewrite rule for a context-sensitive grammar. -/
 structure CSrule (T : Type) (N : Type) where
   contextLeft : List (Symbol T N)
   inputNonterminal : N

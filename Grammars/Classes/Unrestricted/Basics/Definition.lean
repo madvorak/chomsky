@@ -6,7 +6,7 @@ inductive Symbol (T : Type) (N : Type)
   | terminal    : T → Symbol T N
   | nonterminal : N → Symbol T N
 
-/-- Transformation rule for a grammar without any restrictions. -/
+/-- Rewrite rule for a grammar without any restrictions. -/
 structure Grule (T : Type) (N : Type) where
   inputL : List (Symbol T N)
   inputN : N

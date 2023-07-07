@@ -2974,10 +2974,9 @@ private lemma star_induction {g : Grammar T} {α : List (Ns T g.Nt)}
 
 end HardDirection
 
-/- ./././Mathport/Syntax/Translate/Tactic/Builtin.lean:69:18: unsupported non-interactive tactic split_ile -/
-/- ./././Mathport/Syntax/Translate/Tactic/Builtin.lean:73:14: unsupported tactic `trim #[] -/
-/-- The class of recursively-enumerable languages is closed under the Kleene star. -/
-lemma RE_of_star_RE (L : Language T) : IsRE L → IsRE (KStar.kstar L) :=
+
+/-- The class of grammar-generated languages is closed under the Kleene star. -/
+theorem GG_of_star_GG (L : Language T) : IsGG L → IsGG (KStar.kstar L) :=
   by
   rintro ⟨g, hg⟩
   use star_grammar g

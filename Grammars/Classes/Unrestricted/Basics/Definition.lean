@@ -41,6 +41,6 @@ def Grammar.Generates (g : Grammar T) (w : List T) : Prop :=
 def Grammar.Language (g : Grammar T) : Language T :=
   setOf g.Generates
 
-/-- Predicate "is recursively-enumerable"; defined by existence of a grammar for the given language. -/
-def IsRE (L : Language T) : Prop :=
+/-- Predicate "is grammar-generated"; defined by existence of a grammar for the given language. -/
+def IsGG (L : Language T) : Prop :=
   ∃ g : Grammar T, g.Language = L

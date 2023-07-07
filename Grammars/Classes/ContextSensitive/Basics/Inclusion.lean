@@ -79,7 +79,7 @@ by
     exact indu (List.map Symbol.terminal w)
 
 theorem CS_subclass_RE {L : Language T} :
-  IsCS L  →  IsRE L  :=
+  IsCS L  →  IsGG L  :=
 by
   rintro ⟨g, eq_L⟩
   use grammar_of_csg g

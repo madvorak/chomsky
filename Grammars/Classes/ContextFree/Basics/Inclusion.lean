@@ -121,5 +121,5 @@ by
   rw [cfLanguage_eq_csLanguage]
 
 theorem CF_subclass_RE {L : Language T} :
-  IsCF L  →  IsRE L  :=
+  IsCF L  →  IsGG L  :=
 CS_subclass_RE ∘ CF_subclass_CS

@@ -2317,9 +2317,10 @@ end VeryComplicated
 
 end HardDirection
 
-/-- The class of recursively-enumerable languages is closed under concatenation. -/
-theorem RE_of_RE_c_RE (L₁ : Language T) (L₂ : Language T) :
-  IsRE L₁  ∧  IsRE L₂  →  IsRE (L₁ * L₂)  :=
+
+/-- The class of grammar-generated languages is closed under concatenation. -/
+theorem GG_of_GG_c_GG (L₁ : Language T) (L₂ : Language T) :
+  IsGG L₁  ∧  IsGG L₂  →  IsGG (L₁ * L₂)  :=
 by
   rintro ⟨⟨g₁, eq_L₁⟩, ⟨g₂, eq_L₂⟩⟩
   use bigGrammar g₁ g₂

@@ -299,9 +299,9 @@ by
   rw [List.map_map]
   rfl
 
-/-- The class of recursively-enumerable languages is closed under union. -/
-theorem RE_of_RE_u_RE (L₁ : Language T) (L₂ : Language T) :
-  IsRE L₁  ∧  IsRE L₂  →  IsRE (L₁ + L₂)  :=
+/-- The class of grammar-generated languages is closed under union. -/
+theorem GG_of_GG_u_GG (L₁ : Language T) (L₂ : Language T) :
+  IsGG L₁  ∧  IsGG L₂  →  IsGG (L₁ + L₂)  :=
 by
   rintro ⟨⟨g₁, eq_L₁⟩, ⟨g₂, eq_L₂⟩⟩
   use unionGrammar g₁ g₂

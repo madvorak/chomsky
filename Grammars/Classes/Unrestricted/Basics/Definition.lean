@@ -3,8 +3,8 @@ import Mathlib.Computability.Language
 
 /-- The type of symbols is the disjoint union of terminals and nonterminals. -/
 inductive Symbol (T : Type) (N : Type)
-  | terminal    : T → Symbol T N
-  | nonterminal : N → Symbol T N
+  | terminal    (t : T) : Symbol T N
+  | nonterminal (n : N) : Symbol T N
 
 /-- Rewrite rule for a grammar without any restrictions. -/
 structure Grule (T : Type) (N : Type) where

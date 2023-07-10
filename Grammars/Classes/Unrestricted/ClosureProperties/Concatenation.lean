@@ -2096,7 +2096,7 @@ by
     repeat' rw [List.length_map] at xylen 
     apply List.ext_get
     · rw [List.length_map, List.length_take_of_le]
-      exact le_trans (Nat.le_add_right x.length y.length) (le_of_eq xylen)
+      exact le_of_add_le_left (le_of_eq xylen)
     intros i iltwl iltxl
     rw [List.get_map]
     have i_lt_lenl : i < (List.map (wrapSymbol₁ g₂.nt) x ++ List.map (wrapSymbol₂ g₁.nt) y).length

@@ -47,10 +47,8 @@ by
   use r
   constructor
   · exact rin
-  use pᵣ ++ u
-  use v
-  rw [h_bef]
-  rw [h_aft]
+  use pᵣ ++ u, v
+  rw [h_bef, h_aft]
   constructor <;> simp only [List.append_assoc]
 
 lemma Grammar.deri_with_postfix {w₁ w₂ : List (Symbol T g.nt)}
@@ -65,10 +63,8 @@ by
   use r
   constructor
   · exact rin
-  use u
-  use v ++ pₒ
-  rw [h_bef]
-  rw [h_aft]
+  use u, v ++ pₒ
+  rw [h_bef, h_aft]
   constructor <;> simp only [List.append_assoc]
 
 

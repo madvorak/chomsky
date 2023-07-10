@@ -58,7 +58,7 @@ def grule_of_kurodaRule {N : Type} : KurodaRule T N → Grule T N
 def grammar_of_kurodaGrammar (k : KurodaGrammar T) : Grammar T :=
   Grammar.mk k.nt k.initial (List.map grule_of_kurodaRule k.rules)
 
-lemma kuroda_tran_iff (k : KurodaGrammar T) (w₁ w₂ : List (Symbol T k.nt)) :
+lemma KurodaGrammar.tran_iff (k : KurodaGrammar T) (w₁ w₂ : List (Symbol T k.nt)) :
   k.Transforms w₁ w₂  ↔  (grammar_of_kurodaGrammar k).Transforms w₁ w₂  :=
 by
   constructor
@@ -160,34 +160,40 @@ by
       · rw [List.append_nil] at aft
         exact aft
 
-lemma kuroda_tran_rel_eq (k : KurodaGrammar T) :
+lemma KurodaGrammar.tran_rel_eq (k : KurodaGrammar T) :
   k.Transforms = (grammar_of_kurodaGrammar k).Transforms :=
 by
   ext w₁ w₂
-  apply kuroda_tran_iff
+  apply KurodaGrammar.tran_iff
 
-lemma kuroda_deri_iff (k : KurodaGrammar T) (w₁ w₂ : List (Symbol T k.nt)) :
+lemma KurodaGrammar.deri_iff (k : KurodaGrammar T) (w₁ w₂ : List (Symbol T k.nt)) :
   k.Derives w₁ w₂  ↔  (grammar_of_kurodaGrammar k).Derives w₁ w₂  :=
 by
   unfold KurodaGrammar.Derives
-  rw [kuroda_tran_rel_eq]
+  rw [KurodaGrammar.tran_rel_eq]
   rfl
 
-lemma kuroda_gene_iff (k : KurodaGrammar T) (w : List T) :
+lemma KurodaGrammar.gene_iff (k : KurodaGrammar T) (w : List T) :
   k.Generates w  ↔  (grammar_of_kurodaGrammar k).Generates w  :=
 by
   unfold KurodaGrammar.Generates
-  rw [kuroda_deri_iff]
+  rw [KurodaGrammar.deri_iff]
   rfl
 
-theorem kuroda_lang_eq (k : KurodaGrammar T) :
+theorem KurodaGrammar.lang_eq (k : KurodaGrammar T) :
   k.Language = (grammar_of_kurodaGrammar k).Language :=
 by
   ext w
-  apply kuroda_gene_iff
+  apply KurodaGrammar.gene_iff
 
 -- big hard theorem will follow
 
-theorem kurodaGrammar_always_exists (L : Language T) :
-  IsGG L  →  ∃ k : KurodaGrammar T, k.Language = L  :=
-sorry
+theorem GG_iff_kurodaGrammar_exists (L : Language T) :
+  IsGG L  ↔  ∃ k : KurodaGrammar T, k.Language = L  :=
+by
+  constructor
+  · sorry
+  · rintro ⟨k, eq_L⟩
+    use grammar_of_kurodaGrammar k
+    rw [← k.lang_eq]
+    exact eq_L

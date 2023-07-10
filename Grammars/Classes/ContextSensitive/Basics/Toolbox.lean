@@ -31,3 +31,7 @@ CSgrammar.deri_of_deri_deri (CSgrammar.deri_of_tran huv) hvw
 lemma CSgrammar.tran_or_id_of_deri {u w : List (Symbol T g.nt)} (ass : g.Derives u w) :
   u = w  ∨  ∃ v : List (Symbol T g.nt), g.Transforms u v ∧ g.Derives v w  :=
 Relation.ReflTransGen.cases_head ass
+
+lemma CSgrammar.id_or_tran_of_deri {u w : List (Symbol T g.nt)} (ass : g.Derives u w) :
+  w = u  ∨  ∃ v : List (Symbol T g.nt), g.Derives u v ∧ g.Transforms v w  :=
+Relation.ReflTransGen.cases_tail ass -- TODO flip `w = u`

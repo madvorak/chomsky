@@ -6,13 +6,14 @@ structure CSrule (T : Type) (N : Type) where
   inputNonterminal : N
   contextRight : List (Symbol T N)
   outputString : List (Symbol T N)
+  output_nonempty : outputString.length > 0
 
--- !! TODO require non-empty `outputString` unless `S` → `[]` where `S` is on no right side !!
 /-- Context-sensitive grammar that generates words over the alphabet `T` (a type of terminals). -/
 structure CSgrammar (T : Type) where
   nt : Type                  -- type of nonterminals
   initial : nt               -- initial symbol
   rules : List (CSrule T nt) -- rewrite rules
+  allow_empty : Bool         -- whether empty word can be generated
 
 variable {T : Type}
 
@@ -28,7 +29,8 @@ def CSgrammar.Transforms (g : CSgrammar T) (w₁ w₂ : List (Symbol T g.nt)) : 
 def CSgrammar.Derives (g : CSgrammar T) : List (Symbol T g.nt) → List (Symbol T g.nt) → Prop :=
   Relation.ReflTransGen g.Transforms
 
-def CSgrammar.Generates (g : CSgrammar T)  (w : List T) : Prop :=
+def CSgrammar.Generates (g : CSgrammar T) (w : List T) : Prop :=
+  (w = [] ∧ g.allow_empty) ∨
   g.Derives [Symbol.nonterminal g.initial] (List.map Symbol.terminal w)
 
 def CSgrammar.Language (g : CSgrammar T) : Language T :=

@@ -28,9 +28,13 @@ lemma CFgrammar.deri_of_tran_deri {u v w : List (Symbol T g.nt)}
   g.Derives u w :=
 CFgrammar.deri_of_deri_deri (CFgrammar.deri_of_tran huv) hvw
 
-lemma CFgrammar.tran_or_id_of_deri {u w : List (Symbol T g.nt)} (ass : g.Derives u w) :
+lemma CFgrammar.eq_or_tranDeri_of_deri {u w : List (Symbol T g.nt)} (ass : g.Derives u w) :
   u = w  ∨  ∃ v : List (Symbol T g.nt), g.Transforms u v ∧ g.Derives v w  :=
 Relation.ReflTransGen.cases_head ass
+
+lemma CFgrammar.eq_or_deriTran_of_deri {u w : List (Symbol T g.nt)} (ass : g.Derives u w) :
+  u = w  ∨  ∃ v : List (Symbol T g.nt), g.Derives u v ∧ g.Transforms v w  :=
+(Relation.ReflTransGen.cases_tail ass).casesOn (fun hwu => Or.inl hwu.symm) Or.inr
 
 
 lemma CFgrammar.deri_with_prefix {w₁ w₂ : List (Symbol T g.nt)}

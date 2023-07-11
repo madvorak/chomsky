@@ -156,7 +156,7 @@ by
   rw [Set.mem_setOf_eq] at ass ⊢
   rw [Set.mem_setOf_eq]
   unfold Grammar.Generates at ass ⊢
-  have hyp := Grammar.tran_or_id_of_deri ass
+  have hyp := Grammar.eq_or_tranDeri_of_deri ass
   clear ass
   cases' hyp with hypo hypot
   · exfalso

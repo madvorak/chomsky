@@ -530,7 +530,7 @@ private lemma in_language_of_in_union (w : List T) :
     w ∈ cFLanguage (unionGrammar g₁ g₂) → w ∈ cFLanguage g₁ ∨ w ∈ cFLanguage g₂ :=
   by
   intro ass
-  cases' CF_tran_or_id_of_deri ass with impossible h
+  cases' CF_eq_or_tranDeri_of_deri ass with impossible h
   · exfalso
     have zeroth := congr_arg (fun p => List.get? p 0) impossible
     unfold List.get? at zeroth 

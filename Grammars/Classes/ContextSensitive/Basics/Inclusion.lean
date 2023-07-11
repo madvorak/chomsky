@@ -93,7 +93,7 @@ by
         rw [Set.mem_setOf_eq]
         simp only [List.map, false_or, iff_false]
         intro imposs
-        cases' CSgrammar.id_or_tran_of_deri imposs with case_id case_tr
+        cases' CSgrammar.eq_or_deriTran_of_deri imposs with case_id case_tr
         · cases case_id
         rcases case_tr with ⟨x, _, r, rin, u, v, bef, aft⟩
         have imposs := congr_arg List.length aft

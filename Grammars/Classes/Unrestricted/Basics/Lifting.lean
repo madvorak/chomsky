@@ -33,7 +33,7 @@ end FunctionsLiftSink
 section LiftingConditions
 
 structure LiftedGrammar (T : Type) where
-  g₀ : Grammar T
+  g₀: Grammar T
   g : Grammar T
   liftNt : g₀.nt → g.nt
   sinkNt : g.nt → Option g₀.nt

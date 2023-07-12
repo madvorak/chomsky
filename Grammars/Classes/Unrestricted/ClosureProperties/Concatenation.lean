@@ -2002,7 +2002,7 @@ lemma in_concatenated_of_in_big {g₁ g₂ : Grammar T} {w : List T}
   w ∈ g₁.Language * g₂.Language :=
 by
   rw [Language.mem_mul]
-  cases' Grammar.eq_or_tranDeri_of_deri ass with case_id case_step
+  cases' Grammar.eq_or_tran_deri_of_deri ass with case_id case_step
   · exfalso
     have nonmatch := congr_fun (congr_arg List.get? case_id) 0
     clear * - nonmatch

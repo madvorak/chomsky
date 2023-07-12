@@ -60,8 +60,8 @@ private lemma missingTODO {g : CSgrammar T} {w : List T}
     (ass : (grammar_of_csg g).Derives [Symbol.nonterminal none] (List.map Symbol.terminal w))
     (wnn : w ≠ []) :
   g.Derives [Symbol.nonterminal g.initial] (List.map Symbol.terminal w) :=
-by -- possibly useless
-  cases' Grammar.eq_or_tranDeri_of_deri ass with imposs possib
+by -- maybe useless
+  cases' Grammar.eq_or_tran_deri_of_deri ass with imposs possib
   · exfalso
     have contra := congr_fun (congr_arg (List.get?) imposs) 0
     simp [List.get?, forall_true_left, List.get?_map] at contra
@@ -96,7 +96,7 @@ by
         rw [Set.mem_setOf_eq]
         simp only [List.map, false_or, iff_false]
         intro imposs
-        cases' CSgrammar.eq_or_deriTran_of_deri imposs with case_id case_tr
+        cases' CSgrammar.eq_or_deri_tran_of_deri imposs with case_id case_tr
         · cases case_id
         rcases case_tr with ⟨x, -, r, rin, u, v, bef, aft⟩
         have contra := congr_arg List.length aft
@@ -106,7 +106,7 @@ by
         linarith
       · rw [iff_false, Set.mem_setOf_eq, emptyStr]
         intro imposs
-        cases' Grammar.eq_or_deriTran_of_deri imposs with case_id case_tr
+        cases' Grammar.eq_or_deri_tran_of_deri imposs with case_id case_tr
         · cases' w with d l <;> simp at case_id
         rcases case_tr with ⟨x, -, r, rin, u, v, bef, aft⟩
         have routlen : r.output.length > 0

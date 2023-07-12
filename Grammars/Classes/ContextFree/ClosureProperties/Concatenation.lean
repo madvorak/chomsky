@@ -401,7 +401,7 @@ private lemma in_concatenated_of_in_combined {g₁ g₂ : CFGrammar T} {w : List
     CFDerives (combined_grammar g₁ g₂) [Symbol.nonterminal (combined_grammar g₁ g₂).initial]
       (List.map Symbol.terminal w) at
     hyp 
-  cases CF_eq_or_tranDeri_of_deri hyp
+  cases CF_eq_or_tran_deri_of_deri hyp
   · rename' h => refl_contr
     exfalso
     have hh := congr_fun (congr_arg List.get? refl_contr) 0

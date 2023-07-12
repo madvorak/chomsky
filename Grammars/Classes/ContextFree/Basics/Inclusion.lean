@@ -16,7 +16,7 @@ lemma grammar_of_cfg_well_defined (g : CFgrammar T) :
 by
   sorry
 
-lemma grammarOfCsg_of_cfg :
+lemma grammar_of_csg_of_cfg :
   grammar_of_csg ∘ csg_of_cfg = @grammar_of_cfg T :=
 by
   ext

@@ -26,7 +26,11 @@ private def oN₂_of_N : (unionGrammar g₁ g₂).nt → Option g₂.nt
 
 
 def lg₁ : LiftedGrammar T :=
-  LiftedGrammar.mk g₁ (unionGrammar g₁ g₂) (Option.some ∘ Sum.inl) oN₁_of_N
+  LiftedGrammar.mk
+    g₁
+    (unionGrammar g₁ g₂)
+    (Option.some ∘ Sum.inl)
+    oN₁_of_N
     (by
       intro x y hyp
       apply Sum.inl_injective
@@ -87,7 +91,11 @@ def lg₁ : LiftedGrammar T :=
     )
 
 def lg₂ : LiftedGrammar T :=
-  LiftedGrammar.mk g₂ (unionGrammar g₁ g₂) (Option.some ∘ Sum.inr) oN₂_of_N
+  LiftedGrammar.mk
+    g₂
+    (unionGrammar g₁ g₂)
+    (Option.some ∘ Sum.inr)
+    oN₂_of_N
     (by
       intro x y hyp
       apply Sum.inr_injective
@@ -156,7 +164,7 @@ by
   rw [Set.mem_setOf_eq] at ass ⊢
   rw [Set.mem_setOf_eq]
   unfold Grammar.Generates at ass ⊢
-  have hyp := Grammar.eq_or_tranDeri_of_deri ass
+  have hyp := Grammar.eq_or_tran_deri_of_deri ass
   clear ass
   cases' hyp with hypo hypot
   · exfalso
@@ -233,7 +241,7 @@ by
     rw [List.filterMap_some]
   · suffices True = False
       by contradiction
-    rcases rin₁ with ⟨r₁, _, r_of_r₁⟩
+    rcases rin₁ with ⟨r₁, -, r_of_r₁⟩
     convert congr_arg
         (fun z => Symbol.nonterminal (liftRule (Option.some ∘ Sum.inl) r₁).inputN ∈ z)
         bef.symm
@@ -245,7 +253,7 @@ by
       simp [liftRule, unionGrammar]
   · suffices True = False
       by contradiction
-    rcases rin₂ with ⟨r₂, _, r_of_r₂⟩
+    rcases rin₂ with ⟨r₂, -, r_of_r₂⟩
     convert congr_arg
         (fun z => Symbol.nonterminal (liftRule (Option.some ∘ Sum.inr) r₂).inputN ∈ z)
         bef.symm

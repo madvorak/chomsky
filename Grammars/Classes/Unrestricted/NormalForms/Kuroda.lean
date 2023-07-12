@@ -186,13 +186,12 @@ by
   ext w
   apply KurodaGrammar.gene_iff
 
--- big hard theorem will follow
 
 theorem GG_iff_kurodaGrammar_exists (L : Language T) :
   IsGG L  ↔  ∃ k : KurodaGrammar T, k.Language = L  :=
 by
   constructor
-  · sorry
+  · sorry -- this direction will be very hard
   · rintro ⟨k, eq_L⟩
     use grammar_of_kurodaGrammar k
     rw [← k.lang_eq]

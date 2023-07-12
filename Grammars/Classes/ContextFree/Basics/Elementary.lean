@@ -23,7 +23,7 @@ lemma language_of_cfgEmptyLang : CFgrammar.Language (@cfgEmptyLang T) = 0 :=
     CFDerives cfgEmptyLang [Symbol.nonterminal cfg_empty_lang.initial]
       (List.map Symbol.terminal w) at hw
   exfalso
-  cases CF_eq_or_tranDeri_of_deri hw
+  cases CF_eq_or_tran_deri_of_deri hw
   · have hhead := congr_fun (congr_arg List.get? h) 0
     cases' w with head tail ih
     · change some (Symbol.nonterminal cfg_empty_lang.initial) = none at hhead 
@@ -60,7 +60,7 @@ lemma language_of_cfgEmptyWord : CFgrammar.Language (@cfgEmptyWord T) = singleto
     CFDerives (@cfgEmptyWord T) [Symbol.nonterminal (@cfgEmptyLang T).initial]
       (List.map Symbol.terminal w) at hw 
   cases
-    @CF_eq_or_tranDeri_of_deri T (@cfgEmptyWord T) [Symbol.nonterminal cfg_empty_lang.initial]
+    @CF_eq_or_tran_deri_of_deri T (@cfgEmptyWord T) [Symbol.nonterminal cfg_empty_lang.initial]
       (List.map Symbol.terminal w) hw
   · exfalso
     have zeroth := congr_fun (congr_arg List.get? h) 0
@@ -113,7 +113,7 @@ lemma language_of_cfgEmptyWord : CFgrammar.Language (@cfgEmptyWord T) = singleto
     rw [rule] at aft 
     exact aft
   rw [v_is_empty_word] at step_none 
-  cases @CF_eq_or_tranDeri_of_deri T (@cfgEmptyWord T) List.nil (List.map Symbol.terminal w) step_none
+  cases @CF_eq_or_tran_deri_of_deri T (@cfgEmptyWord T) List.nil (List.map Symbol.terminal w) step_none
   · by_contra contra
     have w_not_nil : w.length > 0 :=
       by

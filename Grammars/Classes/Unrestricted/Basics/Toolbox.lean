@@ -29,13 +29,13 @@ lemma Grammar.deri_of_tran_deri {u v w : List (Symbol T g.nt)}
   g.Derives u w :=
 Grammar.deri_of_deri_deri (Grammar.deri_of_tran huv) hvw
 
-lemma Grammar.eq_or_tranDeri_of_deri {u w : List (Symbol T g.nt)} (ass : g.Derives u w) :
+lemma Grammar.eq_or_tran_deri_of_deri {u w : List (Symbol T g.nt)} (ass : g.Derives u w) :
   u = w  ∨  ∃ v : List (Symbol T g.nt), g.Transforms u v ∧ g.Derives v w  :=
 Relation.ReflTransGen.cases_head ass
 
-lemma Grammar.eq_or_deriTran_of_deri {u w : List (Symbol T g.nt)} (ass : g.Derives u w) :
+lemma Grammar.eq_or_deri_tran_of_deri {u w : List (Symbol T g.nt)} (ass : g.Derives u w) :
   u = w  ∨  ∃ v : List (Symbol T g.nt), g.Derives u v ∧ g.Transforms v w  :=
-(Relation.ReflTransGen.cases_tail ass).casesOn (fun hwu => Or.inl hwu.symm) Or.inr
+(Relation.ReflTransGen.cases_tail ass).casesOn (Or.inl ∘ Eq.symm) Or.inr
 
 
 lemma Grammar.deri_with_prefix {w₁ w₂ : List (Symbol T g.nt)}

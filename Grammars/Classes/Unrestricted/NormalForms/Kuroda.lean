@@ -180,7 +180,7 @@ by
   rw [KurodaGrammar.deri_iff]
   rfl
 
-theorem KurodaGrammar.lang_eq (k : KurodaGrammar T) :
+lemma KurodaGrammar.lang_eq (k : KurodaGrammar T) :
   k.Language = (grammar_of_kurodaGrammar k).Language :=
 by
   ext w

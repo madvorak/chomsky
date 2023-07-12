@@ -4,6 +4,27 @@ import Grammars.Classes.ContextSensitive.Basics.Inclusion
 variable {T : Type}
 
 
+private def CFgrammar.discardEmpty (g : CFgrammar T) (n : g.nt) (n_to_nil_in_gr : (n, []) ∈ g.rules) : CFgrammar T :=
+  g -- TODO remove `(n, [])` from `g.rules` and then, for every rule containing `n` on the right-hand side, duplicate
+
+private def CFgrammar.hasEmptyRule (g : CFgrammar T) : Option g.nt :=
+  none -- TODO test if any `(n, [])` is in `g.rules`
+
+private partial def CFgrammar.eliminateEmptyRules (g : CFgrammar T) : CFgrammar T :=
+  match g.hasEmptyRule with
+  | none   => g -- TODO prove termination
+  | some n => (g.discardEmpty n sorry).eliminateEmptyRules
+
+private lemma CFgrammar.discardEmpty_preserves_language {g : CFgrammar T} {n : g.nt} (ass : (n, []) ∈ g.rules) :
+  (g.discardEmpty n ass).Language = g.Language  :=
+by -- TODO allow `(g.discardEmpty n ass).Language` and `g.Language` to differ in `[] ∈ g.Language` when `n = g.initial`
+  sorry
+
+private lemma CFgrammar.eliminateEmptyRules_preserves_language (g : CFgrammar T) :
+  g.eliminateEmptyRules.Language = g.Language  :=
+by -- TODO allow `(g.discardEmpty n ass).Language` and `g.Language` to differ in `[] ∈ g.Language`
+  sorry
+
 def csg_of_cfg (g : CFgrammar T) : CSgrammar T :=
   sorry
 

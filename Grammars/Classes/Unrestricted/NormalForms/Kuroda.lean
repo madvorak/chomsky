@@ -186,6 +186,7 @@ by
   ext w
   apply KurodaGrammar.gene_iff
 
+-- TODO reduction `Grammar → KurodaGrammar`
 
 theorem GG_iff_kurodaGrammar_exists (L : Language T) :
   IsGG L  ↔  ∃ k : KurodaGrammar T, k.Language = L  :=

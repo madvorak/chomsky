@@ -185,8 +185,8 @@ by
   cases' hyp with a_eq_d a_in_l
   · exact contr.left a_eq_d.symm
   specialize ih a_in_l
-  have zero_in_tail : countIn l a = 0 := by
-    unfold countIn
+  have zero_in_tail : countIn l a = 0
+  · unfold countIn
     exact contr.right
   rw [zero_in_tail] at ih 
   exact Nat.lt_irrefl 0 ih

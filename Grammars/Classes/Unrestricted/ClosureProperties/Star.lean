@@ -67,7 +67,7 @@ private def rulesThatScanTerminals (g : Grammar T) : List (Grule T (nn g.nt)) :=
 
 
 -- grammar for iteration of `g.Language`
-private def star_grammar (g : Grammar T) : Grammar T :=
+private def starGrammar (g : Grammar T) : Grammar T :=
   Grammar.mk (nn g.nt) (Sum.inr 0) (
     Grule.mk [] (Sum.inr 0) [] [Z, S, H] :: (
     Grule.mk [] (Sum.inr 0) [] [R, H] :: (
@@ -78,39 +78,35 @@ private def star_grammar (g : Grammar T) : Grammar T :=
 
 end Construction
 
-/-section EasyDirection
+section EasyDirection
 
-/- ./././Mathport/Syntax/Translate/Expr.lean:177:8: unsupported: ambiguous notation -/
-/- ./././Mathport/Syntax/Translate/Expr.lean:177:8: unsupported: ambiguous notation -/
 private lemma short_induction {g : Grammar T} {w : List (List T)}
-    (ass : ∀ wᵢ ∈ w.reverse, GrammarGenerates g wᵢ) :
-    GrammarDerives (starGrammar g) [z]
-        (z::List.join (List.map (· ++ [h]) (List.map (List.map Symbol.terminal) w.reverse))) ∧
-      ∀ p ∈ w, ∀ t ∈ p, Symbol.terminal t ∈ List.join (List.map Grule.output g.rules) :=
-  by
+    (ass : ∀ wᵢ ∈ w.reverse, g.Generates wᵢ) :
+  (starGrammar g).Derives
+    [Z]
+    (Z :: List.join (List.map (List.append · [H]) (List.map (List.map Symbol.terminal) w.reverse))) ∧
+  ∀ p ∈ w, ∀ t ∈ p, Symbol.terminal t ∈ List.join (List.map Grule.output g.rules) :=
+by
   induction' w with v x ih
   · constructor
-    · apply grammar_deri_self
+    · apply Grammar.deri_self
     · intro p pin
       exfalso
       exact List.not_mem_nil p pin
-  have vx_reverse : (v::x).reverse = x.reverse ++ [v] := by apply List.reverse_cons
-  rw [vx_reverse] at *
-  specialize
-    ih
-      (by
-        intro wᵢ in_reversed
-        apply ass
-        apply List.mem_append_left
-        exact in_reversed)
-  specialize
-    ass v
-      (by
-        apply List.mem_append_right
-        apply List.mem_singleton_self)
-  unfold GrammarGenerates at ass 
+  have vx_reverse : (v::x).reverse = x.reverse ++ [v]
+  · apply List.reverse_cons
+  rw [vx_reverse] at ass
+  specialize ih (by
+      intro wᵢ in_reversed
+      apply ass
+      apply List.mem_append_left
+      exact in_reversed)
+  specialize ass v (by
+      apply List.mem_append_right
+      apply List.mem_singleton_self)
+  sorry /-unfold Grammar.Generates at ass 
   constructor
-  · apply grammar_deri_of_tran_deri
+  · apply Grammar.deri_of_tran_deri
     · use (star_grammar g).rules.nthLe 0 (by decide)
       constructor
       · apply List.nthLe_mem
@@ -235,22 +231,16 @@ private lemma short_induction {g : Grammar T} {w : List (List T)}
         · exact stirn
       · exfalso
         exact Symbol.noConfusion imposs
-    · exact ih.right p pin t tin
+    · exact ih.right p pin t tin-/
 
-/- ./././Mathport/Syntax/Translate/Tactic/Builtin.lean:69:18: unsupported non-interactive tactic split_ile -/
-/- ./././Mathport/Syntax/Translate/Tactic/Builtin.lean:73:14: unsupported tactic `trim #[] -/
-/- ./././Mathport/Syntax/Translate/Tactic/Builtin.lean:73:14: unsupported tactic `trim #[] -/
-private lemma terminal_scan_ind {g : Grammar T} {w : List (List T)} (n : ℕ)
+/-private lemma terminal_scan_ind {g : Grammar T} {w : List (List T)} (n : ℕ)
     (n_lt_wl : n ≤ w.length)
-    (terminals :
-      ∀ v ∈ w, ∀ t ∈ v, Symbol.terminal t ∈ List.join (List.map Grule.output g.rules)) :
-    GrammarDerives (starGrammar g)
-      ((List.map (fun u => List.map Symbol.terminal u) (List.take (w.length - n) w)).join ++ [r] ++
-          (List.map (fun v => [h] ++ List.map Symbol.terminal v)
-              (List.drop (w.length - n) w)).join ++
-        [h])
-      (List.map Symbol.terminal w.join ++ [r, h]) :=
-  by
+    (terminals : ∀ v ∈ w, ∀ t ∈ v, Symbol.terminal t ∈ List.join (List.map Grule.output g.rules)) :
+  (starGrammar g).Derives
+    ((List.map (List.map Symbol.terminal) (List.take (w.length - n) w)).join ++ [R] ++
+      (List.map (fun v => [H] ++ List.map Symbol.terminal v) (List.drop (w.length - n) w)).join ++ [H])
+    (List.map Symbol.terminal w.join ++ [R, H]) :=
+by
   induction' n with k ih
   · rw [Nat.sub_zero]
     rw [List.drop_length]
@@ -392,23 +382,22 @@ private lemma terminal_scan_ind {g : Grammar T} {w : List (List T)} (n : ℕ)
     rfl
 
 private lemma terminal_scan_aux {g : Grammar T} {w : List (List T)}
-    (terminals :
-      ∀ v ∈ w, ∀ t ∈ v, Symbol.terminal t ∈ List.join (List.map Grule.output g.rules)) :
-    GrammarDerives (starGrammar g)
-      ([r] ++ (List.map (fun v => [h] ++ v) (List.map (List.map Symbol.terminal) w)).join ++ [h])
-      (List.map Symbol.terminal w.join ++ [r, h]) :=
-  by
+    (terminals : ∀ v ∈ w, ∀ t ∈ v, Symbol.terminal t ∈ List.join (List.map Grule.output g.rules)) :
+  (starGrammar g).Derives
+    ([R] ++ (List.map ([H] ++ ·) (List.map (List.map Symbol.terminal) w)).join ++ [H])
+    (List.map Symbol.terminal w.join ++ [R, H]) :=
+by
   rw [List.map_map]
   convert terminal_scan_ind w.length (by rfl) terminals
   · rw [Nat.sub_self]
     rw [List.take_zero]
     rfl
   · rw [Nat.sub_self]
-    rfl
+    rfl-/
 
 end EasyDirection
 
-section HardDirection
+/-section HardDirection
 
 lemma zero_of_not_ge_one {n : ℕ} (not_pos : ¬n ≥ 1) : n = 0 :=
   by

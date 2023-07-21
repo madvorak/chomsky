@@ -523,11 +523,11 @@ private lemma snsri_not_in_join_mpHmmw {g : Grammar T} {x : List (List (Symbol T
   · exact map_wrap_never_contains_nt_inr i in_l
   · rw [List.mem_singleton] at in_l 
     exact snsri_neq_H in_l
-
-private lemma Z_not_in_join_mpHmmw {g : Grammar T} {x : List (List (Symbol T g.Nt))} :
-    z ∉ List.join (List.map (· ++ [h]) (List.map (List.map wrapSym) x)) :=
-  snsri_not_in_join_mpHmmw Z_neq_H
-
+-/
+private lemma Z_not_in_join_mpHmmw {g : Grammar T} {x : List (List (Symbol T g.nt))} :
+    Z ∉ List.join (List.map (· ++ [H]) (List.map (List.map wrapSym) x)) :=
+sorry -- snsri_not_in_join_mpHmmw Z_neq_H
+/-
 private lemma R_not_in_join_mpHmmw {g : Grammar T} {x : List (List (Symbol T g.Nt))} :
     r ∉ List.join (List.map (· ++ [h]) (List.map (List.map wrapSym) x)) :=
   snsri_not_in_join_mpHmmw H_neq_R.symm
@@ -1223,37 +1223,49 @@ private lemma case_2_match_rule {g : Grammar T} {r₀ : Grule T g.Nt}
   constructor
   · exact xm_eq
   · exact v_eq
+-/
 
-/- ./././Mathport/Syntax/Translate/Tactic/Builtin.lean:73:14: unsupported tactic `trim #[] -/
-private lemma star_case_2 {g : Grammar T} {α α' : List (Symbol T (starGrammar g).Nt)}
-    (orig : GrammarTransforms (starGrammar g) α α')
-    (hyp :
-      ∃ x : List (List (Symbol T g.Nt)),
-        (∀ xᵢ ∈ x, GrammarDerives g [Symbol.nonterminal g.initial] xᵢ) ∧
-          α = [r, h] ++ List.join (List.map (· ++ [h]) (List.map (List.map wrapSym) x))) :
-    (∃ x : List (List (Symbol T g.Nt)),
-        (∀ xᵢ ∈ x, GrammarDerives g [Symbol.nonterminal g.initial] xᵢ) ∧
-          α' = [r, h] ++ List.join (List.map (· ++ [h]) (List.map (List.map wrapSym) x))) ∨
-      (∃ w : List (List T),
-          ∃ β : List T,
-            ∃ γ : List (Symbol T g.Nt),
-              ∃ x : List (List (Symbol T g.Nt)),
-                (∀ wᵢ ∈ w, GrammarGenerates g wᵢ) ∧
-                  GrammarDerives g [Symbol.nonterminal g.initial]
-                      (List.map Symbol.terminal β ++ γ) ∧
-                    (∀ xᵢ ∈ x, GrammarDerives g [Symbol.nonterminal g.initial] xᵢ) ∧
-                      α' =
-                        List.map Symbol.terminal (List.join w) ++ List.map Symbol.terminal β ++
-                                [r] ++
-                              List.map wrapSym γ ++
-                            [h] ++
-                          List.join (List.map (· ++ [h]) (List.map (List.map wrapSym) x))) ∨
-        (∃ u : List T, u ∈ KStar.kstar (grammarLanguage g) ∧ α' = List.map Symbol.terminal u) ∨
-          (∃ σ : List (Symbol T g.Nt), α' = List.map wrapSym σ ++ [r]) ∨
-            (∃ ω : List (Ns T g.Nt), α' = ω ++ [h]) ∧ z ∉ α' ∧ r ∉ α' :=
-  by
+private lemma star_case_2 {g : Grammar T} {α α' : List (Symbol T (starGrammar g).nt)}
+    (orig : (starGrammar g).Transforms α α')
+    (hyp : ∃ x : List (List (Symbol T g.nt)),
+        (∀ xᵢ ∈ x, g.Derives [Symbol.nonterminal g.initial] xᵢ) ∧
+        α = [R, H] ++ List.join (List.map (· ++ [H]) (List.map (List.map wrapSym) x))) :
+  (∃ x : List (List (Symbol T g.nt)),
+    (∀ xᵢ ∈ x, g.Derives [Symbol.nonterminal g.initial] xᵢ) ∧
+    α' = [R, H] ++ List.join (List.map (· ++ [H]) (List.map (List.map wrapSym) x))) ∨
+  (∃ w : List (List T), ∃ β : List T, ∃ γ : List (Symbol T g.nt), ∃ x : List (List (Symbol T g.nt)),
+    (∀ wᵢ ∈ w, g.Generates wᵢ) ∧
+    g.Derives [Symbol.nonterminal g.initial] (List.map Symbol.terminal β ++ γ) ∧
+    (∀ xᵢ ∈ x, g.Derives [Symbol.nonterminal g.initial] xᵢ) ∧
+    α' = List.map Symbol.terminal (List.join w) ++ sorry) ∨
+-- The following expression (ported from Lean 3) does not typecheck `α' = (List.map Symbol.terminal (List.join w)).append ((List.map Symbol.terminal β).append ([R] ++ List.map wrapSym γ ++ [H] ++ List.join (List.map (· ++ [H]) (List.map (List.map wrapSym) x)))))`
+  (∃ u : List T, u ∈ KStar.kstar g.Language ∧ α' = List.map Symbol.terminal u) ∨
+  (∃ σ : List (Symbol T g.nt), α' = List.map wrapSym σ ++ [R]) ∨
+  (∃ ω : List (ns T g.nt), α' = ω ++ [H]) ∧ Z ∉ α' ∧ R ∉ α' :=
+by
   rcases hyp with ⟨x, valid, cat⟩
-  have no_Z_in_alpha : Z ∉ α := by
+  have no_Z_in_alpha : Z ∉ α
+  · intro contr
+    rw [cat, List.mem_append] at contr
+    cases' contr with ZRH Zin
+    · rw [List.mem_doubleton] at ZRH
+      cases' ZRH with Z_eq_R Z_eq_H -- golfing possible
+      · exact Z_neq_R Z_eq_R
+      · exact Z_neq_H Z_eq_H
+    · exact Z_not_in_join_mpHmmw Zin
+  rw [cat] at *
+  clear cat
+  rcases orig with ⟨r, rin, u, v, bef, aft⟩
+  simp only [starGrammar, List.mem_cons, List.mem_append, List.mem_map] at rin
+  rcases rin with Z_ZSH | Z_RH | RH_R | RH_nil | original | Rt_tR
+  · sorry
+  · sorry
+  · sorry
+  · sorry
+  · sorry
+  · sorry
+  
+/-have no_Z_in_alpha : Z ∉ α := by
     intro contr
     rw [cat] at contr 
     clear * - contr

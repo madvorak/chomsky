@@ -1741,8 +1741,8 @@ by
     · rw [List.length_append, List.length_append, List.length_singleton]
       clear * -
       linarith
-    sorry
-    /-rw [List.get_append_right] at eqi_symb 
+    sorry /-
+    rw [List.get_append_right] at eqi_symb 
     simp only [Nat.sub_self, List.singleton_append, List.get] at eqi_symb 
     have eq_none :
       (List.map (wrapSymbol₁ g₂.nt) x ++ List.map (wrapSymbol₂ g₁.nt) y).nthLe u.length ulen₁ =

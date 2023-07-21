@@ -726,12 +726,12 @@ private lemma in_concatenated_of_in_combined {g₁ g₂ : CFGrammar T} {w : List
         have c_converted_and_back : List.map sTNOfSTN₁ (List.filterMap sTN₁_of_sTN c) = c :=
           by
           /-
-                      Simplified schema of this conversion (applies to some other conversions, too):
-                      we have `g ∘ f = id` but `f ∘ g` does not annihilate (in general)
-                      we need `(f ∘ g)(c) = c` for a specific `c`
-                      which we can express as `c = f(x)` and then
-                      we calculate `f(g(c)) = f(g(f(x))) = f(x) = c` hooray!
-                    -/
+            Simplified schema of this conversion (applies to some other conversions, too):
+            we have `g ∘ f = id` but `f ∘ g` does not annihilate (in general)
+            we need `(f ∘ g)(c) = c` for a specific `c`
+            which we can express as `c = f(x)` and then
+            we calculate `f(g(c)) = f(g(f(x))) = f(x) = c` hooray!
+          -/
           have taken_c_from_u := congr_arg (List.take c.length) part_for_u
           rw [List.take_take] at taken_c_from_u 
           rw [min_eq_left (le_of_lt h_len)] at taken_c_from_u 

@@ -8,17 +8,17 @@ variable {α β : Type _} {x y z : List α}
 section ListAppendAppend
 
 lemma length_append_append :
-  List.length (x ++ y ++ z) = x.length + y.length + z.length := 
+  (x ++ y ++ z).length = x.length + y.length + z.length := 
 by
   rw [List.length_append, List.length_append]
 
 lemma map_append_append {f : α → β} :
-  List.map f (x ++ y ++ z) = List.map f x ++ List.map f y ++ List.map f z :=
+  (x ++ y ++ z).map f = x.map f ++ y.map f ++ z.map f :=
 by
   rw [List.map_append, List.map_append]
 
 lemma filterMap_append_append {f : α → Option β} :
-  List.filterMap f (x ++ y ++ z) = List.filterMap f x ++ List.filterMap f y ++ List.filterMap f z :=
+  (x ++ y ++ z).filterMap f = x.filterMap f ++ y.filterMap f ++ z.filterMap f :=
 by
   rw [List.filterMap_append, List.filterMap_append]
 
@@ -38,7 +38,7 @@ by
   rw [List.forall_mem_append, List.forall_mem_append, and_assoc]
 
 lemma join_append_append {X Y Z : List (List α)} :
-  List.join (X ++ Y ++ Z) = X.join ++ Y.join ++ Z.join :=
+  (X ++ Y ++ Z).join = X.join ++ Y.join ++ Z.join :=
 by
   rw [List.join_append, List.join_append]
 
@@ -62,7 +62,7 @@ end ListReplicate
 section ListJoin
 
 private lemma cons_drop_succ {m : ℕ} (mlt : m < x.length) :
-  drop m x = x.get ⟨m, mlt⟩ :: drop m.succ x :=
+  x.drop m = x.get ⟨m, mlt⟩ :: x.drop m.succ :=
 by
   induction' x with d l ih generalizing m
   · exfalso
@@ -76,13 +76,13 @@ by
 
 lemma take_join_of_lt {L : List (List α)} {n : ℕ} (notall : n < L.join.length) :
   ∃ m k : ℕ, ∃ mlt : m < L.length,
-    k < (L.get ⟨m, mlt⟩).length  ∧
+    k < (L.get ⟨m, mlt⟩).length ∧
     L.join.take n = (L.take m).join ++ (L.get ⟨m, mlt⟩).take k :=
 sorry
 
 lemma drop_join_of_lt {L : List (List α)} {n : ℕ} (notall : n < L.join.length) :
   ∃ m k : ℕ, ∃ mlt : m < L.length,
-    k < (L.get ⟨m, mlt⟩).length  ∧
+    k < (L.get ⟨m, mlt⟩).length ∧
     L.join.drop n = (L.get ⟨m, mlt⟩).drop k ++ (L.drop m.succ).join :=
 by
   obtain ⟨m, k, mlt, klt, left_half⟩ := take_join_of_lt notall
@@ -114,6 +114,11 @@ def nTimes (l : List α) (n : ℕ) : List α :=
 infixl:100 " ^^ " => nTimes
 
 end ListJoin
+
+lemma mem_doubleton {a b c : α} :
+  a ∈ [b, c] ↔ a = b ∨ a = c :=
+by
+  rw [List.mem_cons, List.mem_singleton]
 
 variable [DecidableEq α]
 

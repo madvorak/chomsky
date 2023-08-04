@@ -101,8 +101,7 @@ by
   rw [auxi] at right_side 
   have near_result :
     take k (L.get ⟨m, mlt⟩) ++ drop n L.join =
-    take k (L.get ⟨m, mlt⟩) ++ drop k (L.get ⟨m, mlt⟩) ++
-      (drop m.succ L).join
+    take k (L.get ⟨m, mlt⟩) ++ drop k (L.get ⟨m, mlt⟩) ++ (drop m.succ L).join
   · convert right_side
     rw [List.take_append_drop]
   rw [append_assoc] at near_result 

@@ -92,7 +92,7 @@ end Auxiliary
 
 /-- The class of grammar-generated languages is closed under reversal. -/
 theorem GG_of_reverse_GG (L : Language T) :
-  IsGG L  →  IsGG (reverseLang L)  :=
+  IsGG L → IsGG (reverseLang L) :=
 by
   rintro ⟨g, hgL⟩
   rw [← hgL]

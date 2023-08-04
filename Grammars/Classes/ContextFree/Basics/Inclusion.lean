@@ -56,7 +56,7 @@ by
   rw [csLanguage_eq_grammarLanguage]
 
 theorem CF_subclass_CS {L : Language T} :
-  IsCF L  →  IsCS L  :=
+  IsCF L → IsCS L :=
 by
   rintro ⟨g, eq_L⟩
   use csg_of_cfg g
@@ -64,5 +64,5 @@ by
   rw [cfLanguage_eq_csLanguage]
 
 theorem CF_subclass_RE {L : Language T} :
-  IsCF L  →  IsGG L  :=
+  IsCF L → IsGG L :=
 CS_subclass_RE ∘ CF_subclass_CS

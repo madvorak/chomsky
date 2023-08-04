@@ -33,7 +33,7 @@ by
   sorry
 
 private theorem bonus_CF_of_CF_u_CF (L₁ : Language T) (L₂ : Language T) :
-  IsCF L₁  ∧  IsCF L₂  →  IsCF (L₁ + L₂)  :=
+  IsCF L₁ ∧ IsCF L₂ → IsCF (L₁ + L₂) :=
 by
   rintro ⟨⟨g₁, eq_L₁⟩, ⟨g₂, eq_L₂⟩⟩
   rw [cfLanguage_eq_grammarLanguage g₁] at eq_L₁ 

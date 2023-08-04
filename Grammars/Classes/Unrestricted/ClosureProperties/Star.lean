@@ -1253,45 +1253,24 @@ by
       · exact Z_neq_R Z_eq_R
       · exact Z_neq_H Z_eq_H
     · exact Z_not_in_join_mpHmmw Zin
-  rw [cat] at *
-  clear cat
+  --rw [cat] at *
+  --clear cat
   rcases orig with ⟨r, rin, u, v, bef, aft⟩
   simp only [starGrammar, List.mem_cons, List.mem_append, List.mem_map] at rin
-  rcases rin with Z_ZSH | Z_RH | RH_R | RH_nil | original | Rt_tR
-  · sorry
-  · sorry
-  · sorry
-  · sorry
-  · sorry
-  · sorry
-  
-/-have no_Z_in_alpha : Z ∉ α := by
-    intro contr
-    rw [cat] at contr 
-    clear * - contr
-    rw [List.mem_append] at contr 
-    cases contr
-    · cases contr
-      · exact Z_neq_R contr
-      · apply Z_neq_H
-        rw [← List.mem_singleton]
-        exact contr
-    · exact Z_not_in_join_mpHmmw contr
-  rw [cat] at *
-  clear cat
-  rcases orig with ⟨r, rin, u, v, bef, aft⟩
-  iterate 2 
-    cases rin
+  rcases rin with rinputZ | rinputZ | RH_R | RH_nil | original | Rt_tR
+  iterate 2
     · exfalso
       apply no_Z_in_alpha
-      rw [bef]
-      apply List.mem_append_left
-      apply List.mem_append_left
-      apply List.mem_append_right
+      rw [bef, rinputZ, List.mem_append_append, List.mem_append_append]
+      left; right; right
       rw [List.mem_singleton]
-      rw [rin]
       rfl
-  cases rin
+  · sorry
+  · sorry
+  · sorry
+  · sorry
+
+/-cases rin
   · cases' x with x₀ L
     · right; right; right
       rw [List.map_nil, List.map_nil, List.join, List.append_nil] at bef 

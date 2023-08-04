@@ -175,7 +175,7 @@ by
       have nt_eq_ter := Option.some.inj zeroth
       exact Symbol.noConfusion nt_eq_ter
   rcases hypot with ⟨i, ⟨r, rin, u, v, bef, aft⟩, deri⟩
-  have uv_nil :  u = []  ∧  v = []
+  have uv_nil : u = [] ∧ v = []
   · have bef_len := congr_arg List.length bef
     clear * - bef_len
     rw [List.length_singleton] at bef_len 
@@ -309,7 +309,7 @@ by
 
 /-- The class of grammar-generated languages is closed under union. -/
 theorem GG_of_GG_u_GG (L₁ : Language T) (L₂ : Language T) :
-  IsGG L₁  ∧  IsGG L₂  →  IsGG (L₁ + L₂)  :=
+  IsGG L₁ ∧ IsGG L₂ → IsGG (L₁ + L₂) :=
 by
   rintro ⟨⟨g₁, eq_L₁⟩, ⟨g₂, eq_L₂⟩⟩
   use unionGrammar g₁ g₂

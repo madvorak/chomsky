@@ -24,9 +24,9 @@ variable {T : Type}
 /-- One step of grammatical transformation. -/
 def Grammar.Transforms (g : Grammar T) (w₁ w₂ : List (Symbol T g.nt)) : Prop :=
   ∃ r : Grule T g.nt,
-    r ∈ g.rules  ∧
+    r ∈ g.rules ∧
     ∃ u v : List (Symbol T g.nt),
-      w₁ = u ++ r.inputL ++ [Symbol.nonterminal r.inputN] ++ r.inputR ++ v  ∧
+      w₁ = u ++ r.inputL ++ [Symbol.nonterminal r.inputN] ++ r.inputR ++ v ∧
       w₂ = u ++ r.output ++ v
 
 /-- Any number of steps of grammatical transformation. -/

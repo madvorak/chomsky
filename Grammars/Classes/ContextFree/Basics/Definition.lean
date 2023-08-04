@@ -12,9 +12,9 @@ variable {T : Type}
 /-- One step of context-free transformation. -/
 def CFgrammar.Transforms (g : CFgrammar T) (w₁ w₂ : List (Symbol T g.nt)) : Prop :=
   ∃ r : g.nt × List (Symbol T g.nt),
-    r ∈ g.rules  ∧
+    r ∈ g.rules ∧
     ∃ u v : List (Symbol T g.nt),
-      w₁ = u ++ [Symbol.nonterminal r.fst] ++ v  ∧  w₂ = u ++ r.snd ++ v
+      w₁ = u ++ [Symbol.nonterminal r.fst] ++ v ∧ w₂ = u ++ r.snd ++ v
 
 /-- Any number of steps of context-free transformation. -/
 def CFgrammar.Derives (g : CFgrammar T) : List (Symbol T g.nt) → List (Symbol T g.nt) → Prop :=

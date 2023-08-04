@@ -38,12 +38,12 @@ structure LiftedGrammar (T : Type) where
   liftNt : g₀.nt → g.nt
   sinkNt : g.nt → Option g₀.nt
   lift_inj : Function.Injective liftNt
-  sink_inj : ∀ x y,  sinkNt x = sinkNt y  →  x = y  ∨  sinkNt x = none
+  sink_inj : ∀ x y, sinkNt x = sinkNt y → x = y ∨ sinkNt x = none
   sinkNt_liftNt : ∀ n₀ : g₀.nt, sinkNt (liftNt n₀) = some n₀
-  corresponding_rules : ∀ r : Grule T g₀.nt,  r ∈ g₀.rules  →  liftRule liftNt r ∈ g.rules
+  corresponding_rules : ∀ r : Grule T g₀.nt, r ∈ g₀.rules → liftRule liftNt r ∈ g.rules
   preimage_of_rules :
     ∀ r : Grule T g.nt,
-      (r ∈ g.rules  ∧  ∃ n₀ : g₀.nt, liftNt n₀ = r.inputN) →
+      (r ∈ g.rules ∧ ∃ n₀ : g₀.nt, liftNt n₀ = r.inputN) →
         (∃ r₀ ∈ g₀.rules, liftRule liftNt r₀ = r)
 
 private lemma lifted_grammar_inverse {T : Type} (lg : LiftedGrammar T) :

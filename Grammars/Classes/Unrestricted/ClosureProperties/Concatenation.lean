@@ -447,7 +447,7 @@ by
   apply List.Forall₂.nil
 
 private lemma correspondingStrings_cons {N₁ N₂ : Type} {d₁ d₂ : nst T N₁ N₂} {l₁ l₂ : List (nst T N₁ N₂)} :
-  correspondingStrings (d₁::l₁) (d₂::l₂)  ↔  correspondingSymbols d₁ d₂  ∧  correspondingStrings l₁ l₂  :=
+  correspondingStrings (d₁::l₁) (d₂::l₂) ↔ correspondingSymbols d₁ d₂ ∧ correspondingStrings l₁ l₂ :=
 by
   apply List.forall₂_cons
 
@@ -2320,7 +2320,7 @@ end HardDirection
 
 /-- The class of grammar-generated languages is closed under concatenation. -/
 theorem GG_of_GG_c_GG (L₁ : Language T) (L₂ : Language T) :
-  IsGG L₁  ∧  IsGG L₂  →  IsGG (L₁ * L₂)  :=
+  IsGG L₁ ∧ IsGG L₂ → IsGG (L₁ * L₂)  :=
 by
   rintro ⟨⟨g₁, eq_L₁⟩, ⟨g₂, eq_L₂⟩⟩
   use bigGrammar g₁ g₂

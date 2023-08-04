@@ -19,20 +19,20 @@ variable {T : Type}
 /-- One step of transformation by a grammar in the Kuroda Normal Form. -/
 def KurodaGrammar.Transforms (g : KurodaGrammar T) (w₁ w₂ : List (Symbol T g.nt)) : Prop :=
   ∃ r : KurodaRule T g.nt,
-    r ∈ g.rules  ∧
+    r ∈ g.rules ∧
     ∃ u v : List (Symbol T g.nt),
       match r with
       | KurodaRule.two_two A B C D =>
-          w₁ = u ++ [Symbol.nonterminal A, Symbol.nonterminal B] ++ v  ∧
+          w₁ = u ++ [Symbol.nonterminal A, Symbol.nonterminal B] ++ v ∧
           w₂ = u ++ [Symbol.nonterminal C, Symbol.nonterminal D] ++ v
       | KurodaRule.one_two A B C =>
-          w₁ = u ++ [Symbol.nonterminal A] ++ v  ∧
+          w₁ = u ++ [Symbol.nonterminal A] ++ v ∧
           w₂ = u ++ [Symbol.nonterminal B, Symbol.nonterminal C] ++ v
       | KurodaRule.one_one A t =>
-          w₁ = u ++ [Symbol.nonterminal A] ++ v  ∧
+          w₁ = u ++ [Symbol.nonterminal A] ++ v ∧
           w₂ = u ++ [Symbol.terminal t] ++ v
       | KurodaRule.one_nil A =>
-          w₁ = u ++ [Symbol.nonterminal A] ++ v  ∧
+          w₁ = u ++ [Symbol.nonterminal A] ++ v ∧
           w₂ = u ++ v
 
 /-- Any number of steps of transformation by a grammar in the Kuroda Normal Form. -/
@@ -59,7 +59,7 @@ def grammar_of_kurodaGrammar (k : KurodaGrammar T) : Grammar T :=
   Grammar.mk k.nt k.initial (List.map grule_of_kurodaRule k.rules)
 
 lemma KurodaGrammar.tran_iff (k : KurodaGrammar T) (w₁ w₂ : List (Symbol T k.nt)) :
-  k.Transforms w₁ w₂  ↔  (grammar_of_kurodaGrammar k).Transforms w₁ w₂  :=
+  k.Transforms w₁ w₂ ↔ (grammar_of_kurodaGrammar k).Transforms w₁ w₂ :=
 by
   constructor
   · rintro ⟨r, rin, u, v, ass⟩
@@ -167,14 +167,14 @@ by
   apply KurodaGrammar.tran_iff
 
 lemma KurodaGrammar.deri_iff (k : KurodaGrammar T) (w₁ w₂ : List (Symbol T k.nt)) :
-  k.Derives w₁ w₂  ↔  (grammar_of_kurodaGrammar k).Derives w₁ w₂  :=
+  k.Derives w₁ w₂ ↔ (grammar_of_kurodaGrammar k).Derives w₁ w₂ :=
 by
   unfold KurodaGrammar.Derives
   rw [KurodaGrammar.tran_rel_eq]
   rfl
 
 lemma KurodaGrammar.gene_iff (k : KurodaGrammar T) (w : List T) :
-  k.Generates w  ↔  (grammar_of_kurodaGrammar k).Generates w  :=
+  k.Generates w ↔ (grammar_of_kurodaGrammar k).Generates w :=
 by
   unfold KurodaGrammar.Generates
   rw [KurodaGrammar.deri_iff]
@@ -189,7 +189,7 @@ by
 -- TODO reduction `Grammar → KurodaGrammar`
 
 theorem GG_iff_kurodaGrammar_exists (L : Language T) :
-  IsGG L  ↔  ∃ k : KurodaGrammar T, k.Language = L  :=
+  IsGG L ↔ ∃ k : KurodaGrammar T, k.Language = L :=
 by
   constructor
   · sorry -- this direction will be very hard

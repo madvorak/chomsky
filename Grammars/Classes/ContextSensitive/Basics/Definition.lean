@@ -33,9 +33,9 @@ def CSgrammar.Generates (g : CSgrammar T) (w : List T) : Prop :=
   (w = [] ∧ g.allow_empty) ∨
   g.Derives [Symbol.nonterminal g.initial] (List.map Symbol.terminal w)
 
-def CSgrammar.Language (g : CSgrammar T) : Language T :=
+def CSgrammar.language (g : CSgrammar T) : Language T :=
   setOf g.Generates
 
 /-- Predicate "is context-sensitive"; defined by existence of a context-sensitive grammar for the given language. -/
 def IsCS (L : Language T) : Prop :=
-  ∃ g : CSgrammar T, g.Language = L
+  ∃ g : CSgrammar T, g.language = L

@@ -19,8 +19,8 @@ def ruleEnde : Trule alphabet specials := ⟨[a, S, b], []⟩
 
 def mysis : Tsys alphabet := ⟨specials, specials.S_, [ruleSkip, ruleAnih, ruleEnde]⟩
 
-example : [alphabet.a_, alphabet.a_, alphabet.b_, alphabet.b_] ∈ mysis.Language := by
-  unfold Tsys.Language
+example : [alphabet.a_, alphabet.a_, alphabet.b_, alphabet.b_] ∈ mysis.language := by
+  unfold Tsys.language
   show (∃ n, Tsys.Derives mysis [S, a, a, b, b] [] n)
   use 4
   have lastStep : mysis.Transforms [a, S, b] []

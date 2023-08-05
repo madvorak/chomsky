@@ -66,7 +66,7 @@ private def rulesThatScanTerminals (g : Grammar T) : List (Grule T (nn g.nt)) :=
       (allUsedTerminals g)
 
 
--- grammar for iteration of `g.Language`
+-- grammar for iteration of `g.language`
 private def starGrammar (g : Grammar T) : Grammar T :=
   Grammar.mk (nn g.nt) (Sum.inr 0) (
     Grule.mk [] (Sum.inr 0) [] [Z, S, H] :: (
@@ -1239,7 +1239,7 @@ private lemma star_case_2 {g : Grammar T} {α α' : List (Symbol T (starGrammar 
     (∀ xᵢ ∈ x, g.Derives [Symbol.nonterminal g.initial] xᵢ) ∧
     α' = List.map Symbol.terminal (List.join w) ++ sorry) ∨
 -- The following expression (ported from Lean 3) does not typecheck `α' = (List.map Symbol.terminal (List.join w)).append ((List.map Symbol.terminal β).append ([R] ++ List.map wrapSym γ ++ [H] ++ List.join (List.map (· ++ [H]) (List.map (List.map wrapSym) x)))))`
-  (∃ u : List T, u ∈ KStar.kstar g.Language ∧ α' = List.map Symbol.terminal u) ∨
+  (∃ u : List T, u ∈ KStar.kstar g.language ∧ α' = List.map Symbol.terminal u) ∨
   (∃ σ : List (Symbol T g.nt), α' = List.map wrapSym σ ++ [R]) ∨
   (∃ ω : List (ns T g.nt), α' = ω ++ [H]) ∧ Z ∉ α' ∧ R ∉ α' :=
 by

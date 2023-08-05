@@ -3,7 +3,7 @@ import Grammars.Classes.ContextFree.Basics.Definition
 variable {T : Type} {g : CFgrammar T}
 
 
-/-- The relation `CF_derives` is reflexive. -/
+/-- The relation `CFgrammar.Derives` is reflexive. -/
 lemma CFgrammar.deri_self {w : List (Symbol T g.nt)} :
   g.Derives w w :=
 Relation.ReflTransGen.refl
@@ -12,7 +12,7 @@ lemma CFgrammar.deri_of_tran {v w : List (Symbol T g.nt)} (ass : g.Transforms v 
   g.Derives v w :=
 Relation.ReflTransGen.single ass
 
-/-- The relation `CF_derives` is transitive. -/
+/-- The relation `CFgrammar.Derives` is transitive. -/
 lemma CFgrammar.deri_of_deri_deri {u v w : List (Symbol T g.nt)} 
     (huv : g.Derives u v) (hvw : g.Derives v w) :
   g.Derives u w :=

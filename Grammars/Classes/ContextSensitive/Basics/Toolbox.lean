@@ -3,7 +3,7 @@ import Grammars.Classes.ContextSensitive.Basics.Definition
 variable {T : Type} {g : CSgrammar T}
 
 
-/-- The relation `CS_derives` is reflexive. -/
+/-- The relation `CSgrammar.Derives` is reflexive. -/
 lemma CSgrammar.deri_self {w : List (Symbol T g.nt)} :
   g.Derives w w :=
 Relation.ReflTransGen.refl
@@ -12,7 +12,7 @@ lemma CSgrammar.deri_of_tran {v w : List (Symbol T g.nt)} (ass : g.Transforms v 
   g.Derives v w :=
 Relation.ReflTransGen.single ass
 
-/-- The relation `CS_derives` is transitive. -/
+/-- The relation `CSgrammar.Derives` is transitive. -/
 lemma CSgrammar.deri_of_deri_deri {u v w : List (Symbol T g.nt)}
     (huv : g.Derives u v) (hvw : g.Derives v w) :
   g.Derives u w :=

@@ -25,9 +25,9 @@ def CFgrammar.Generates (g : CFgrammar T) (w : List T) : Prop :=
   g.Derives [Symbol.nonterminal g.initial] (List.map Symbol.terminal w)
 
 /-- The set of words that can be derived from the initial nonterminal. -/
-def CFgrammar.Language (g : CFgrammar T) : Language T :=
+def CFgrammar.language (g : CFgrammar T) : Language T :=
   setOf g.Generates
 
 /-- Predicate "is context-free"; defined by existence of a context-free grammar for the given language. -/
 def IsCF (L : Language T) : Prop :=
-  ∃ g : CFgrammar T, g.Language = L
+  ∃ g : CFgrammar T, g.language = L

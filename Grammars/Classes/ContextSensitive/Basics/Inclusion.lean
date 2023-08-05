@@ -70,15 +70,15 @@ by -- maybe useless
   sorry
 
 lemma csLanguage_eq_grammarLanguage (g : CSgrammar T) :
-  g.Language = (grammar_of_csg g).Language :=
+  g.language = (grammar_of_csg g).language :=
 by
-  unfold Grammar.Language
+  unfold Grammar.language
   ext1 w
   by_cases emptyStr : w = []
   · by_cases emptyCan : g.allow_empty
     · convert_to True ↔ True
       · rw [iff_true]
-        simp only [CSgrammar.Language, CSgrammar.Generates, emptyStr, emptyCan, and_true]
+        simp only [CSgrammar.language, CSgrammar.Generates, emptyStr, emptyCan, and_true]
         rw [Set.mem_setOf_eq]
         left
         rfl
@@ -92,7 +92,7 @@ by
         simp [grammar_of_csg]
       rfl
     · convert_to False ↔ False
-      · simp only [CSgrammar.Language, CSgrammar.Generates, emptyStr, emptyCan, and_false]
+      · simp only [CSgrammar.language, CSgrammar.Generates, emptyStr, emptyCan, and_false]
         rw [Set.mem_setOf_eq]
         simp only [List.map, false_or, iff_false]
         intro imposs
@@ -126,7 +126,7 @@ by
       rfl
   rw [Set.mem_setOf_eq]
   constructor
-  · unfold CSgrammar.Language
+  · unfold CSgrammar.language
     rw [Set.mem_setOf]
     unfold CSgrammar.Generates
     intro ass
@@ -142,7 +142,7 @@ by
     simp [woption]
   · unfold Grammar.Generates
     intro ass
-    unfold CSgrammar.Language
+    unfold CSgrammar.language
     rw [Set.mem_setOf]
     unfold CSgrammar.Generates
     right

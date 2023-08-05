@@ -1,5 +1,5 @@
 import Grammars.Classes.Unrestricted.Basics.Toolbox
-import Grammars.Utilities.LanguageOperations
+import Grammars.Utilities.languageOperations
 import Grammars.Utilities.ListUtils
 
 variable {T : Type}
@@ -80,10 +80,10 @@ by
     exact congr_arg List.reverse aft
 
 private lemma reversed_word_in_original_language {g : Grammar T} {w : List T}
-    (hyp : w ∈ (reversalGrammar g).Language) :
-  w.reverse ∈ g.Language :=
+    (hyp : w ∈ (reversalGrammar g).language) :
+  w.reverse ∈ g.language :=
 by
-  unfold Grammar.Language at *
+  unfold Grammar.language at *
   have almost_done := derives_reversed g (List.map Symbol.terminal w) hyp
   rw [← List.map_reverse] at almost_done 
   exact almost_done
@@ -100,10 +100,10 @@ by
   unfold reverseLang
   apply Set.eq_of_subset_of_subset
   · intro w hwL
-    change w.reverse ∈ g.Language
+    change w.reverse ∈ g.language
     exact reversed_word_in_original_language hwL
   · intro w hwL
-    change w.reverse ∈ g.Language at hwL 
+    change w.reverse ∈ g.language at hwL 
     obtain ⟨g₀, pre_reversal⟩ : ∃ g₀, g = reversalGrammar g₀
     · use reversalGrammar g
       rw [dual_of_reversalGrammar]

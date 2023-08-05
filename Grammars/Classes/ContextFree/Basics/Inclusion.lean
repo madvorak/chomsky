@@ -16,13 +16,13 @@ private partial def CFgrammar.eliminateEmptyRules (g : CFgrammar T) : CFgrammar 
   | some n => (g.discardEmpty n sorry).eliminateEmptyRules
 
 private lemma CFgrammar.discardEmpty_preserves_language {g : CFgrammar T} {n : g.nt} (ass : (n, []) ∈ g.rules) :
-  (g.discardEmpty n ass).Language = g.Language  :=
-by -- TODO allow `(g.discardEmpty n ass).Language` and `g.Language` to differ in `[] ∈ g.Language` when `n = g.initial`
+  (g.discardEmpty n ass).language = g.language  :=
+by -- TODO allow `(g.discardEmpty n ass).language` and `g.language` to differ in `[] ∈ g.language` when `n = g.initial`
   sorry
 
 private lemma CFgrammar.eliminateEmptyRules_preserves_language (g : CFgrammar T) :
-  g.eliminateEmptyRules.Language = g.Language  :=
-by -- TODO allow `(g.discardEmpty n ass).Language` and `g.Language` to differ in `[] ∈ g.Language`
+  g.eliminateEmptyRules.language = g.language  :=
+by -- TODO allow `(g.discardEmpty n ass).language` and `g.language` to differ in `[] ∈ g.language`
   sorry
 
 def csg_of_cfg (g : CFgrammar T) : CSgrammar T :=
@@ -44,12 +44,12 @@ by
   apply grammar_of_cfg_well_defined
 
 lemma cfLanguage_eq_csLanguage (g : CFgrammar T) :
-  g.Language = (csg_of_cfg g).Language :=
+  g.language = (csg_of_cfg g).language :=
 by
   sorry
 
 lemma cfLanguage_eq_grammarLanguage (g : CFgrammar T) :
-  g.Language = (grammar_of_cfg g).Language :=
+  g.language = (grammar_of_cfg g).language :=
 by
   rw [← grammar_of_cfg_well_defined]
   rw [cfLanguage_eq_csLanguage]

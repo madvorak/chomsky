@@ -29,18 +29,18 @@ inductive Tsys.Derives (h : Tsys α) : List (Tsymb α h.beta) → List (Tsymb α
   | refl (w : List (Tsymb α h.beta)) : h.Derives w w 0
   | tail (u v w : List (Tsymb α h.beta)) (n : ℕ) : h.Derives u v n → h.Transforms v w → h.Derives u w n.succ
 
-def Tsys.Language (h : Tsys α) : Language α :=
+def Tsys.language (h : Tsys α) : Language α :=
   setOf (fun w => ∃ n : ℕ, h.Derives (h.initiate w) [] n)
 
 def IsThue (L : Language α) : Prop :=
-  ∃ h : Tsys α, h.Language = L
+  ∃ h : Tsys α, h.language = L
 
 def Tsys.IsDeterministic (h : Tsys α) : Prop :=
   ∀ w : List α, ∀ s : List (Tsymb α h.beta), ∀ n : ℕ, h.Derives (h.initiate w) s n →
     ∀ x y : List (Tsymb α h.beta), h.Transforms s x ∧ h.Transforms s y → x = y
 
 def IsDethue (L : Language α) : Prop :=
-  ∃ h : Tsys α, h.Language = L ∧ h.IsDeterministic
+  ∃ h : Tsys α, h.language = L ∧ h.IsDeterministic
 
 def Tsys.IsDtime (h : Tsys α) (f : ℕ → ℕ) : Prop :=
   h.IsDeterministic ∧

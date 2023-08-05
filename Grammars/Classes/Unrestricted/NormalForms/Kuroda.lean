@@ -44,7 +44,7 @@ def KurodaGrammar.Generates (g : KurodaGrammar T) (w : List T) : Prop :=
   g.Derives [Symbol.nonterminal g.initial] (List.map Symbol.terminal w)
 
 /-- The set of words that can be derived from the initial nonterminal. -/
-def KurodaGrammar.Language (g : KurodaGrammar T) : Language T :=
+def KurodaGrammar.language (g : KurodaGrammar T) : Language T :=
   setOf g.Generates
 
 -- end of definition
@@ -181,7 +181,7 @@ by
   rfl
 
 lemma KurodaGrammar.lang_eq (k : KurodaGrammar T) :
-  k.Language = (grammar_of_kurodaGrammar k).Language :=
+  k.language = (grammar_of_kurodaGrammar k).language :=
 by
   ext w
   apply KurodaGrammar.gene_iff
@@ -189,7 +189,7 @@ by
 -- TODO reduction `Grammar → KurodaGrammar`
 
 theorem GG_iff_kurodaGrammar_exists (L : Language T) :
-  IsGG L ↔ ∃ k : KurodaGrammar T, k.Language = L :=
+  IsGG L ↔ ∃ k : KurodaGrammar T, k.language = L :=
 by
   constructor
   · sorry -- this direction will be very hard

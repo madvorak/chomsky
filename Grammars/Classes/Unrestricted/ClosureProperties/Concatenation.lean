@@ -93,7 +93,7 @@ def rulesForTerminals₂ (N₁ : Type) (g : Grammar T) : List (Grule T (nnn T N�
   List.map (fun t => Grule.mk [] (Sum.inr (Sum.inr t)) [] [Symbol.terminal t]) (allUsedTerminals g)
 
 
--- grammar for concatenation of `g₁.Language` with `g₂.Language`
+-- grammar for concatenation of `g₁.language` with `g₂.language`
 def bigGrammar (g₁ g₂ : Grammar T) : Grammar T :=
   Grammar.mk (nnn T g₁.nt g₂.nt) (Sum.inl none) (
     @Grule.mk T (nnn T g₁.nt g₂.nt) [] (Sum.inl none) [] [
@@ -190,12 +190,12 @@ by
     exact List.mem_cons_of_mem d tin
 
 lemma in_big_of_in_concatenated {g₁ g₂ : Grammar T} {w : List T}
-    (ass : w ∈ g₁.Language * g₂.Language) :
-  w ∈ (bigGrammar g₁ g₂).Language :=
+    (ass : w ∈ g₁.language * g₂.language) :
+  w ∈ (bigGrammar g₁ g₂).language :=
 by
   rw [Language.mem_mul] at ass 
   rcases ass with ⟨u, v, hu, hv, hw⟩
-  unfold Grammar.Language at *
+  unfold Grammar.language at *
   rw [Set.mem_setOf_eq] at *
   unfold Grammar.Generates at *
   apply Grammar.deri_of_tran_deri first_transformation
@@ -1998,8 +1998,8 @@ by
             unfold corresponding_symbols-/
 
 lemma in_concatenated_of_in_big {g₁ g₂ : Grammar T} {w : List T}
-    (ass : w ∈ (bigGrammar g₁ g₂).Language) :
-  w ∈ g₁.Language * g₂.Language :=
+    (ass : w ∈ (bigGrammar g₁ g₂).language) :
+  w ∈ g₁.language * g₂.language :=
 by
   rw [Language.mem_mul]
   cases' Grammar.eq_or_tran_deri_of_deri ass with case_id case_step
@@ -2086,7 +2086,7 @@ by
   use List.drop x.length w
   constructor
   · clear deri_y
-    unfold Grammar.Language
+    unfold Grammar.language
     rw [Set.mem_setOf_eq]
     unfold Grammar.Generates
     convert deri_x
@@ -2181,7 +2181,7 @@ by
       exact equivalent_ith-/
   constructor
   · clear deri_x
-    unfold Grammar.Language
+    unfold Grammar.language
     rw [Set.mem_setOf_eq]
     unfold Grammar.Generates
     convert deri_y

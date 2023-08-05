@@ -9,9 +9,9 @@ def cfgEmptyLang : CFgrammar T :=
   CFgrammar.mk (Fin 1) 0 []
 
 /-- Characterization of the empty language. -/
-lemma language_of_cfgEmptyLang : CFgrammar.Language (@cfgEmptyLang T) = 0 :=
+lemma language_of_cfgEmptyLang : CFgrammar.language (@cfgEmptyLang T) = 0 :=
   by
-  unfold CFgrammar.Language
+  unfold CFgrammar.language
   ext1 w
   constructor; swap
   · intro h
@@ -38,9 +38,9 @@ def cfgEmptyWord : CFgrammar T :=
   CFgrammar.mk (Fin 1) 0 [(0, [])]
 
 /-- Characterization of the singleton language. -/
-lemma language_of_cfgEmptyWord : CFgrammar.Language (@cfgEmptyWord T) = singleton [] :=
+lemma language_of_cfgEmptyWord : CFgrammar.language (@cfgEmptyWord T) = singleton [] :=
   by
-  unfold CFgrammar.Language
+  unfold CFgrammar.language
   ext1 w
   sorry /-
   constructor; swap
@@ -142,7 +142,7 @@ def cfgSymbolStar (a : T) : CFgrammar T :=
 /- ./././Mathport/Syntax/Translate/Expr.lean:177:8: unsupported: ambiguous notation -/
 /-- Characterization of the `{a}.star` language. -/
 lemma language_of_cfgSymbolStar (a : T) :
-    (cfgSymbolStar a).Language = fun w => ∃ n : ℕ, w = List.replicate n a :=
+    (cfgSymbolStar a).language = fun w => ∃ n : ℕ, w = List.replicate n a :=
   by sorry /-
   apply Set.eq_of_subset_of_subset
   · intro w
@@ -180,7 +180,7 @@ lemma language_of_cfgSymbolStar (a : T) :
       rw [List.nthLe_replicate a hr] at nq 
       specialize ass (w.nth_le n hl) nq
       exact ass (List.nthLe_mem w n hl)
-    have implication1 : w ∈ (cfgSymbolStar a).Language → ∀ t : T, t ≠ a → t ∉ w :=
+    have implication1 : w ∈ (cfgSymbolStar a).language → ∀ t : T, t ≠ a → t ∉ w :=
       by sorry /-
       clear implication2
       intro ass t nq

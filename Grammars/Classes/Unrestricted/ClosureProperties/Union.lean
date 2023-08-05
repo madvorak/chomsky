@@ -157,10 +157,10 @@ def lg₂ : LiftedGrammar T :=
 
 
 lemma in_L₁_or_L₂_of_in_union {w : List T}
-    (ass : w ∈ (unionGrammar g₁ g₂).Language) :
-  w ∈ g₁.Language ∨ w ∈ g₂.Language :=
+    (ass : w ∈ (unionGrammar g₁ g₂).language) :
+  w ∈ g₁.language ∨ w ∈ g₂.language :=
 by
-  unfold Grammar.Language at ass ⊢
+  unfold Grammar.language at ass ⊢
   rw [Set.mem_setOf_eq] at ass ⊢
   rw [Set.mem_setOf_eq]
   unfold Grammar.Generates at ass ⊢
@@ -264,10 +264,10 @@ by
     · rw [List.mem_singleton, Symbol.nonterminal.injEq]
       simp [liftRule, unionGrammar]
 
-lemma in_union_of_in_L₁ {w : List T} (ass : w ∈ g₁.Language) :
-  w ∈ (unionGrammar g₁ g₂).Language :=
+lemma in_union_of_in_L₁ {w : List T} (ass : w ∈ g₁.language) :
+  w ∈ (unionGrammar g₁ g₂).language :=
 by
-  unfold Grammar.Language at ass ⊢
+  unfold Grammar.language at ass ⊢
   rw [Set.mem_setOf_eq] at ass ⊢
   unfold Grammar.Generates at ass ⊢
   apply Grammar.deri_of_tran_deri
@@ -285,10 +285,10 @@ by
   rw [List.map_map]
   rfl
 
-lemma in_union_of_in_L₂ {w : List T} (ass : w ∈ g₂.Language) :
-  w ∈ (unionGrammar g₁ g₂).Language :=
+lemma in_union_of_in_L₂ {w : List T} (ass : w ∈ g₂.language) :
+  w ∈ (unionGrammar g₁ g₂).language :=
 by
-  unfold Grammar.Language at ass ⊢
+  unfold Grammar.language at ass ⊢
   rw [Set.mem_setOf_eq] at ass ⊢
   unfold Grammar.Generates at ass ⊢
   apply Grammar.deri_of_tran_deri

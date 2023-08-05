@@ -20,8 +20,8 @@ private def unionCFgrammar (g₁ g₂ : CFgrammar T) : CFgrammar T :=
     List.map (liftCFrule₂ g₁.nt) g₂.rules)
 
 private lemma unionCFgrammar_same_language (g₁ g₂ : CFgrammar T) :
-  (unionCFgrammar g₁ g₂).Language =
-  (unionGrammar (grammar_of_cfg g₁) (grammar_of_cfg g₂)).Language :=
+  (unionCFgrammar g₁ g₂).language =
+  (unionGrammar (grammar_of_cfg g₁) (grammar_of_cfg g₂)).language :=
 by
   rw [cfLanguage_eq_grammarLanguage]
   congr

@@ -9,4 +9,3 @@ def bijemapLang {T' : Type} (L : Language T) (π : Equiv T T') : Language T' := 
 
 def permuteLang (L : Language T) (π : Equiv.Perm T) : Language T :=
   bijemapLang L π
-

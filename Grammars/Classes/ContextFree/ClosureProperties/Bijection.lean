@@ -1,5 +1,5 @@
 /-import Project.Classes.ContextFree.Basics.Toolbox
-import Project.Utilities.LanguageOperations
+import Project.Utilities.languageOperations
 
 variable {T₁ T₂ N : Type}
 

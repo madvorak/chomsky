@@ -51,11 +51,11 @@ lemma CF_of_bijemap_CF (π : Equiv T₁ T₂) (L : Language T₁) : IsCF L → I
       use r₁
       constructor
       · change (r.fst, lsT₁_of_lsT₂ π r.snd) ∈ g.rules
-        rw [List.mem_map, Prod.exists] at r_in 
+        rw [List.mem_map, Prod.exists] at r_in
         rcases r_in with ⟨a, b, ab_in, ab_eq⟩
         have a_eq : a = r.fst := (congr_arg Prod.fst ab_eq).congr_right.mp rfl
         have b_eq : lsT₂_of_lsT₁ π b = r.snd := (congr_arg Prod.snd ab_eq).congr_right.mp rfl
-        rw [a_eq] at ab_in 
+        rw [a_eq] at ab_in
         convert ab_in
         rw [← b_eq]
         unfold lsT₁_of_lsT₂
@@ -85,18 +85,18 @@ lemma CF_of_bijemap_CF (π : Equiv T₁ T₂) (L : Language T₁) : IsCF L → I
         rw [List.map_append]
         rfl
     specialize deri_of_deri (List.map Symbol.terminal w) hw
-    unfold lsT₁_of_lsT₂ at deri_of_deri 
+    unfold lsT₁_of_lsT₂ at deri_of_deri
     rw [List.map_map] at *
     convert deri_of_deri
   · intro w hw
-    unfold bijemapLang at hw 
-    change List.map π.inv_fun w ∈ L at hw 
-    rw [← hg] at hw 
-    unfold cFLanguage at hw 
-    rw [Set.mem_setOf_eq] at hw 
-    unfold CFGenerates at hw 
-    rw [List.map_map] at hw 
-    unfold CFGeneratesStr at hw 
+    unfold bijemapLang at hw
+    change List.map π.inv_fun w ∈ L at hw
+    rw [← hg] at hw
+    unfold cFLanguage at hw
+    rw [Set.mem_setOf_eq] at hw
+    unfold CFGenerates at hw
+    rw [List.map_map] at hw
+    unfold CFGeneratesStr at hw
     unfold cFLanguage
     change CFGeneratesStr g' (List.map Symbol.terminal w)
     unfold CFGeneratesStr
@@ -137,8 +137,8 @@ lemma CF_of_bijemap_CF (π : Equiv T₁ T₂) (L : Language T₁) : IsCF L → I
         rw [List.map_append]
         rfl
     specialize deri_of_deri (List.map (Symbol.terminal ∘ π.inv_fun) w) hw
-    rw [lsT₂_of_lsT₁] at deri_of_deri 
-    rw [List.map_map] at deri_of_deri 
+    rw [lsT₂_of_lsT₁] at deri_of_deri
+    rw [List.map_map] at deri_of_deri
     convert deri_of_deri
     ext1
     change Symbol.terminal x = sT₂_of_sT₁ π (Symbol.terminal (π.inv_fun x))

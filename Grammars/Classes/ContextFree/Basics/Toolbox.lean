@@ -13,7 +13,7 @@ lemma CFgrammar.deri_of_tran {v w : List (Symbol T g.nt)} (ass : g.Transforms v 
 Relation.ReflTransGen.single ass
 
 /-- The relation `CFgrammar.Derives` is transitive. -/
-lemma CFgrammar.deri_of_deri_deri {u v w : List (Symbol T g.nt)} 
+lemma CFgrammar.deri_of_deri_deri {u v w : List (Symbol T g.nt)}
     (huv : g.Derives u v) (hvw : g.Derives v w) :
   g.Derives u w :=
 Relation.ReflTransGen.trans huv hvw

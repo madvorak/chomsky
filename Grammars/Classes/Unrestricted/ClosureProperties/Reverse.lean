@@ -46,8 +46,8 @@ by
     apply Grammar.deri_self
   apply Grammar.deri_of_deri_tran ih
   rcases orig with ⟨r, rin, x, y, bef, aft⟩
-  change r ∈ List.map _ g.rules at rin 
-  rw [List.mem_map] at rin 
+  change r ∈ List.map _ g.rules at rin
+  rw [List.mem_map] at rin
   rcases rin with ⟨r₀, rin₀, r_from_r₀⟩
   use r₀
   constructor
@@ -85,7 +85,7 @@ private lemma reversed_word_in_original_language {g : Grammar T} {w : List T}
 by
   unfold Grammar.language at *
   have almost_done := derives_reversed g (List.map Symbol.terminal w) hyp
-  rw [← List.map_reverse] at almost_done 
+  rw [← List.map_reverse] at almost_done
   exact almost_done
 
 end Auxiliary
@@ -103,12 +103,12 @@ by
     change w.reverse ∈ g.language
     exact reversed_word_in_original_language hwL
   · intro w hwL
-    change w.reverse ∈ g.language at hwL 
+    change w.reverse ∈ g.language at hwL
     obtain ⟨g₀, pre_reversal⟩ : ∃ g₀, g = reversalGrammar g₀
     · use reversalGrammar g
       rw [dual_of_reversalGrammar]
     rw [pre_reversal] at hwL ⊢
     have finished_up_to_reverses := reversed_word_in_original_language hwL
     rw [dual_of_reversalGrammar]
-    rw [List.reverse_reverse] at finished_up_to_reverses 
+    rw [List.reverse_reverse] at finished_up_to_reverses
     exact finished_up_to_reverses

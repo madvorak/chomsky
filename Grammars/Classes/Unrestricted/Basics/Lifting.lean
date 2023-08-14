@@ -56,10 +56,10 @@ by
   symm
   by_contra x_neq
   have inje := lg.sink_inj x (lg.liftNt n₀)
-  rw [lg.sinkNt_liftNt] at inje 
+  rw [lg.sinkNt_liftNt] at inje
   cases' inje ass with case_valu case_none
   · exact x_neq case_valu
-  rw [ass] at case_none 
+  rw [ass] at case_none
   exact Option.noConfusion case_none
 
 end LiftingConditions
@@ -82,7 +82,7 @@ by
   constructor
   · have lift_bef := congr_arg (liftString lg.liftNt) bef
     unfold liftString at *
-    rw [List.map_append_append, List.map_append_append] at lift_bef 
+    rw [List.map_append_append, List.map_append_append] at lift_bef
     exact lift_bef
   · have lift_aft := congr_arg (liftString lg.liftNt) aft
     unfold liftString at *
@@ -114,31 +114,31 @@ by
   rcases lg.preimage_of_rules r (by
       constructor
       · exact rin
-      rw [bef] at ok_input 
+      rw [bef] at ok_input
       have good_matched_nonterminal : GoodLetter (Symbol.nonterminal r.inputN)
       · apply ok_input (Symbol.nonterminal r.inputN)
         apply List.mem_append_left
         apply List.mem_append_left
         apply List.mem_append_right
         rw [List.mem_singleton]
-      change ∃ n₀ : lg.g₀.nt, lg.sinkNt r.inputN = some n₀ at good_matched_nonterminal 
+      change ∃ n₀ : lg.g₀.nt, lg.sinkNt r.inputN = some n₀ at good_matched_nonterminal
       cases' good_matched_nonterminal with n₀ hn₀
       use n₀
       have almost := congr_arg (Option.map lg.liftNt) hn₀
-      rw [lifted_grammar_inverse lg r.inputN ⟨n₀, hn₀⟩] at almost 
-      rw [Option.map_some'] at almost 
+      rw [lifted_grammar_inverse lg r.inputN ⟨n₀, hn₀⟩] at almost
+      rw [Option.map_some'] at almost
       apply Option.some_injective
       exact almost.symm
     )
     with ⟨r₀, pre_in, preimage⟩
   constructor; swap
-  · rw [bef] at ok_input 
+  · rw [bef] at ok_input
     rw [aft]
     unfold GoodString at ok_input ⊢
     rw [← preimage]
     clear * - ok_input
     rw [List.forall_mem_append_append] at ok_input ⊢
-    rw [List.forall_mem_append_append] at ok_input 
+    rw [List.forall_mem_append_append] at ok_input
     constructor
     · exact ok_input.1.1
     constructor; swap
@@ -146,16 +146,16 @@ by
     intro a a_in_ros
     cases a
     · simp [GoodLetter]
-    unfold liftRule at a_in_ros 
-    dsimp only at a_in_ros 
-    unfold liftString at a_in_ros 
-    rw [List.mem_map] at a_in_ros 
+    unfold liftRule at a_in_ros
+    dsimp only at a_in_ros
+    unfold liftString at a_in_ros
+    rw [List.mem_map] at a_in_ros
     rcases a_in_ros with ⟨s, trash, a_from_s⟩
     rw [← a_from_s]
     cases' s with s' s''
     · exfalso
       clear * - a_from_s
-      unfold liftSymbol at a_from_s 
+      unfold liftSymbol at a_from_s
       exact Symbol.noConfusion a_from_s
     simp [liftSymbol, GoodLetter]
     use s''
@@ -176,8 +176,8 @@ by
   constructor
   · have sink_bef := congr_arg (sinkString lg.sinkNt) bef
     unfold sinkString at *
-    rw [List.filterMap_append_append] at sink_bef 
-    rw [List.filterMap_append_append] at sink_bef 
+    rw [List.filterMap_append_append] at sink_bef
+    rw [List.filterMap_append_append] at sink_bef
     convert sink_bef <;> rw [← preimage] <;> unfold liftRule <;> dsimp only <;> clear * - correct_inverse
     · unfold liftString
       rw [List.filterMap_map]
@@ -191,7 +191,7 @@ by
       rw [List.filterMap_map, correct_inverse, List.filterMap_some]
   · have sink_aft := congr_arg (sinkString lg.sinkNt) aft
     unfold sinkString at *
-    rw [List.filterMap_append_append] at sink_aft 
+    rw [List.filterMap_append_append] at sink_aft
     convert sink_aft
     rw [← preimage]
     clear * - correct_inverse

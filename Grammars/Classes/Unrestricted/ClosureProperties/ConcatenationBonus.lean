@@ -63,8 +63,8 @@ private lemma bonus_CF_of_CF_c_CF (L₁ : Language T) (L₂ : Language T) :
     IsCF L₁ ∧ IsCF L₂ → IsCF (L₁ * L₂) :=
   by
   rintro ⟨⟨g₁, eq_L₁⟩, ⟨g₂, eq_L₂⟩⟩
-  rw [cFLanguage_eq_grammarLanguage g₁] at eq_L₁ 
-  rw [cFLanguage_eq_grammarLanguage g₂] at eq_L₂ 
+  rw [cFLanguage_eq_grammarLanguage g₁] at eq_L₁
+  rw [cFLanguage_eq_grammarLanguage g₂] at eq_L₂
   use big_CF_grammar g₁ g₂
   rw [big_CF_grammar_same_language]
   apply Set.eq_of_subset_of_subset
@@ -73,7 +73,7 @@ private lemma bonus_CF_of_CF_c_CF (L₁ : Language T) (L₂ : Language T) :
     rw [← eq_L₂]
     exact in_concatenated_of_in_big hyp
   · intro w hyp
-    rw [← eq_L₁] at hyp 
-    rw [← eq_L₂] at hyp 
+    rw [← eq_L₁] at hyp
+    rw [← eq_L₂] at hyp
     exact in_big_of_in_concatenated hyp
 -/

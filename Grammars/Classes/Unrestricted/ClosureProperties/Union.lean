@@ -171,41 +171,41 @@ by
     have zeroth := congr_fun (congr_arg List.get? hypo) 0
     cases w
     · exact Option.noConfusion zeroth
-    · rw [List.get?, List.map_cons, List.get?] at zeroth 
+    · rw [List.get?, List.map_cons, List.get?] at zeroth
       have nt_eq_ter := Option.some.inj zeroth
       exact Symbol.noConfusion nt_eq_ter
   rcases hypot with ⟨i, ⟨r, rin, u, v, bef, aft⟩, deri⟩
   have uv_nil : u = [] ∧ v = []
   · have bef_len := congr_arg List.length bef
     clear * - bef_len
-    rw [List.length_singleton] at bef_len 
-    repeat' rw [List.length_append] at bef_len 
-    rw [List.length_singleton] at bef_len 
+    rw [List.length_singleton] at bef_len
+    repeat' rw [List.length_append] at bef_len
+    rw [List.length_singleton] at bef_len
     constructor <;>
     · rw [← List.length_eq_zero]
       linarith
-  rw [uv_nil.1, List.nil_append, uv_nil.2, List.append_nil] at bef aft 
+  rw [uv_nil.1, List.nil_append, uv_nil.2, List.append_nil] at bef aft
   have same_nt : (unionGrammar g₁ g₂).initial = r.inputN
   · clear * - bef
     have elemeq :
       [Symbol.nonterminal (unionGrammar g₁ g₂).initial] = [Symbol.nonterminal r.inputN]
     · have bef_len := congr_arg List.length bef
-      rw [List.length_append_append, List.length_singleton, List.length_singleton] at bef_len 
+      rw [List.length_append_append, List.length_singleton, List.length_singleton] at bef_len
       have rl_first : r.inputL.length = 0
       · clear * - bef_len
         linarith
       have rl_third : r.inputR.length = 0
       · clear * - bef_len
         linarith
-      rw [List.length_eq_zero] at rl_first rl_third 
-      rw [rl_first, rl_third] at bef 
+      rw [List.length_eq_zero] at rl_first rl_third
+      rw [rl_first, rl_third] at bef
       exact bef
     exact Symbol.nonterminal.inj (List.head_eq_of_cons_eq elemeq)
   simp [unionGrammar] at rin
   rcases rin with req₁ | req₂ | rin₁ | rin₂
-  · rw [req₁] at aft 
-    dsimp only at aft 
-    rw [aft] at deri 
+  · rw [req₁] at aft
+    dsimp only at aft
+    rw [aft] at deri
     left
     have sinked := sink_deri lg₁ deri
     clear * - sinked
@@ -221,9 +221,9 @@ by
     convert_to List.map Symbol.terminal w = List.filterMap (Option.some ∘ Symbol.terminal) w
     rw [← List.filterMap_map]
     rw [List.filterMap_some]
-  · rw [req₂] at aft 
-    dsimp only at aft 
-    rw [aft] at deri 
+  · rw [req₂] at aft
+    dsimp only at aft
+    rw [aft] at deri
     right
     have sinked := sink_deri lg₂ deri
     clear * - sinked
@@ -320,7 +320,7 @@ by
     exact in_L₁_or_L₂_of_in_union ass
   · intro w ass
     cases' ass with case₁ case₂
-    · rw [← eq_L₁] at case₁ 
+    · rw [← eq_L₁] at case₁
       exact in_union_of_in_L₁ case₁
-    · rw [← eq_L₂] at case₂ 
+    · rw [← eq_L₂] at case₂
       exact in_union_of_in_L₂ case₂

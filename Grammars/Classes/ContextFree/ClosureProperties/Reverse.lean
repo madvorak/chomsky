@@ -42,8 +42,8 @@ private lemma derives_reversed (g : CFGrammar T) (v : List (Symbol T g.Nt)) :
   apply CF_deri_of_deri_tran ih
   rcases orig with ⟨r, rin, x, y, bef, aft⟩
   change
-    r ∈ List.map (fun r : g.nt × List (Symbol T g.nt) => (r.fst, List.reverse r.snd)) g.rules at rin 
-  rw [List.mem_map] at rin 
+    r ∈ List.map (fun r : g.nt × List (Symbol T g.nt) => (r.fst, List.reverse r.snd)) g.rules at rin
+  rw [List.mem_map] at rin
   rcases rin with ⟨r₀, rin₀, r_from_r₀⟩
   use r₀
   constructor
@@ -88,7 +88,7 @@ lemma CF_of_reverse_CF (L : Language T) : IsCF L → IsCF (reverseLang L) :=
     change w.reverse ∈ cFLanguage g
     exact reversed_word_in_original_language hwL
   · intro w hwL
-    change w.reverse ∈ cFLanguage g at hwL 
+    change w.reverse ∈ cFLanguage g at hwL
     have pre_reversal : ∃ g₀, g = reversal_grammar g₀ :=
       by
       use reversal_grammar g
@@ -97,6 +97,6 @@ lemma CF_of_reverse_CF (L : Language T) : IsCF L → IsCF (reverseLang L) :=
     rw [pre_rev] at hwL ⊢
     have finished_modulo_reverses := reversed_word_in_original_language hwL
     rw [dual_of_reversal_grammar]
-    rw [List.reverse_reverse] at finished_modulo_reverses 
+    rw [List.reverse_reverse] at finished_modulo_reverses
     exact finished_modulo_reverses
 -/

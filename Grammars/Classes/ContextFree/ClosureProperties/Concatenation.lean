@@ -67,7 +67,7 @@ private def g₁g (g₁ g₂ : CFGrammar T) : @LiftedGrammar T :=
       cases y; swap
       · tauto
       left
-      simp only [oN₁_of_N] at ass 
+      simp only [oN₁_of_N] at ass
       apply congr_arg
       apply congr_arg
       exact ass)
@@ -76,14 +76,14 @@ private def g₁g (g₁ g₂ : CFGrammar T) : @LiftedGrammar T :=
       rintro ⟨r_in, r_ntype⟩
       cases r_in
       · exfalso
-        rw [r_in] at r_ntype 
-        dsimp only at r_ntype 
+        rw [r_in] at r_ntype
+        dsimp only at r_ntype
         cases' r_ntype with n₀ imposs
         exact Option.noConfusion imposs
-      change r ∈ List.map ruleOfRule₁ g₁.rules ++ List.map ruleOfRule₂ g₂.rules at r_in 
-      rw [List.mem_append] at r_in 
+      change r ∈ List.map ruleOfRule₁ g₁.rules ++ List.map ruleOfRule₂ g₂.rules at r_in
+      rw [List.mem_append] at r_in
       cases r_in
-      · rw [List.mem_map] at r_in 
+      · rw [List.mem_map] at r_in
         rcases r_in with ⟨r₁, r₁_in, r₁_convert_r⟩
         use r₁
         constructor
@@ -94,13 +94,13 @@ private def g₁g (g₁ g₂ : CFGrammar T) : @LiftedGrammar T :=
         run_tac
           five_steps
       · exfalso
-        rw [List.mem_map] at r_in 
+        rw [List.mem_map] at r_in
         rcases r_in with ⟨r₂, r₂_in, r₂_convert_r⟩
-        rw [← r₂_convert_r] at r_ntype 
-        unfold ruleOfRule₂ at r_ntype 
-        dsimp only at r_ntype 
+        rw [← r₂_convert_r] at r_ntype
+        unfold ruleOfRule₂ at r_ntype
+        dsimp only at r_ntype
         cases' r_ntype with n₁ contr
-        rw [Option.some_inj] at contr 
+        rw [Option.some_inj] at contr
         exact Sum.noConfusion contr)
     (by intro; rfl)
 
@@ -146,7 +146,7 @@ private def g₂g (g₁ g₂ : CFGrammar T) : @LiftedGrammar T :=
       cases y
       · tauto
       left
-      simp only [oN₂_of_N] at ass 
+      simp only [oN₂_of_N] at ass
       apply congr_arg
       apply congr_arg
       exact ass)
@@ -155,23 +155,23 @@ private def g₂g (g₁ g₂ : CFGrammar T) : @LiftedGrammar T :=
       rintro ⟨r_in, r_ntype⟩
       cases r_in
       · exfalso
-        rw [r_in] at r_ntype 
-        dsimp only at r_ntype 
+        rw [r_in] at r_ntype
+        dsimp only at r_ntype
         cases' r_ntype with n₀ imposs
         exact Option.noConfusion imposs
-      change r ∈ List.map ruleOfRule₁ g₁.rules ++ List.map ruleOfRule₂ g₂.rules at r_in 
-      rw [List.mem_append] at r_in 
+      change r ∈ List.map ruleOfRule₁ g₁.rules ++ List.map ruleOfRule₂ g₂.rules at r_in
+      rw [List.mem_append] at r_in
       cases r_in
       · exfalso
-        rw [List.mem_map] at r_in 
+        rw [List.mem_map] at r_in
         rcases r_in with ⟨r₁, r₁_in, r₁_convert_r⟩
-        rw [← r₁_convert_r] at r_ntype 
-        unfold ruleOfRule₁ at r_ntype 
-        dsimp only at r_ntype 
+        rw [← r₁_convert_r] at r_ntype
+        unfold ruleOfRule₁ at r_ntype
+        dsimp only at r_ntype
         cases' r_ntype with n₂ contr
-        rw [Option.some_inj] at contr 
+        rw [Option.some_inj] at contr
         exact Sum.noConfusion contr
-      · rw [List.mem_map] at r_in 
+      · rw [List.mem_map] at r_in
         rcases r_in with ⟨r₂, r₂_in, r₂_convert_r⟩
         use r₂
         constructor
@@ -203,11 +203,11 @@ private lemma u_eq_take_map_w {g₁ g₂ : CFGrammar T} (u : List (Symbol T g₁
       by
       convert hyp
       have takenl := List.take_left (List.map sTNOfSTN₁ u) (lsTNOfLsTN₂ v)
-      rw [List.length_map] at takenl 
+      rw [List.length_map] at takenl
       exact takenl.symm
     have nth_equ := congr_fun (congr_arg List.get? ass) n
     rw [List.get?_take h]
-    rw [List.get?_take h] at nth_equ 
+    rw [List.get?_take h] at nth_equ
     have n_lt_wl : n < w.length := gt_of_ge_of_gt len h
     have triv : n < (List.map sTNOfSTN₁ u).length :=
       by
@@ -221,9 +221,9 @@ private lemma u_eq_take_map_w {g₁ g₂ : CFGrammar T} (u : List (Symbol T g₁
       by
       rw [List.length_map]
       exact n_lt_wl
-    rw [List.nthLe_get? triv] at nth_equ 
-    rw [List.nthLe_get? trin] at nth_equ 
-    rw [Option.some_inj] at nth_equ 
+    rw [List.nthLe_get? triv] at nth_equ
+    rw [List.nthLe_get? trin] at nth_equ
+    rw [Option.some_inj] at nth_equ
     rw [List.nthLe_map] at nth_equ ; swap
     · exact h
     rw [List.nthLe_map] at nth_equ ; swap
@@ -235,14 +235,14 @@ private lemma u_eq_take_map_w {g₁ g₂ : CFGrammar T} (u : List (Symbol T g₁
     apply congr_arg
     norm_num
     cases u.nth_le n h
-    · unfold sTNOfSTN₁ at nth_equ 
+    · unfold sTNOfSTN₁ at nth_equ
       clear * - nth_equ
       finish
     · exfalso
       exact Symbol.noConfusion nth_equ
   convert_to none = none
   · finish
-  · push_neg at h 
+  · push_neg at h
     rw [List.get?_eq_none]
     rw [List.length_take]
     exact min_le_of_left_le h
@@ -259,8 +259,8 @@ private lemma v_eq_drop_map_w {g₁ g₂ : CFGrammar T} (u : List (Symbol T g₁
   by_cases n < v.length
   · have nth_equ := congr_fun (congr_arg List.get? hyp) n
     rw [List.get?_drop]
-    rw [List.get?_drop] at nth_equ 
-    rw [List.get?_drop] at nth_equ 
+    rw [List.get?_drop] at nth_equ
+    rw [List.get?_drop] at nth_equ
     have hunltuv : u.length + n < u.length + v.length := by apply add_lt_add_left h
     have hunltw : u.length + n < w.length :=
       by
@@ -281,8 +281,8 @@ private lemma v_eq_drop_map_w {g₁ g₂ : CFGrammar T} (u : List (Symbol T g₁
       by
       rw [List.length_map]
       exact hunltw
-    rw [List.nthLe_get? hlen₁] at nth_equ 
-    rw [List.nthLe_get? hlen₂] at nth_equ 
+    rw [List.nthLe_get? hlen₁] at nth_equ
+    rw [List.nthLe_get? hlen₂] at nth_equ
     rw [List.nthLe_get? h]
     rw [List.nthLe_get? hlen₂']
     rw [Option.some_inj] at *
@@ -298,15 +298,15 @@ private lemma v_eq_drop_map_w {g₁ g₂ : CFGrammar T} (u : List (Symbol T g₁
       (List.map sTNOfSTN₂ v).nthLe n hlen =
         (List.map Symbol.terminal w).nthLe (u.length + n) hlen₂ :=
       by
-      rw [List.nthLe_append_right hlen₀] at nth_equ 
+      rw [List.nthLe_append_right hlen₀] at nth_equ
       convert nth_equ
       rw [List.length_map]
       symm
       apply add_tsub_cancel_left
-    rw [List.nthLe_map] at nth_equ_simplified 
+    rw [List.nthLe_map] at nth_equ_simplified
     cases' v.nth_le n h with x
-    · unfold sTNOfSTN₂ at nth_equ_simplified 
-      rw [List.nthLe_map _ _ hunltw] at nth_equ_simplified 
+    · unfold sTNOfSTN₂ at nth_equ_simplified
+      rw [List.nthLe_map _ _ hunltw] at nth_equ_simplified
       rw [List.nthLe_map _ _ hunltw]
       injection nth_equ_simplified with hx
       apply congr_arg
@@ -317,7 +317,7 @@ private lemma v_eq_drop_map_w {g₁ g₂ : CFGrammar T} (u : List (Symbol T g₁
   convert_to none = none
   · finish
   · rw [List.get?_drop]
-    push_neg at h 
+    push_neg at h
     rw [List.get?_eq_none]
     rw [List.length_map]
     rw [← total_len]
@@ -400,26 +400,26 @@ private lemma in_concatenated_of_in_combined {g₁ g₂ : CFGrammar T} {w : List
   change
     CFDerives (combined_grammar g₁ g₂) [Symbol.nonterminal (combined_grammar g₁ g₂).initial]
       (List.map Symbol.terminal w) at
-    hyp 
+    hyp
   cases CF_eq_or_tran_deri_of_deri hyp
   · rename' h => refl_contr
     exfalso
     have hh := congr_fun (congr_arg List.get? refl_contr) 0
-    rw [List.get?] at hh 
+    rw [List.get?] at hh
     by_cases (List.map (@Symbol.terminal T (combined_grammar g₁ g₂).Nt) w).length = 0
     · have empty_none : (List.map Symbol.terminal w).get? 0 = none := by finish
-      rw [empty_none] at hh 
+      rw [empty_none] at hh
       exact Option.noConfusion hh
-    rw [List.get?_map] at hh 
+    rw [List.get?_map] at hh
     have hw0 : ∃ s, w.nth 0 = some s := by
       cases w.nth 0
       · exfalso
         exact Option.noConfusion hh
       use val
     rcases hw0 with ⟨s, hs⟩
-    rw [hs] at hh 
-    rw [Option.map_some'] at hh 
-    rw [Option.some_inj] at hh 
+    rw [hs] at hh
+    rw [Option.map_some'] at hh
+    rw [Option.some_inj] at hh
     exact Symbol.noConfusion hh
   rcases h with ⟨y, first_step, derivation⟩
   clear hyp
@@ -431,22 +431,22 @@ private lemma in_concatenated_of_in_combined {g₁ g₂ : CFGrammar T} {w : List
     rcases first_step with ⟨first_rule, first_rule_in, p, q, bef, aft⟩
     have len_bef := congr_arg List.length bef
     rw [List.length_singleton, List.length_append, List.length_append, List.length_singleton] at
-      len_bef 
+      len_bef
     have p_nil : p = [] := by
       have p0 : p.length = 0 := by linarith
-      rw [List.length_eq_zero] at p0 
+      rw [List.length_eq_zero] at p0
       exact p0
     have q_nil : q = [] := by
       have q0 : q.length = 0 := by linarith
-      rw [List.length_eq_zero] at q0 
+      rw [List.length_eq_zero] at q0
       exact q0
     have initial : first_rule.fst = none :=
       by
       apply Symbol.nonterminal.inj
-      rw [p_nil] at bef 
-      rw [q_nil] at bef 
-      rw [List.append_nil] at bef 
-      rw [List.nil_append] at bef 
+      rw [p_nil] at bef
+      rw [q_nil] at bef
+      rw [List.append_nil] at bef
+      rw [List.nil_append] at bef
       exact List.head_eq_of_cons_eq (Eq.symm bef)
     have only_rule :
       first_rule =
@@ -463,15 +463,15 @@ private lemma in_concatenated_of_in_combined {g₁ g₂ : CFGrammar T} {w : List
                     (Sum.inr
                       g₂.initial))])::List.map ruleOfRule₁ g₁.rules ++
               List.map ruleOfRule₂ g₂.rules at
-        first_rule_in 
+        first_rule_in
       cases first_rule_in
       · exact first_rule_in
       exfalso
       change first_rule ∈ List.map ruleOfRule₁ g₁.rules ++ List.map ruleOfRule₂ g₂.rules at
-        first_rule_in 
-      rw [List.mem_append] at first_rule_in 
+        first_rule_in
+      rw [List.mem_append] at first_rule_in
       cases first_rule_in
-      · delta ruleOfRule₁ at first_rule_in 
+      · delta ruleOfRule₁ at first_rule_in
         have rfst :
           first_rule.fst ∈
             List.map Prod.fst
@@ -479,10 +479,10 @@ private lemma in_concatenated_of_in_combined {g₁ g₂ : CFGrammar T} {w : List
                 (fun r : g₁.nt × List (Symbol T g₁.nt) => (some (Sum.inl r.fst), lsTNOfLsTN₁ r.snd))
                 g₁.rules) :=
           List.mem_map_of_mem Prod.fst first_rule_in
-        rw [initial] at rfst 
+        rw [initial] at rfst
         convert rfst
         simp
-      · delta ruleOfRule₂ at first_rule_in 
+      · delta ruleOfRule₂ at first_rule_in
         have rfst :
           first_rule.fst ∈
             List.map Prod.fst
@@ -490,15 +490,15 @@ private lemma in_concatenated_of_in_combined {g₁ g₂ : CFGrammar T} {w : List
                 (fun r : g₂.nt × List (Symbol T g₂.nt) => (some (Sum.inr r.fst), lsTNOfLsTN₂ r.snd))
                 g₂.rules) :=
           List.mem_map_of_mem Prod.fst first_rule_in
-        rw [initial] at rfst 
+        rw [initial] at rfst
         convert rfst
         simp
-    rw [p_nil, q_nil, only_rule] at aft 
-    rw [List.append_nil] at aft 
-    rw [List.nil_append] at aft 
+    rw [p_nil, q_nil, only_rule] at aft
+    rw [List.append_nil] at aft
+    rw [List.nil_append] at aft
     exact aft
   clear first_step
-  rw [only_option] at derivation 
+  rw [only_option] at derivation
   clear only_option y
   have complicated_induction :
     ∀ x : List (Symbol T (combined_grammar g₁ g₂).Nt),
@@ -523,10 +523,10 @@ private lemma in_concatenated_of_in_combined {g₁ g₂ : CFGrammar T} {w : List
     rcases ih with ⟨u, v, ⟨ih₁, ih₂⟩, ih_concat⟩
     cases orig_in
     · exfalso
-      rw [← ih_concat] at bef 
-      rw [orig_in] at bef 
+      rw [← ih_concat] at bef
+      rw [orig_in] at bef
       clear * - bef
-      dsimp only at bef 
+      dsimp only at bef
       have init_nt_in_bef_right : Symbol.nonterminal none ∈ c ++ [Symbol.nonterminal none] ++ d :=
         by
         apply List.mem_append_left
@@ -548,7 +548,7 @@ private lemma in_concatenated_of_in_combined {g₁ g₂ : CFGrammar T} {w : List
               intro hypo
               have impossible := Symbol.nonterminal.inj hypo
               exact Option.noConfusion impossible
-          · rw [List.length_map] at hn 
+          · rw [List.length_map] at hn
             exact hn
         · rw [List.mem_iff_nthLe]
           push_neg
@@ -561,29 +561,29 @@ private lemma in_concatenated_of_in_combined {g₁ g₂ : CFGrammar T} {w : List
               intro hypo
               have impossible := Symbol.nonterminal.inj hypo
               exact Option.noConfusion impossible
-          · rw [List.length_map] at hn 
+          · rw [List.length_map] at hn
             exact hn
-      rw [bef] at init_nt_notin_bef_left 
+      rw [bef] at init_nt_notin_bef_left
       exact init_nt_notin_bef_left init_nt_in_bef_right
     clear derivation w
-    change orig_rule ∈ List.map ruleOfRule₁ g₁.rules ++ List.map ruleOfRule₂ g₂.rules at orig_in 
-    rw [List.mem_append] at orig_in 
+    change orig_rule ∈ List.map ruleOfRule₁ g₁.rules ++ List.map ruleOfRule₂ g₂.rules at orig_in
+    rw [List.mem_append] at orig_in
     cases orig_in
-    · rw [List.mem_map] at orig_in 
+    · rw [List.mem_map] at orig_in
       rcases orig_in with ⟨r₁, r₁_in, r₁_conv⟩
       rw [aft]
-      rw [bef] at ih_concat 
+      rw [bef] at ih_concat
       clear bef aft a b
       rw [← r₁_conv] at ih_concat ⊢
       clear r₁_conv orig_rule
       have part_for_u := congr_arg (List.take (@lsTNOfLsTN₁ T g₁ g₂ u).length) ih_concat
       have part_for_v := congr_arg (List.drop (@lsTNOfLsTN₁ T g₁ g₂ u).length) ih_concat
-      rw [List.take_left] at part_for_u 
-      rw [List.drop_left] at part_for_v 
+      rw [List.take_left] at part_for_u
+      rw [List.drop_left] at part_for_v
       have h_len : (@lsTNOfLsTN₁ T g₁ g₂ u).length > c.length :=
         by
         by_contra contra
-        push_neg at contra 
+        push_neg at contra
         have not_in : Symbol.nonterminal (ruleOfRule₁ r₁).fst ∉ lsTNOfLsTN₂ v :=
           by
           unfold lsTNOfLsTN₂
@@ -596,7 +596,7 @@ private lemma in_concatenated_of_in_combined {g₁ g₂ : CFGrammar T} {w : List
         have yes_in : Symbol.nonterminal (@ruleOfRule₁ T g₁ g₂ r₁).fst ∈ lsTNOfLsTN₂ v :=
           by
           have lcth := congr_fun (congr_arg List.get? ih_concat) c.length
-          rw [List.append_assoc c] at lcth 
+          rw [List.append_assoc c] at lcth
           have clength :
             (c ++ ([Symbol.nonterminal (ruleOfRule₁ r₁).fst] ++ d)).get? c.length =
               some (Symbol.nonterminal (@ruleOfRule₁ T g₁ g₂ r₁).fst) :=
@@ -605,8 +605,8 @@ private lemma in_concatenated_of_in_combined {g₁ g₂ : CFGrammar T} {w : List
             · rfl
             rw [Nat.sub_self]
             rfl
-          rw [clength] at lcth 
-          rw [List.get?_append_right contra] at lcth 
+          rw [clength] at lcth
+          rw [List.get?_append_right contra] at lcth
           exact List.get?_mem lcth
         exact not_in yes_in
       -- nonterminal was rewritten in the left half of `a` ... upgrade `u`
@@ -667,8 +667,8 @@ private lemma in_concatenated_of_in_combined {g₁ g₂ : CFGrammar T} {w : List
                 apply Nat.add_sub_of_le
                 rw [List.length_append]
                 rw [List.length_singleton]
-                unfold lsTNOfLsTN₁ at h_len 
-                rw [List.length_map] at h_len 
+                unfold lsTNOfLsTN₁ at h_len
+                rw [List.length_map] at h_len
                 rw [Nat.succ_le_iff]
                 exact h_len
               convert_to
@@ -710,13 +710,13 @@ private lemma in_concatenated_of_in_combined {g₁ g₂ : CFGrammar T} {w : List
           unfold lsTNOfLsTN₁
           rw [List.length_map]
           clear * - part_for_u
-          unfold lsTNOfLsTN₁ at part_for_u 
+          unfold lsTNOfLsTN₁ at part_for_u
           have lengs := congr_arg List.length part_for_u
-          rw [List.length_map] at lengs 
-          rw [List.length_take] at lengs 
-          rw [List.length_append] at lengs 
-          rw [List.length_append] at lengs 
-          rw [List.length_singleton] at lengs 
+          rw [List.length_map] at lengs
+          rw [List.length_take] at lengs
+          rw [List.length_append] at lengs
+          rw [List.length_append] at lengs
+          rw [List.length_singleton] at lengs
           have uleng_le : u.length ≤ c.length + 1 + d.length :=
             by
             rw [← min_eq_left_iff]
@@ -733,10 +733,10 @@ private lemma in_concatenated_of_in_combined {g₁ g₂ : CFGrammar T} {w : List
             we calculate `f(g(c)) = f(g(f(x))) = f(x) = c` hooray!
           -/
           have taken_c_from_u := congr_arg (List.take c.length) part_for_u
-          rw [List.take_take] at taken_c_from_u 
-          rw [min_eq_left (le_of_lt h_len)] at taken_c_from_u 
-          rw [List.append_assoc] at taken_c_from_u 
-          rw [List.take_left] at taken_c_from_u 
+          rw [List.take_take] at taken_c_from_u
+          rw [min_eq_left (le_of_lt h_len)] at taken_c_from_u
+          rw [List.append_assoc] at taken_c_from_u
+          rw [List.take_left] at taken_c_from_u
           convert_to
             List.map sTNOfSTN₁ (List.filterMap sTN₁_of_sTN (List.take c.length (lsTNOfLsTN₁ u))) = c
           · rw [taken_c_from_u]
@@ -760,16 +760,16 @@ private lemma in_concatenated_of_in_combined {g₁ g₂ : CFGrammar T} {w : List
             symm
             apply Nat.add_sub_of_le
             exact Nat.succ_le_of_lt h_len
-          rw [for_the_decomposition] at taken_d_from_dropped_u 
-          rw [List.drop_take] at taken_d_from_dropped_u 
+          rw [for_the_decomposition] at taken_d_from_dropped_u
+          rw [List.drop_take] at taken_d_from_dropped_u
           have translate_counts :
             c.length + 1 = (c ++ [Symbol.nonterminal (ruleOfRule₁ r₁).fst]).length :=
             by
             rw [List.length_append]
             rw [List.length_singleton]
-          rw [translate_counts] at taken_d_from_dropped_u 
-          rw [List.drop_left] at taken_d_from_dropped_u 
-          rw [← translate_counts] at taken_d_from_dropped_u 
+          rw [translate_counts] at taken_d_from_dropped_u
+          rw [List.drop_left] at taken_d_from_dropped_u
+          rw [← translate_counts] at taken_d_from_dropped_u
           change
             List.map sTNOfSTN₁
                 (List.filterMap sTN₁_of_sTN
@@ -903,21 +903,21 @@ private lemma in_concatenated_of_in_combined {g₁ g₂ : CFGrammar T} {w : List
         rw [part_for_v]
         rw [identity_of_suffixes]
         apply List.take_append_drop
-    · rw [List.mem_map] at orig_in 
+    · rw [List.mem_map] at orig_in
       rcases orig_in with ⟨r₂, r₂_in, r₂_conv⟩
       rw [aft]
-      rw [bef] at ih_concat 
+      rw [bef] at ih_concat
       clear bef aft a b
       rw [← r₂_conv] at ih_concat ⊢
       clear r₂_conv orig_rule
       have part_for_u := congr_arg (List.take (@lsTNOfLsTN₁ T g₁ g₂ u).length) ih_concat
       have part_for_v := congr_arg (List.drop (@lsTNOfLsTN₁ T g₁ g₂ u).length) ih_concat
-      rw [List.take_left] at part_for_u 
-      rw [List.drop_left] at part_for_v 
+      rw [List.take_left] at part_for_u
+      rw [List.drop_left] at part_for_v
       have hlen_vd : (@lsTNOfLsTN₂ T g₁ g₂ v).length > d.length :=
         by
         by_contra contra
-        push_neg at contra 
+        push_neg at contra
         have not_in : Symbol.nonterminal (ruleOfRule₂ r₂).fst ∉ lsTNOfLsTN₁ u :=
           by
           unfold lsTNOfLsTN₁
@@ -930,7 +930,7 @@ private lemma in_concatenated_of_in_combined {g₁ g₂ : CFGrammar T} {w : List
         have yes_in : Symbol.nonterminal (ruleOfRule₂ r₂).fst ∈ lsTNOfLsTN₁ u :=
           by
           have ih_backwards := congr_arg List.reverse ih_concat
-          repeat' rw [List.reverse_append] at ih_backwards 
+          repeat' rw [List.reverse_append] at ih_backwards
           have ldth := congr_fun (congr_arg List.get? ih_backwards) d.length
           have dlengthth :
             (d.reverse ++ ([Symbol.nonterminal (ruleOfRule₂ r₂).fst].reverse ++ c.reverse)).get?
@@ -942,20 +942,20 @@ private lemma in_concatenated_of_in_combined {g₁ g₂ : CFGrammar T} {w : List
             rw [List.length_reverse]
             rw [Nat.sub_self]
             rfl
-          rw [dlengthth] at ldth 
-          rw [← List.length_reverse] at contra 
-          rw [List.get?_append_right contra] at ldth 
+          rw [dlengthth] at ldth
+          rw [← List.length_reverse] at contra
+          rw [List.get?_append_right contra] at ldth
           have rrr := List.get?_mem ldth
-          rw [List.mem_reverse'] at rrr 
+          rw [List.mem_reverse'] at rrr
           exact rrr
         exact not_in yes_in
       have total_length := congr_arg List.length ih_concat
-      repeat' rw [List.length_append] at total_length 
-      rw [List.length_singleton] at total_length 
+      repeat' rw [List.length_append] at total_length
+      rw [List.length_singleton] at total_length
       have hlen_uc : (@lsTNOfLsTN₁ T g₁ g₂ u).length ≤ c.length :=
         by
         by_contra too_long
-        push_neg at too_long 
+        push_neg at too_long
         have imposs_gt_self : c.length + 1 + d.length > c.length + 1 + d.length := by
           calc
             c.length + 1 + d.length =
@@ -968,8 +968,8 @@ private lemma in_concatenated_of_in_combined {g₁ g₂ : CFGrammar T} {w : List
         exact Nat.lt_irrefl _ imposs_gt_self
       have hlen_uc_orig : u.length ≤ c.length :=
         by
-        unfold lsTNOfLsTN₁ at hlen_uc 
-        rw [List.length_map] at hlen_uc 
+        unfold lsTNOfLsTN₁ at hlen_uc
+        rw [List.length_map] at hlen_uc
         exact hlen_uc
       -- nonterminal was rewritten in the right half of `a` ... upgrade `v`
       let c' : List (Symbol T (combined_grammar g₁ g₂).Nt) :=
@@ -1053,11 +1053,11 @@ private lemma in_concatenated_of_in_combined {g₁ g₂ : CFGrammar T} {w : List
               rw [Nat.add_sub_cancel_left]
             have taken_c_from_v :=
               congr_arg (List.take (c.length - (@lsTNOfLsTN₁ T g₁ g₂ u).length)) part_for_v
-            rw [← List.drop_take] at taken_c_from_v 
-            rw [List.append_assoc] at taken_c_from_v 
-            rw [List.take_append_of_le_length (le_of_eq aux_plus_minus)] at taken_c_from_v 
-            rw [aux_plus_minus] at taken_c_from_v 
-            rw [List.take_length] at taken_c_from_v 
+            rw [← List.drop_take] at taken_c_from_v
+            rw [List.append_assoc] at taken_c_from_v
+            rw [List.take_append_of_le_length (le_of_eq aux_plus_minus)] at taken_c_from_v
+            rw [aux_plus_minus] at taken_c_from_v
+            rw [List.take_length] at taken_c_from_v
             rw [← taken_c_from_v]
             unfold lsTNOfLsTN₂
             rw [← List.map_take]
@@ -1071,7 +1071,7 @@ private lemma in_concatenated_of_in_combined {g₁ g₂ : CFGrammar T} {w : List
             rw [self_of_lsTN₂]
           · have taken_d_from_v :=
               congr_arg (List.drop ((@lsTNOfLsTN₂ T g₁ g₂ v).length - d.length)) part_for_v
-            rw [List.drop_drop] at taken_d_from_v 
+            rw [List.drop_drop] at taken_d_from_v
             have dropped_exactly_length :
               (@lsTNOfLsTN₂ T g₁ g₂ v).length - d.length + (@lsTNOfLsTN₁ T g₁ g₂ u).length =
                 (c ++ [Symbol.nonterminal (ruleOfRule₂ r₂).fst]).length :=
@@ -1089,8 +1089,8 @@ private lemma in_concatenated_of_in_combined {g₁ g₂ : CFGrammar T} {w : List
               rw [reorder_sum]
               rw [total_length]
               apply Nat.add_sub_cancel
-            rw [dropped_exactly_length] at taken_d_from_v 
-            rw [List.drop_left] at taken_d_from_v 
+            rw [dropped_exactly_length] at taken_d_from_v
+            rw [List.drop_left] at taken_d_from_v
             rw [← taken_d_from_v]
             unfold lsTNOfLsTN₂
             rw [← List.map_drop]
@@ -1118,16 +1118,16 @@ private lemma in_concatenated_of_in_combined {g₁ g₂ : CFGrammar T} {w : List
     convert hu
     have u_from_terminals : ∃ uₜ : List T, u = List.map Symbol.terminal uₜ :=
       by
-      unfold lsTNOfLsTN₁ at hw 
+      unfold lsTNOfLsTN₁ at hw
       use List.take u.length w
       rw [List.map_take]
       exact
         u_eq_take_map_w u v w
           (by
             have hwlen := congr_arg List.length hw
-            rw [List.length_append] at hwlen 
-            rw [List.length_map] at hwlen 
-            rw [List.length_map] at hwlen 
+            rw [List.length_append] at hwlen
+            rw [List.length_map] at hwlen
+            rw [List.length_map] at hwlen
             exact Nat.le.intro hwlen)
           (congr_arg (List.take u.length) hw)
     cases' u_from_terminals with uₜ hut
@@ -1141,24 +1141,24 @@ private lemma in_concatenated_of_in_combined {g₁ g₂ : CFGrammar T} {w : List
     convert hv
     have v_from_terminals : ∃ vₜ : List T, v = List.map Symbol.terminal vₜ :=
       by
-      unfold lsTNOfLsTN₁ at hw 
-      unfold lsTNOfLsTN₂ at hw 
+      unfold lsTNOfLsTN₁ at hw
+      unfold lsTNOfLsTN₂ at hw
       use List.drop u.length w
       rw [List.map_drop]
       have hwlen := congr_arg List.length hw
-      rw [List.length_append] at hwlen 
-      repeat' rw [List.length_map] at hwlen 
+      rw [List.length_append] at hwlen
+      repeat' rw [List.length_map] at hwlen
       exact v_eq_drop_map_w u v w hwlen (congr_arg (List.drop u.length) hw)
     cases' v_from_terminals with vₜ hvt
     rw [hvt]
     rw [List.filterMap_map]
     convert_to List.map Symbol.terminal (List.filterMap some vₜ) = List.map Symbol.terminal vₜ
     rw [List.filterMap_some]
-  unfold liT_of_lsTN₃ at huvw 
-  rw [List.filterMap_append] at huvw 
-  unfold lsTNOfLsTN₁ at huvw 
-  unfold lsTNOfLsTN₂ at huvw 
-  repeat' rw [List.filterMap_map] at huvw 
+  unfold liT_of_lsTN₃ at huvw
+  rw [List.filterMap_append] at huvw
+  unfold lsTNOfLsTN₁ at huvw
+  unfold lsTNOfLsTN₂ at huvw
+  repeat' rw [List.filterMap_map] at huvw
   have disappear_sTN_of_sTN₁ : @oT_of_sTN₃ T (combined_grammar g₁ g₂) ∘ sTNOfSTN₁ = oT_of_sTN₃ :=
     by
     ext1
@@ -1167,8 +1167,8 @@ private lemma in_concatenated_of_in_combined {g₁ g₂ : CFGrammar T} {w : List
     by
     ext1
     cases x <;> rfl
-  rw [disappear_sTN_of_sTN₁] at huvw 
-  rw [disappear_sTN_of_sTN₂] at huvw 
+  rw [disappear_sTN_of_sTN₁] at huvw
+  rw [disappear_sTN_of_sTN₂] at huvw
   unfold liT_of_lsTN₃
   convert huvw
   have bundle_unbundle : @oT_of_sTN₃ T (combined_grammar g₁ g₂) ∘ Symbol.terminal = Option.some :=
@@ -1181,7 +1181,7 @@ private lemma in_concatenated_of_in_combined {g₁ g₂ : CFGrammar T} {w : List
 private lemma in_combined_of_in_concatenated {g₁ g₂ : CFGrammar T} {w : List T}
     (hyp : w ∈ cFLanguage g₁ * cFLanguage g₂) : w ∈ cFLanguage (combinedGrammar g₁ g₂) :=
   by
-  rw [Language.mem_mul] at hyp 
+  rw [Language.mem_mul] at hyp
   rcases hyp with ⟨u, v, hu, hv, hw⟩
   unfold cFLanguage at *
   change
@@ -1211,7 +1211,7 @@ private lemma in_combined_of_in_concatenated {g₁ g₂ : CFGrammar T} {w : List
           [Symbol.nonterminal (some (Sum.inr g₂.initial))])
         (List.map Symbol.terminal u ++ [Symbol.nonterminal (some (Sum.inr g₂.initial))])
     apply CF_deri_with_postfix
-    change CFDerives g₁ [Symbol.nonterminal g₁.initial] (List.map Symbol.terminal u) at hu 
+    change CFDerives g₁ [Symbol.nonterminal g₁.initial] (List.map Symbol.terminal u) at hu
     let gg₁ := g₁g g₁ g₂
     change
       CFDerives gg₁.g [Symbol.nonterminal (some (Sum.inl g₁.initial))] (List.map Symbol.terminal u)
@@ -1230,7 +1230,7 @@ private lemma in_combined_of_in_concatenated {g₁ g₂ : CFGrammar T} {w : List
     rw [baz]
     exact lift_deri hu
   · apply CF_deri_with_prefix
-    change CFDerives g₂ [Symbol.nonterminal g₂.initial] (List.map Symbol.terminal v) at hv 
+    change CFDerives g₂ [Symbol.nonterminal g₂.initial] (List.map Symbol.terminal v) at hv
     let gg₂ := g₂g g₁ g₂
     change
       CFDerives gg₂.g [Symbol.nonterminal (some (Sum.inr g₂.initial))] (List.map Symbol.terminal v)
@@ -1262,7 +1262,7 @@ lemma CF_of_CF_c_CF (L₁ : Language T) (L₂ : Language T) : IsCF L₁ ∧ IsCF
     exact in_concatenated_of_in_combined hyp
   · -- prove `L₁ * L₂ ⊆ ` here
     intro w hyp
-    rw [← eq_L₁] at hyp 
-    rw [← eq_L₂] at hyp 
+    rw [← eq_L₁] at hyp
+    rw [← eq_L₂] at hyp
     exact in_combined_of_in_concatenated hyp
 -/

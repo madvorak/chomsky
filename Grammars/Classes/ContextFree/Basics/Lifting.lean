@@ -44,10 +44,10 @@ private lemma lifted_grammar_inverse (lg : @LiftedGrammar T) :
   symm
   by_contra
   have inje := lg.sink_inj x (lg.liftNt valu)
-  rw [lg.liftNt_sink] at inje 
+  rw [lg.liftNt_sink] at inje
   cases' inje ass with case_valu case_none
   · exact h case_valu
-  rw [ass] at case_none 
+  rw [ass] at case_none
   exact Option.noConfusion case_none
 
 private lemma lift_tran {lg : LiftedGrammar} {w₁ w₂ : List (Symbol T lg.g₀.nt)}
@@ -63,11 +63,11 @@ private lemma lift_tran {lg : LiftedGrammar} {w₁ w₂ : List (Symbol T lg.g₀
   constructor
   · have lift_bef := congr_arg (liftString lg.liftNt) bef
     unfold liftString at *
-    rw [List.map_append_append] at lift_bef 
+    rw [List.map_append_append] at lift_bef
     convert lift_bef
   · have lift_aft := congr_arg (liftString lg.liftNt) aft
     unfold liftString at *
-    rw [List.map_append_append] at lift_aft 
+    rw [List.map_append_append] at lift_aft
     exact lift_aft
 
 lemma lift_deri {lg : LiftedGrammar} {w₁ w₂ : List (Symbol T lg.g₀.nt)}
@@ -96,18 +96,18 @@ private lemma sink_tran {lg : LiftedGrammar} {w₁ w₂ : List (Symbol T lg.g.nt
       (by
         constructor
         · exact rin
-        rw [bef] at ok_input 
+        rw [bef] at ok_input
         have good_matched_nonterminal : GoodLetter (Symbol.nonterminal r.fst) :=
           by
           specialize ok_input (Symbol.nonterminal r.fst)
           unfold GoodLetter
           sorry
-        change ∃ n₀ : lg.g₀.nt, lg.sinkNt r.fst = some n₀ at good_matched_nonterminal 
+        change ∃ n₀ : lg.g₀.nt, lg.sinkNt r.fst = some n₀ at good_matched_nonterminal
         cases' good_matched_nonterminal with n₀ hn₀
         use n₀
         have almost := congr_arg (Option.map lg.liftNt) hn₀
-        rw [lifted_grammar_inverse lg r.fst ⟨n₀, hn₀⟩] at almost 
-        rw [Option.map_some'] at almost 
+        rw [lifted_grammar_inverse lg r.fst ⟨n₀, hn₀⟩] at almost
+        rw [Option.map_some'] at almost
         apply Option.some_injective
         exact almost.symm) with
     ⟨p, pin, preimage⟩
@@ -129,7 +129,7 @@ private lemma sink_tran {lg : LiftedGrammar} {w₁ w₂ : List (Symbol T lg.g.nt
   constructor
   · have sink_bef := congr_arg (sinkString lg.sinkNt) bef
     unfold sinkString at *
-    rw [List.filterMap_append_append] at sink_bef 
+    rw [List.filterMap_append_append] at sink_bef
     convert sink_bef
     rw [← preimage]
     unfold liftRule
@@ -143,7 +143,7 @@ private lemma sink_tran {lg : LiftedGrammar} {w₁ w₂ : List (Symbol T lg.g.nt
     rw [List.filterMap_some]
   · have sink_aft := congr_arg (sinkString lg.sinkNt) aft
     unfold sinkString at *
-    rw [List.filterMap_append_append] at sink_aft 
+    rw [List.filterMap_append_append] at sink_aft
     convert sink_aft
     rw [← preimage]
     unfold liftRule
@@ -168,12 +168,12 @@ lemma sink_deri (lg : LiftedGrammar) (w₁ w₂ : List (Symbol T lg.g.nt))
   · intro a in_y
     have ihr := ih.right a
     rcases orig with ⟨r, in_rules, u, y, bef, aft⟩
-    rw [bef] at ihr 
-    rw [List.mem_append] at ihr 
-    rw [aft] at in_y 
-    rw [List.mem_append] at in_y 
+    rw [bef] at ihr
+    rw [List.mem_append] at ihr
+    rw [aft] at in_y
+    rw [List.mem_append] at in_y
     cases in_y
-    rw [List.mem_append] at in_y 
+    rw [List.mem_append] at in_y
     cases in_y
     · apply ihr
       rw [List.mem_append]
@@ -194,23 +194,23 @@ lemma sink_deri (lg : LiftedGrammar) (w₁ w₂ : List (Symbol T lg.g.nt))
             apply List.mem_cons_self
           have glruf : GoodLetter (Symbol.nonterminal r.fst) :=
             ih.right (Symbol.nonterminal r.fst) ruu
-          unfold GoodLetter at glruf 
-          rw [h] at glruf 
+          unfold GoodLetter at glruf
+          rw [h] at glruf
           cases' glruf with n₀ imposs
           exact Option.noConfusion imposs
         cases' option.ne_none_iff_exists'.mp h with x ex
         use x
         have gix := lifted_grammar_inverse lg r.fst ⟨x, ex⟩
-        rw [ex] at gix 
-        rw [Option.map_some'] at gix 
+        rw [ex] at gix
+        rw [Option.map_some'] at gix
         apply Option.some_injective
         exact gix
       rcases lg.preimage_of_rules r ⟨in_rules, exn₀⟩ with ⟨r₀, in0, lif⟩
-      rw [← lif] at in_y 
-      unfold liftRule at in_y 
-      dsimp only at in_y 
-      unfold liftString at in_y 
-      rw [List.mem_map] at in_y 
+      rw [← lif] at in_y
+      unfold liftRule at in_y
+      dsimp only at in_y
+      unfold liftString at in_y
+      rw [List.mem_map] at in_y
       rcases in_y with ⟨s, s_in_rulsnd, symbol_letter⟩
       rw [← symbol_letter]
       cases s

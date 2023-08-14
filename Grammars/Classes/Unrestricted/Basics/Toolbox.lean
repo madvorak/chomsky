@@ -25,7 +25,7 @@ lemma Grammar.deri_of_deri_tran {u v w : List (Symbol T g.nt)}
 Grammar.deri_of_deri_deri huv (Grammar.deri_of_tran hvw)
 
 lemma Grammar.deri_of_tran_deri {u v w : List (Symbol T g.nt)}
-    (huv : g.Transforms u v) (hvw : g.Derives v w) : 
+    (huv : g.Transforms u v) (hvw : g.Derives v w) :
   g.Derives u w :=
 Grammar.deri_of_deri_deri (Grammar.deri_of_tran huv) hvw
 

@@ -26,10 +26,10 @@ lemma language_of_cfgEmptyLang : CFgrammar.language (@cfgEmptyLang T) = 0 :=
   cases CF_eq_or_tran_deri_of_deri hw
   · have hhead := congr_fun (congr_arg List.get? h) 0
     cases' w with head tail ih
-    · change some (Symbol.nonterminal cfg_empty_lang.initial) = none at hhead 
-      norm_cast at hhead 
-    · change some (Symbol.nonterminal cfg_empty_lang.initial) = some (Symbol.terminal head) at hhead 
-      norm_cast at hhead 
+    · change some (Symbol.nonterminal cfg_empty_lang.initial) = none at hhead
+      norm_cast at hhead
+    · change some (Symbol.nonterminal cfg_empty_lang.initial) = some (Symbol.terminal head) at hhead
+      norm_cast at hhead
   · rcases h with ⟨v, ⟨r, rin, -, -, -, -⟩, -⟩
     cases rin -/
 
@@ -45,7 +45,7 @@ lemma language_of_cfgEmptyWord : CFgrammar.language (@cfgEmptyWord T) = singleto
   sorry /-
   constructor; swap
   · intro h
-    rw [Set.mem_singleton_iff] at h 
+    rw [Set.mem_singleton_iff] at h
     change
       CFDerives cfgEmptyWord [Symbol.nonterminal cfg_empty_lang.initial]
         (List.map Symbol.terminal w)
@@ -58,20 +58,20 @@ lemma language_of_cfgEmptyWord : CFgrammar.language (@cfgEmptyWord T) = singleto
   intro hw
   change
     CFDerives (@cfgEmptyWord T) [Symbol.nonterminal (@cfgEmptyLang T).initial]
-      (List.map Symbol.terminal w) at hw 
+      (List.map Symbol.terminal w) at hw
   cases
     @CF_eq_or_tran_deri_of_deri T (@cfgEmptyWord T) [Symbol.nonterminal cfg_empty_lang.initial]
       (List.map Symbol.terminal w) hw
   · exfalso
     have zeroth := congr_fun (congr_arg List.get? h) 0
-    rw [List.get?] at zeroth 
+    rw [List.get?] at zeroth
     by_cases w = List.nil
     · have is_none : (List.map Symbol.terminal w).get? 0 = none :=
         by
         rw [h]
         rw [List.get?_map]
         rfl
-      rw [is_none] at zeroth 
+      rw [is_none] at zeroth
       exact Option.noConfusion zeroth
     · have is_terminal : ∃ t, (List.map Symbol.terminal w).get? 0 = some (Symbol.terminal t) :=
         by
@@ -80,8 +80,8 @@ lemma language_of_cfgEmptyWord : CFgrammar.language (@cfgEmptyWord T) = singleto
         norm_num
         exact List.nthLe_get? (List.length_pos_of_ne_nil h)
       cases' is_terminal with irr is_termin
-      rw [is_termin] at zeroth 
-      norm_cast at zeroth 
+      rw [is_termin] at zeroth
+      norm_cast at zeroth
   rcases h with ⟨v, step_init, step_none⟩
   have v_is_empty_word : v = List.nil :=
     by
@@ -92,27 +92,27 @@ lemma language_of_cfgEmptyWord : CFgrammar.language (@cfgEmptyWord T) = singleto
       exact rin
     have empty_surrounding : pre = [] ∧ Pos = [] :=
       by
-      rw [rule] at bef 
+      rw [rule] at bef
       have bef_lenghts := congr_arg List.length bef
-      rw [List.length_append_append] at bef_lenghts 
-      rw [List.length_singleton] at bef_lenghts 
-      rw [List.length_singleton] at bef_lenghts 
+      rw [List.length_append_append] at bef_lenghts
+      rw [List.length_singleton] at bef_lenghts
+      rw [List.length_singleton] at bef_lenghts
       constructor
       · have pre_zero : pre.length = 0 := by
           clear * - bef_lenghts
           linarith
-        rw [List.length_eq_zero] at pre_zero 
+        rw [List.length_eq_zero] at pre_zero
         exact pre_zero
       · have pos_zero : pos.length = 0 := by
           clear * - bef_lenghts
           linarith
-        rw [List.length_eq_zero] at pos_zero 
+        rw [List.length_eq_zero] at pos_zero
         exact pos_zero
-    rw [empty_surrounding.1] at aft 
-    rw [empty_surrounding.2] at aft 
-    rw [rule] at aft 
+    rw [empty_surrounding.1] at aft
+    rw [empty_surrounding.2] at aft
+    rw [rule] at aft
     exact aft
-  rw [v_is_empty_word] at step_none 
+  rw [v_is_empty_word] at step_none
   cases @CF_eq_or_tran_deri_of_deri T (@cfgEmptyWord T) List.nil (List.map Symbol.terminal w) step_none
   · by_contra contra
     have w_not_nil : w.length > 0 :=
@@ -120,17 +120,17 @@ lemma language_of_cfgEmptyWord : CFgrammar.language (@cfgEmptyWord T) = singleto
       apply List.length_pos_of_ne_nil
       convert contra
     have impossible_lengths := congr_arg List.length h
-    rw [List.length] at impossible_lengths 
-    rw [List.length_map] at impossible_lengths 
-    rw [← impossible_lengths] at w_not_nil 
+    rw [List.length] at impossible_lengths
+    rw [List.length_map] at impossible_lengths
+    rw [← impossible_lengths] at w_not_nil
     exact Nat.lt_irrefl 0 w_not_nil
   · exfalso
     rcases h with ⟨-, ⟨trash_r, -, trash_1, trash_2, impossible, -⟩, -⟩
     have impossible_len := congr_arg List.length impossible
     clear * - impossible_len
-    rw [List.length_append_append] at impossible_len 
-    rw [List.length_singleton] at impossible_len 
-    rw [List.length] at impossible_len 
+    rw [List.length_append_append] at impossible_len
+    rw [List.length_singleton] at impossible_len
+    rw [List.length] at impossible_len
     linarith -/
 
 /-- Context-free grammar for a language `{a}.star` where `a` is a given terminal symbol. -/
@@ -156,7 +156,7 @@ lemma language_of_cfgSymbolStar (a : T) :
       by
       contrapose
       intro contr ass
-      push_neg at contr 
+      push_neg at contr
       specialize contr w.length
       have different :
         ∃ n : ℕ,
@@ -169,23 +169,23 @@ lemma language_of_cfgSymbolStar (a : T) :
           rw [List.length_replicate]
         apply contr
         apply List.ext_nthLe same_len
-        push_neg at isnt 
+        push_neg at isnt
         intro n n_small_left n_small_right
         specialize isnt n n_small_left
-        push_neg at isnt 
+        push_neg at isnt
         specialize isnt n_small_right
-        push_neg at isnt 
+        push_neg at isnt
         exact isnt
       rcases different with ⟨n, hl, hr, nq⟩
-      rw [List.nthLe_replicate a hr] at nq 
+      rw [List.nthLe_replicate a hr] at nq
       specialize ass (w.nth_le n hl) nq
       exact ass (List.nthLe_mem w n hl)
     have implication1 : w ∈ (cfgSymbolStar a).language → ∀ t : T, t ≠ a → t ∉ w :=
       by sorry /-
       clear implication2
       intro ass t nq
-      change CFGeneratesStr (cfgSymbolStar a) (List.map Symbol.terminal w) at ass 
-      unfold CFGeneratesStr at ass 
+      change CFGeneratesStr (cfgSymbolStar a) (List.map Symbol.terminal w) at ass
+      unfold CFGeneratesStr at ass
       have indu :
         ∀ v : List (Symbol T (cfgSymbolStar a).Nt),
           CFDerives (cfgSymbolStar a) [Symbol.nonterminal (cfgSymbolStar a).initial] v →
@@ -198,10 +198,10 @@ lemma language_of_cfgSymbolStar (a : T) :
           apply Symbol.noConfusion
         rcases orig with ⟨r, rin, p, q, bef, aft⟩
         rw [aft]
-        rw [bef] at ih 
+        rw [bef] at ih
         repeat' rw [List.mem_append] at *
         push_neg
-        push_neg at ih 
+        push_neg at ih
         constructor; swap
         · exact ih.right
         constructor
@@ -214,10 +214,10 @@ lemma language_of_cfgSymbolStar (a : T) :
           · apply nq
             exact Symbol.terminal.inj imposs
           cases imposs
-          · norm_cast at imposs 
+          · norm_cast at imposs
           exact List.not_mem_nil (@Symbol.terminal T (cfgSymbolStar a).Nt t) imposs
-        · change r ∈ [((0 : Fin 1), ([] : List (Symbol T (cfgSymbolStar a).Nt)))] at rin 
-          rw [List.mem_singleton] at rin 
+        · change r ∈ [((0 : Fin 1), ([] : List (Symbol T (cfgSymbolStar a).Nt)))] at rin
+          rw [List.mem_singleton] at rin
           rw [rin]
           exact List.not_mem_nil (Symbol.terminal t)
       specialize indu (List.map Symbol.terminal w) ass

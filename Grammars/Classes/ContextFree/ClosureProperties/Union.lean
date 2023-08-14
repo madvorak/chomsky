@@ -71,7 +71,7 @@ private def g₁g : @LiftedGrammar T :=
       cases y; swap
       · tauto
       left
-      simp only [oN₁_of_N] at ass 
+      simp only [oN₁_of_N] at ass
       apply congr_arg
       apply congr_arg
       exact ass)
@@ -80,20 +80,20 @@ private def g₁g : @LiftedGrammar T :=
       rintro ⟨r_in, r_ntype⟩
       cases r_in
       · exfalso
-        rw [r_in] at r_ntype 
-        dsimp only at r_ntype 
+        rw [r_in] at r_ntype
+        dsimp only at r_ntype
         cases' r_ntype with n₀ imposs
         exact Option.noConfusion imposs
       cases r_in
       · exfalso
-        rw [r_in] at r_ntype 
-        dsimp only at r_ntype 
+        rw [r_in] at r_ntype
+        dsimp only at r_ntype
         cases' r_ntype with n₀ imposs
         exact Option.noConfusion imposs
-      change r ∈ List.map ruleOfRule₁ g₁.rules ++ List.map ruleOfRule₂ g₂.rules at r_in 
-      rw [List.mem_append] at r_in 
+      change r ∈ List.map ruleOfRule₁ g₁.rules ++ List.map ruleOfRule₂ g₂.rules at r_in
+      rw [List.mem_append] at r_in
       cases r_in
-      · rw [List.mem_map] at r_in 
+      · rw [List.mem_map] at r_in
         rcases r_in with ⟨r₁, r₁_in, r₁_convert_r⟩
         use r₁
         constructor
@@ -104,13 +104,13 @@ private def g₁g : @LiftedGrammar T :=
         run_tac
           five_steps
       · exfalso
-        rw [List.mem_map] at r_in 
+        rw [List.mem_map] at r_in
         rcases r_in with ⟨r₂, r₂_in, r₂_convert_r⟩
-        rw [← r₂_convert_r] at r_ntype 
-        unfold ruleOfRule₂ at r_ntype 
-        dsimp only at r_ntype 
+        rw [← r₂_convert_r] at r_ntype
+        unfold ruleOfRule₂ at r_ntype
+        dsimp only at r_ntype
         cases' r_ntype with n₁ contr
-        rw [Option.some_inj] at contr 
+        rw [Option.some_inj] at contr
         exact Sum.noConfusion contr)
     (by intro; rfl)
 
@@ -155,7 +155,7 @@ private def g₂g : @LiftedGrammar T :=
       cases y
       · tauto
       left
-      simp only [oN₂_of_N] at ass 
+      simp only [oN₂_of_N] at ass
       apply congr_arg
       apply congr_arg
       exact ass)
@@ -164,30 +164,30 @@ private def g₂g : @LiftedGrammar T :=
       rintro ⟨r_in, r_ntype⟩
       cases' List.eq_or_mem_of_mem_cons r_in with r_eq r_in_
       · exfalso
-        rw [r_eq] at r_ntype 
-        dsimp only at r_ntype 
+        rw [r_eq] at r_ntype
+        dsimp only at r_ntype
         cases' r_ntype with n₀ imposs
         exact Option.noConfusion imposs
       cases' List.eq_or_mem_of_mem_cons r_in_ with r_eq_ r_in__
       · exfalso
-        rw [r_eq_] at r_ntype 
-        dsimp only at r_ntype 
+        rw [r_eq_] at r_ntype
+        dsimp only at r_ntype
         cases' r_ntype with n₀ imposs
         exact Option.noConfusion imposs
       clear r_in r_in_
       rename' r_in__ => r_in
-      rw [List.mem_append] at r_in 
+      rw [List.mem_append] at r_in
       cases r_in
       · exfalso
-        rw [List.mem_map] at r_in 
+        rw [List.mem_map] at r_in
         rcases r_in with ⟨r₁, r₁_in, r₁_convert_r⟩
-        rw [← r₁_convert_r] at r_ntype 
-        unfold ruleOfRule₁ at r_ntype 
-        dsimp only at r_ntype 
+        rw [← r₁_convert_r] at r_ntype
+        unfold ruleOfRule₁ at r_ntype
+        dsimp only at r_ntype
         cases' r_ntype with n₂ contr
-        rw [Option.some_inj] at contr 
+        rw [Option.some_inj] at contr
         exact Sum.noConfusion contr
-      · rw [List.mem_map] at r_in 
+      · rw [List.mem_map] at r_in
         rcases r_in with ⟨r₂, r₂_in, r₂_convert_r⟩
         use r₂
         constructor
@@ -471,10 +471,10 @@ private lemma both_empty (u v : List (Symbol T (unionGrammar g₁ g₂).Nt))
     (bef : [Symbol.nonterminal (unionGrammar g₁ g₂).initial] = u ++ [a] ++ v) : u = [] ∧ v = [] :=
   by
   have len := congr_arg List.length bef
-  rw [List.length_singleton, List.length_append, List.length_append, List.length_singleton] at len 
+  rw [List.length_singleton, List.length_append, List.length_append, List.length_singleton] at len
   constructor
   · by_contra
-    rw [← List.length_eq_zero] at h 
+    rw [← List.length_eq_zero] at h
     exact
       Nat.not_succ_le_self 1
         (by
@@ -486,7 +486,7 @@ private lemma both_empty (u v : List (Symbol T (unionGrammar g₁ g₂).Nt))
             _ ≥ 1 + 1 + 0 := le_self_add
             _ = 2 := rfl)
   · by_contra
-    rw [← List.length_eq_zero] at h 
+    rw [← List.length_eq_zero] at h
     exact
       Nat.not_succ_le_self 1
         (by
@@ -505,25 +505,25 @@ private lemma in_language_impossible_case_of_union (w : List T)
     (sbi : r ∈ List.map ruleOfRule₁ g₁.rules ++ List.map ruleOfRule₂ g₂.rules) :
     w ∈ cFLanguage g₁ ∨ w ∈ cFLanguage g₂ := by
   exfalso
-  rw [hu, hv] at bef 
-  rw [List.nil_append, List.append_nil] at bef 
-  change [Symbol.nonterminal none] = [Symbol.nonterminal r.fst] at bef 
+  rw [hu, hv] at bef
+  rw [List.nil_append, List.append_nil] at bef
+  change [Symbol.nonterminal none] = [Symbol.nonterminal r.fst] at bef
   have rule_root : r.fst = none :=
     haveI almost := List.head_eq_of_cons_eq bef
     Symbol.nonterminal.inj almost.symm
-  rw [List.mem_append] at sbi 
+  rw [List.mem_append] at sbi
   cases sbi
-  · rw [List.mem_map] at sbi 
+  · rw [List.mem_map] at sbi
     rcases sbi with ⟨r₁, -, imposs⟩
-    unfold ruleOfRule₁ at imposs 
-    rw [← imposs] at rule_root 
-    unfold Prod.fst at rule_root 
+    unfold ruleOfRule₁ at imposs
+    rw [← imposs] at rule_root
+    unfold Prod.fst at rule_root
     exact Option.noConfusion rule_root
-  · rw [List.mem_map] at sbi 
+  · rw [List.mem_map] at sbi
     rcases sbi with ⟨r₂, -, imposs⟩
-    unfold ruleOfRule₂ at imposs 
-    rw [← imposs] at rule_root 
-    unfold Prod.fst at rule_root 
+    unfold ruleOfRule₂ at imposs
+    rw [← imposs] at rule_root
+    unfold Prod.fst at rule_root
     exact Option.noConfusion rule_root
 
 private lemma in_language_of_in_union (w : List T) :
@@ -533,30 +533,30 @@ private lemma in_language_of_in_union (w : List T) :
   cases' CF_eq_or_tran_deri_of_deri ass with impossible h
   · exfalso
     have zeroth := congr_arg (fun p => List.get? p 0) impossible
-    unfold List.get? at zeroth 
-    rw [List.get?_map] at zeroth 
+    unfold List.get? at zeroth
+    rw [List.get?_map] at zeroth
     cases w.nth 0
-    · rw [Option.map_none'] at zeroth 
+    · rw [Option.map_none'] at zeroth
       exact Option.noConfusion zeroth
-    · rw [Option.map_some'] at zeroth 
+    · rw [Option.map_some'] at zeroth
       exact Symbol.noConfusion (Option.some.inj zeroth)
   rcases h with ⟨S₁, deri_head, deri_tail⟩
   rcases deri_head with ⟨rule, ruleok, u, v, h_bef, h_aft⟩
-  rw [h_aft] at deri_tail 
+  rw [h_aft] at deri_tail
   cases' both_empty u v (Symbol.nonterminal rule.fst) h_bef with u_nil v_nil
   cases' ruleok with g₁S r_rest
   · left
     rw [g₁S] at *
-    rw [u_nil] at deri_tail 
-    rw [v_nil] at deri_tail 
-    rw [List.nil_append] at deri_tail 
+    rw [u_nil] at deri_tail
+    rw [v_nil] at deri_tail
+    rw [List.nil_append] at deri_tail
     exact in_language_left_case_of_union deri_tail
   cases' r_rest with g₂S r_imposs
   · right
     rw [g₂S] at *
-    rw [u_nil] at deri_tail 
-    rw [v_nil] at deri_tail 
-    rw [List.nil_append] at deri_tail 
+    rw [u_nil] at deri_tail
+    rw [v_nil] at deri_tail
+    rw [List.nil_append] at deri_tail
     exact in_language_right_case_of_union deri_tail
   exact in_language_impossible_case_of_union w rule u v u_nil v_nil h_bef r_imposs
 
@@ -578,8 +578,8 @@ lemma CF_of_CF_u_CF {T : Type} (L₁ : Language T) (L₂ : Language T) :
   · -- prove `L₁ + L₂ ⊆ `
     intro w hyp
     cases' hyp with case₁ case₂
-    · rw [← eq_L₁] at case₁ 
+    · rw [← eq_L₁] at case₁
       exact in_union_of_in_first w case₁
-    · rw [← eq_L₂] at case₂ 
+    · rw [← eq_L₂] at case₂
       exact in_union_of_in_second w case₂
 -/

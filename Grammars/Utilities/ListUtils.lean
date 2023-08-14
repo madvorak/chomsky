@@ -8,7 +8,7 @@ variable {α β : Type _} {x y z : List α}
 section ListAppendAppend
 
 lemma length_append_append :
-  (x ++ y ++ z).length = x.length + y.length + z.length := 
+  (x ++ y ++ z).length = x.length + y.length + z.length :=
 by
   rw [List.length_append, List.length_append]
 
@@ -66,7 +66,7 @@ private lemma cons_drop_succ {m : ℕ} (mlt : m < x.length) :
 by
   induction' x with d l ih generalizing m
   · exfalso
-    rw [length] at mlt 
+    rw [length] at mlt
     exact Nat.not_lt_zero m mlt
   cases m
   · rw [get]
@@ -88,23 +88,23 @@ by
   obtain ⟨m, k, mlt, klt, left_half⟩ := take_join_of_lt notall
   use m, k, mlt, klt
   have L_two_parts := congr_arg List.join (List.take_append_drop m L)
-  rw [List.join_append] at L_two_parts 
+  rw [List.join_append] at L_two_parts
   have whole := List.take_append_drop n L.join
-  rw [left_half] at whole 
+  rw [left_half] at whole
   have important := Eq.trans whole L_two_parts.symm
-  rw [append_assoc] at important 
+  rw [append_assoc] at important
   have right_side := append_left_cancel important
   have auxi : (drop m L).join = (L.get ⟨m, mlt⟩ :: drop m.succ L).join
   · apply congr_arg
     apply cons_drop_succ
-  rw [join] at auxi 
-  rw [auxi] at right_side 
+  rw [join] at auxi
+  rw [auxi] at right_side
   have near_result :
     take k (L.get ⟨m, mlt⟩) ++ drop n L.join =
     take k (L.get ⟨m, mlt⟩) ++ drop k (L.get ⟨m, mlt⟩) ++ (drop m.succ L).join
   · convert right_side
     rw [List.take_append_drop]
-  rw [append_assoc] at near_result 
+  rw [append_assoc] at near_result
   exact append_left_cancel near_result
 
 def nTimes (l : List α) (n : ℕ) : List α :=
@@ -177,22 +177,22 @@ lemma countIn_pos_of_in {a : α} (hyp : a ∈ x) :
 by
   induction' x with d l ih
   · exfalso
-    rw [List.mem_nil_iff] at hyp 
+    rw [List.mem_nil_iff] at hyp
     exact hyp
   by_contra contr
-  rw [not_lt] at contr 
-  rw [le_zero_iff] at contr 
+  rw [not_lt] at contr
+  rw [le_zero_iff] at contr
   rw [mem_cons] at hyp
-  unfold countIn at contr 
-  unfold List.map at contr 
-  simp at contr 
+  unfold countIn at contr
+  unfold List.map at contr
+  simp at contr
   cases' hyp with a_eq_d a_in_l
   · exact contr.left a_eq_d.symm
   specialize ih a_in_l
   have zero_in_tail : countIn l a = 0
   · unfold countIn
     exact contr.right
-  rw [zero_in_tail] at ih 
+  rw [zero_in_tail] at ih
   exact Nat.lt_irrefl 0 ih
 
 lemma countIn_zero_of_notin {a : α} (hyp : a ∉ x) :

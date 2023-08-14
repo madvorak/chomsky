@@ -1,5 +1,5 @@
 import Grammars.Classes.Unrestricted.Basics.Toolbox
-import Grammars.Utilities.languageOperations
+import Grammars.Utilities.LanguageOperations
 import Grammars.Utilities.ListUtils
 
 variable {T : Type}

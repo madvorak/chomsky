@@ -30,7 +30,7 @@ inductive Tsys.Derives (h : Tsys α) : List (Tsymb α h.beta) → List (Tsymb α
   | tail (u v w : List (Tsymb α h.beta)) (n : ℕ) : h.Derives u v n → h.Transforms v w → h.Derives u w n.succ
 
 def Tsys.language (h : Tsys α) : Language α :=
-  setOf (fun w => ∃ n : ℕ, h.Derives (h.initiate w) [] n)
+  setOf (fun w => ∃ n : ℕ, h.Derives (h.initiate w) [Tsymb.marker h.special] n)
 
 def IsThue (L : Language α) : Prop :=
   ∃ h : Tsys α, h.language = L

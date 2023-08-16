@@ -9,19 +9,17 @@ section Auxiliary
 private def reversalGrule {N : Type} (r : Grule T N) : Grule T N :=
   Grule.mk r.inputR.reverse r.inputN r.inputL.reverse r.output.reverse
 
-private lemma dual_of_reversal_grule {N : Type} (r : Grule T N) :
+private lemma dual_of_reversalGrule {N : Type} (r : Grule T N) :
   reversalGrule (reversalGrule r) = r :=
 by
   cases r
-  unfold reversalGrule
-  dsimp only
-  simp [List.reverse_reverse]
+  simp [reversalGrule, List.reverse_reverse]
 
 private lemma reversal_grule_reversal_grule {N : Type} :
   @reversalGrule T N ∘ @reversalGrule T N = id :=
 by
   ext
-  apply dual_of_reversal_grule
+  apply dual_of_reversalGrule
 
 private def reversalGrammar (g : Grammar T) : Grammar T :=
   Grammar.mk g.nt g.initial (List.map reversalGrule g.rules)

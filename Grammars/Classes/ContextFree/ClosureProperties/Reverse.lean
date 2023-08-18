@@ -4,8 +4,6 @@ import Grammars.Utilities.ListUtils
 
 variable {T : Type}
 
-section Auxiliary
-
 private def reversalGrammar (g : CFgrammar T) : CFgrammar T :=
   CFgrammar.mk
     g.nt
@@ -19,10 +17,8 @@ by
   simp only [reversalGrammar, List.map_map, CFgrammar.mk.injEq, heq_eq_eq, true_and]
   convert_to
     List.map (fun r : g_nt × List (Symbol T g_nt) => (r.fst, r.snd.reverse.reverse)) g_rules =
-      g_rules
-  convert_to List.map (fun r : g_nt × List (Symbol T g_nt) => (r.fst, r.snd)) g_rules = g_rules
-  · simp [List.reverse_reverse]
-  · simp
+    g_rules
+  simp [List.reverse_reverse]
 
 private lemma derives_reversed (g : CFgrammar T) (v : List (Symbol T g.nt)) :
   (reversalGrammar g).Derives [Symbol.nonterminal (reversalGrammar g).initial] v →
@@ -49,10 +45,8 @@ by
     rw [fst_from_r]
     exact congr_arg List.reverse bef
   · have snd_from_r : r₀.snd = r.snd.reverse
-    · rw [← r_from_r₀]
-      rw [List.reverse_reverse]
-    rw [snd_from_r]
-    rw [← List.reverse_append_append]
+    · rw [← r_from_r₀, List.reverse_reverse]
+    rw [snd_from_r, ← List.reverse_append_append]
     exact congr_arg List.reverse aft
 
 private lemma reversed_word_in_original_language {g : CFgrammar T} {w : List T}
@@ -65,10 +59,8 @@ by
   rw [List.map_reverse]
   exact derives_reversed g (List.map Symbol.terminal w) hyp
 
-end Auxiliary
-
 /-- The class of context-free languages is closed under reversal. -/
-lemma CF_of_reverse_CF (L : Language T) :
+theorem CF_of_reverse_CF (L : Language T) :
   IsCF L → IsCF (reverseLang L) :=
 by
   rintro ⟨g, hgL⟩

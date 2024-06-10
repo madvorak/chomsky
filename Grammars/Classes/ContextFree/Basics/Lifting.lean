@@ -1,260 +1,166 @@
-/-import Grammars.Classes.ContextFree.Basics.Toolbox
+import Grammars.Classes.ContextFree.Basics.Toolbox
 import Grammars.Utilities.ListUtils
 
 variable {T : Type}
 
-def liftSymbol {N₀ N : Type} (lift_N : N₀ → N) : Symbol T N₀ → Symbol T N
+
+/-- Lifting `Symbol` to a larger nonterminal type. -/
+def liftSymbol {N₀ N : Type} (liftN : N₀ → N) : Symbol T N₀ → Symbol T N
   | Symbol.terminal t => Symbol.terminal t
-  | Symbol.nonterminal n => Symbol.nonterminal (lift_N n)
+  | Symbol.nonterminal n => Symbol.nonterminal (liftN n)
 
-def sinkSymbol {N₀ N : Type} (sink_N : N → Option N₀) : Symbol T N → Option (Symbol T N₀)
+/-- Sinking `Symbol` from a larger nonterminal type; may return `none`. -/
+def sinkSymbol {N₀ N : Type} (sinkN : N → Option N₀) : Symbol T N → Option (Symbol T N₀)
   | Symbol.terminal t => some (Symbol.terminal t)
-  | Symbol.nonterminal n => Option.map Symbol.nonterminal (sink_N n)
+  | Symbol.nonterminal n => Option.map Symbol.nonterminal (sinkN n)
 
-def liftString {N₀ N : Type} (lift_N : N₀ → N) : List (Symbol T N₀) → List (Symbol T N) :=
-  List.map (liftSymbol lift_N)
+/-- Lifting `List Symbol` to a larger nonterminal type. -/
+def liftString {N₀ N : Type} (liftN : N₀ → N) :
+    List (Symbol T N₀) → List (Symbol T N) :=
+  List.map (liftSymbol liftN)
 
-def sinkString {N₀ N : Type} (sink_N : N → Option N₀) : List (Symbol T N) → List (Symbol T N₀) :=
-  List.filterMap (sinkSymbol sink_N)
+/-- Sinking `List Symbol` from a larger nonterminal type; may skip some elements. -/
+def sinkString {N₀ N : Type} (sinkN : N → Option N₀) :
+    List (Symbol T N) → List (Symbol T N₀) :=
+  List.filterMap (sinkSymbol sinkN)
 
-def liftRule {N₀ N : Type} (lift_N : N₀ → N) : N₀ × List (Symbol T N₀) → N × List (Symbol T N) :=
-  fun r => (lift_N r.fst, liftString lift_N r.snd)
+/-- Lifting context-free rules to a larger nonterminal type. -/
+def liftRule {N₀ N : Type} (r : N₀ × List (Symbol T N₀)) (liftN : N₀ → N) :
+    N × List (Symbol T N) :=
+  ⟨liftN r.fst, liftString liftN r.snd⟩
 
-structure LiftedGrammar where
-  (g₀ g : CFgrammar T)
-  liftNt : g₀.nt → g.nt
-  lift_inj : Function.Injective liftNt
-  corresponding_rules :
-    ∀ r : g₀.nt × List (Symbol T g₀.nt), r ∈ g₀.rules → liftRule liftNt r ∈ g.rules
-  sinkNt : g.nt → Option g₀.nt
-  sink_inj : ∀ x y, sinkNt x = sinkNt y → x = y ∨ sinkNt x = none
+/-- Lifting `CFgrammar` to a larger nonterminal type. -/
+structure LiftedCFG (T : Type) where
+  /-- The smaller grammar. -/
+  g₀: CFgrammar T
+  /-- The bigger grammar. -/
+  g : CFgrammar T
+  /-- Mapping nonterminals from the smaller type to the bigger type. -/
+  liftNT : g₀.nt → g.nt
+  /-- Mapping nonterminals from the bigger type to the smaller type. -/
+  sinkNT : g.nt → Option g₀.nt
+  /-- The former map is injective. -/
+  lift_inj : Function.Injective liftNT
+  /-- The latter map is injective where defined. -/
+  sink_inj : ∀ x y, sinkNT x = sinkNT y → x = y ∨ sinkNT x = none
+  /-- The two mappings are essentially inverses. -/
+  sinkNT_liftNT : ∀ n₀ : g₀.nt, sinkNT (liftNT n₀) = some n₀
+  /-- Each rule of the smaller grammar has a corresponding rule in the bigger grammar. -/
+  corresponding_rules : ∀ r : g₀.nt × List (Symbol T g₀.nt), r ∈ g₀.rules → liftRule r liftNT ∈ g.rules
+  /-- Each rule of the bigger grammar whose input nonterminal the smaller grammar recognizes
+      has a corresponding rule in the smaller grammar. -/
   preimage_of_rules :
     ∀ r : g.nt × List (Symbol T g.nt),
-      (r ∈ g.rules ∧ ∃ n₀ : g₀.nt, liftNt n₀ = r.fst) → ∃ r₀ ∈ g₀.rules, liftRule liftNt r₀ = r
-  liftNt_sink : ∀ n₀ : g₀.nt, sinkNt (liftNt n₀) = some n₀
+      (r ∈ g.rules ∧ ∃ n₀ : g₀.nt, liftNT n₀ = r.fst) →
+        (∃ r₀ ∈ g₀.rules, liftRule r₀ liftNT = r)
 
-private lemma lifted_grammar_inverse (lg : @LiftedGrammar T) :
-    ∀ x : lg.g.nt, (∃ val, lg.sinkNt x = some val) → Option.map lg.liftNt (lg.sinkNt x) = x :=
-  by
-  intro x h
-  cases' h with valu ass
-  rw [ass]
-  rw [Option.map_some']
+lemma LiftedCFG.sinkNT_inverse_liftNT (G : LiftedCFG T) :
+    ∀ x : G.g.nt, (∃ n₀, G.sinkNT x = some n₀) → (Option.map G.liftNT (G.sinkNT x) = x) := by
+  intro x ⟨n₀, hx⟩
+  rw [hx, Option.map_some']
   apply congr_arg
-  symm
-  by_contra
-  have inje := lg.sink_inj x (lg.liftNt valu)
-  rw [lg.liftNt_sink] at inje
-  cases' inje ass with case_valu case_none
-  · exact h case_valu
-  rw [ass] at case_none
-  exact Option.noConfusion case_none
+  by_contra hnx
+  cases (G.sinkNT_liftNT n₀ ▸ G.sink_inj x (G.liftNT n₀)) hx with
+  | inl case_valu => exact hnx case_valu.symm
+  | inr case_none => exact Option.noConfusion (hx ▸ case_none)
 
-private lemma lift_tran {lg : LiftedGrammar} {w₁ w₂ : List (Symbol T lg.g₀.nt)}
-    (hyp : CFTransforms lg.g₀ w₁ w₂) :
-    CFTransforms lg.g (liftString lg.liftNt w₁) (liftString lg.liftNt w₂) :=
-  by
-  rcases hyp with ⟨r, rin, u, v, bef, aft⟩
-  use liftRule lg.liftNt r
+lemma LiftedCFG.lift_produces {G : LiftedCFG T}
+    {w₁ w₂ : List (Symbol T G.g₀.nt)} (hG : G.g₀.Transforms w₁ w₂) :
+    G.g.Transforms (liftString G.liftNT w₁) (liftString G.liftNT w₂) := by
+  rcases hG with ⟨r, rin, hr⟩
+  rcases hr with ⟨u, v, bef, aft⟩
+  refine ⟨liftRule r G.liftNT, G.corresponding_rules r rin, ?_⟩
+  use liftString G.liftNT u, liftString G.liftNT v
   constructor
-  · exact lg.corresponding_rules r rin
-  use liftString lg.liftNt u
-  use liftString lg.liftNt v
-  constructor
-  · have lift_bef := congr_arg (liftString lg.liftNt) bef
-    unfold liftString at *
-    rw [List.map_append_append] at lift_bef
-    convert lift_bef
-  · have lift_aft := congr_arg (liftString lg.liftNt) aft
-    unfold liftString at *
-    rw [List.map_append_append] at lift_aft
-    exact lift_aft
+  · simpa only [liftString, List.map_append] using congr_arg (liftString G.liftNT) bef
+  · simpa only [liftString, List.map_append] using congr_arg (liftString G.liftNT) aft
 
-lemma lift_deri {lg : LiftedGrammar} {w₁ w₂ : List (Symbol T lg.g₀.nt)}
-    (hyp : CFDerives lg.g₀ w₁ w₂) :
-    CFDerives lg.g (liftString lg.liftNt w₁) (liftString lg.liftNt w₂) :=
-  by
-  induction' hyp with x y trash orig ih
-  · apply CF_deri_self
-  apply CF_deri_of_deri_tran
-  · exact ih
-  exact lift_tran orig
+/-- Derivation by `G.g₀` can be mirrored by `G.g` derivation. -/
+lemma LiftedCFG.lift_derives {G : LiftedCFG T}
+    {w₁ w₂ : List (Symbol T G.g₀.nt)} (hG : G.g₀.Derives w₁ w₂) :
+    G.g.Derives (liftString G.liftNT w₁) (liftString G.liftNT w₂) := by
+  induction hG with
+  | refl => exact CFgrammar.deri_self
+  | tail _ orig ih => exact CFgrammar.deri_of_deri_tran ih (lift_produces orig)
 
-def GoodLetter {lg : @LiftedGrammar T} : Symbol T lg.g.nt → Prop
-  | Symbol.terminal t => True
-  | Symbol.nonterminal n => ∃ n₀ : lg.g₀.nt, lg.sinkNt n = n₀
+/-- A `Symbol` is good iff it is one of those nonterminals that result from sinking or it is any
+terminal. -/
+def LiftedCFG.GoodLetter {G : LiftedCFG T} : Symbol T G.g.nt → Prop
+  | Symbol.terminal _ => True
+  | Symbol.nonterminal n => ∃ n₀ : G.g₀.nt, G.sinkNT n = n₀
 
-def GoodString {lg : @LiftedGrammar T} (s : List (Symbol T lg.g.nt)) :=
+/-- A string is good iff every `Symbol` in it is good. -/
+def LiftedCFG.GoodString {G : LiftedCFG T}
+    (s : List (Symbol T G.g.nt)) : Prop :=
   ∀ a ∈ s, GoodLetter a
 
-private lemma sink_tran {lg : LiftedGrammar} {w₁ w₂ : List (Symbol T lg.g.nt)}
-    (hyp : CFTransforms lg.g w₁ w₂) (ok_input : GoodString w₁) :
-    CFTransforms lg.g₀ (sinkString lg.sinkNt w₁) (sinkString lg.sinkNt w₂) :=
-  by
-  rcases hyp with ⟨r, rin, u, v, bef, aft⟩
-  rcases lg.preimage_of_rules r
-      (by
-        constructor
-        · exact rin
-        rw [bef] at ok_input
-        have good_matched_nonterminal : GoodLetter (Symbol.nonterminal r.fst) :=
-          by
-          specialize ok_input (Symbol.nonterminal r.fst)
-          unfold GoodLetter
-          sorry
-        change ∃ n₀ : lg.g₀.nt, lg.sinkNt r.fst = some n₀ at good_matched_nonterminal
-        cases' good_matched_nonterminal with n₀ hn₀
-        use n₀
-        have almost := congr_arg (Option.map lg.liftNt) hn₀
-        rw [lifted_grammar_inverse lg r.fst ⟨n₀, hn₀⟩] at almost
-        rw [Option.map_some'] at almost
-        apply Option.some_injective
-        exact almost.symm) with
-    ⟨p, pin, preimage⟩
-  use p
+lemma LiftedCFG.sink_produces {G : LiftedCFG T}
+    {w₁ w₂ : List (Symbol T G.g.nt)} (hG : G.g.Transforms w₁ w₂) (hw₁ : GoodString w₁) :
+    G.g₀.Transforms (sinkString G.sinkNT w₁) (sinkString G.sinkNT w₂) ∧
+      GoodString w₂ := by
+  rcases hG with ⟨r, rin, hr⟩
+  rcases hr with ⟨u, v, bef, aft⟩
+  rcases G.preimage_of_rules r (by
+      refine ⟨rin, ?_⟩
+      rw [bef] at hw₁
+      obtain ⟨n₀, hn₀⟩ : GoodLetter (Symbol.nonterminal r.fst)
+      · apply hw₁; simp
+      use n₀
+      simpa [G.sinkNT_inverse_liftNT r.fst ⟨n₀, hn₀⟩, Option.map_some'] using
+        congr_arg (Option.map G.liftNT) hn₀.symm)
+    with ⟨r₀, hr₀, hrr₀⟩
   constructor
-  · exact pin
-  use sinkString lg.sinkNt u
-  use sinkString lg.sinkNt v
-  have correct_inverse : sinkSymbol lg.sinkNt ∘ liftSymbol lg.liftNt = Option.some :=
-    by
-    ext1 x
-    cases x
-    · rfl
-    rw [Function.comp_apply]
-    unfold liftSymbol
-    unfold sinkSymbol
-    rw [lg.liftNt_sink]
-    apply Option.map_some'
-  constructor
-  · have sink_bef := congr_arg (sinkString lg.sinkNt) bef
-    unfold sinkString at *
-    rw [List.filterMap_append_append] at sink_bef
-    convert sink_bef
-    rw [← preimage]
-    unfold liftRule
-    dsimp only
-    change
-      [Symbol.nonterminal p.fst] =
-        List.filterMap (sinkSymbol lg.sinkNt)
-          (List.map (liftSymbol lg.liftNt) [Symbol.nonterminal p.fst])
-    rw [List.filterMap_map]
-    rw [correct_inverse]
-    rw [List.filterMap_some]
-  · have sink_aft := congr_arg (sinkString lg.sinkNt) aft
-    unfold sinkString at *
-    rw [List.filterMap_append_append] at sink_aft
-    convert sink_aft
-    rw [← preimage]
-    unfold liftRule
-    dsimp only
-    unfold liftString
-    rw [List.filterMap_map]
-    rw [correct_inverse]
-    rw [List.filterMap_some]
+  · use r₀
+    refine ⟨hr₀, ?_⟩
+    use sinkString G.sinkNT u, sinkString G.sinkNT v
+    have correct_inverse : sinkSymbol G.sinkNT ∘ liftSymbol G.liftNT = Option.some
+    · ext1 x
+      cases x
+      · rfl
+      rw [Function.comp_apply]
+      simp only [sinkSymbol, liftSymbol, Option.map_eq_some', Symbol.nonterminal.injEq]
+      rw [exists_eq_right]
+      apply G.sinkNT_liftNT
+      exact T
+    constructor
+    · have middle :
+        List.filterMap (sinkSymbol (T := T) G.sinkNT) [Symbol.nonterminal (G.liftNT r₀.fst)] =
+          [Symbol.nonterminal r₀.fst]
+      · simp [sinkSymbol, G.sinkNT_liftNT]
+      simpa only [
+        sinkString, List.filterMap_append, liftRule, ←hrr₀, middle
+      ] using congr_arg (sinkString G.sinkNT) bef
+    · simpa only [
+        sinkString, List.filterMap_append, liftRule, liftString, List.filterMap_map, List.filterMap_some, ←hrr₀, correct_inverse
+      ] using congr_arg (sinkString G.sinkNT) aft
+  · rw [bef] at hw₁
+    rw [aft, ← hrr₀]
+    simp only [GoodString, List.forall_mem_append] at hw₁ ⊢
+    refine ⟨⟨hw₁.left.left, ?_⟩, hw₁.right⟩
+    intro a ha
+    cases a
+    · simp [GoodLetter]
+    dsimp only [liftRule, liftString] at ha
+    rw [List.mem_map] at ha
+    rcases ha with ⟨s, -, hs⟩
+    rw [← hs]
+    cases s with
+    | terminal _ => exact False.elim (Symbol.noConfusion hs)
+    | nonterminal s' => exact ⟨s', G.sinkNT_liftNT s'⟩
 
-lemma sink_deri (lg : LiftedGrammar) (w₁ w₂ : List (Symbol T lg.g.nt))
-    (hyp : CFDerives lg.g w₁ w₂) (ok_input : GoodString w₁) :
-    CFDerives lg.g₀ (sinkString lg.sinkNt w₁) (sinkString lg.sinkNt w₂) ∧ GoodString w₂ :=
-  by
-  induction' hyp with x y trash orig ih
-  · constructor
-    · apply CF_deri_self
-    · exact ok_input
-  constructor
-  · apply CF_deri_of_deri_tran
-    · exact ih.left
-    exact sink_tran orig ih.right
-  · intro a in_y
-    have ihr := ih.right a
-    rcases orig with ⟨r, in_rules, u, y, bef, aft⟩
-    rw [bef] at ihr
-    rw [List.mem_append] at ihr
-    rw [aft] at in_y
-    rw [List.mem_append] at in_y
-    cases in_y
-    rw [List.mem_append] at in_y
-    cases in_y
-    · apply ihr
-      rw [List.mem_append]
-      left
-      left
-      exact in_y
-    · have exn₀ : ∃ n₀ : lg.g₀.nt, lg.liftNt n₀ = r.fst :=
-        by
-        by_cases lg.sinkNt r.fst = none
-        · exfalso
-          have ruu : Symbol.nonterminal r.fst ∈ x :=
-            by
-            rw [bef]
-            rw [List.mem_append]
-            left
-            rw [List.mem_append]
-            right
-            apply List.mem_cons_self
-          have glruf : GoodLetter (Symbol.nonterminal r.fst) :=
-            ih.right (Symbol.nonterminal r.fst) ruu
-          unfold GoodLetter at glruf
-          rw [h] at glruf
-          cases' glruf with n₀ imposs
-          exact Option.noConfusion imposs
-        cases' option.ne_none_iff_exists'.mp h with x ex
-        use x
-        have gix := lifted_grammar_inverse lg r.fst ⟨x, ex⟩
-        rw [ex] at gix
-        rw [Option.map_some'] at gix
-        apply Option.some_injective
-        exact gix
-      rcases lg.preimage_of_rules r ⟨in_rules, exn₀⟩ with ⟨r₀, in0, lif⟩
-      rw [← lif] at in_y
-      unfold liftRule at in_y
-      dsimp only at in_y
-      unfold liftString at in_y
-      rw [List.mem_map] at in_y
-      rcases in_y with ⟨s, s_in_rulsnd, symbol_letter⟩
-      rw [← symbol_letter]
-      cases s
-      · unfold liftSymbol
-      unfold liftSymbol
-      unfold GoodLetter
-      use s
-      exact lg.lift_nt_sink s
-    · apply ihr
-      right
-      exact in_y
+lemma LiftedCFG.sink_derives_aux {G : LiftedCFG T}
+    {w₁ w₂ : List (Symbol T G.g.nt)} (hG : G.g.Derives w₁ w₂) (hw₁ : GoodString w₁) :
+    G.g₀.Derives (sinkString G.sinkNT w₁) (sinkString G.sinkNT w₂) ∧
+      GoodString w₂ := by
+  induction hG with
+  | refl => exact ⟨CFgrammar.deri_self, hw₁⟩
+  | tail _ orig ih =>
+    have both := sink_produces orig ih.right
+    exact ⟨CFgrammar.deri_of_deri_tran ih.left both.left, both.right⟩
 
-/- ./././Mathport/Syntax/Translate/Expr.lean:336:4: warning: unsupported (TODO): `[tacs] -/
-unsafe def five_steps : tactic Unit :=
-  sorry
-
-variable {g₁ g₂ : CFGrammar T}
-
-/-- similar to `lift_symbol (option.some ∘ sum.inl)` -/
-def sTNOfSTN₁ : Symbol T g₁.nt → Symbol T (Option (Sum g₁.nt g₂.nt))
-  | Symbol.terminal st => Symbol.terminal st
-  | Symbol.nonterminal snt => Symbol.nonterminal (some (Sum.inl snt))
-
-/-- similar to `lift_symbol (option.some ∘ sum.inr)` -/
-def sTNOfSTN₂ : Symbol T g₂.nt → Symbol T (Option (Sum g₁.nt g₂.nt))
-  | Symbol.terminal st => Symbol.terminal st
-  | Symbol.nonterminal snt => Symbol.nonterminal (some (Sum.inr snt))
-
-/-- similar to `lift_string (option.some ∘ sum.inl)` -/
-def lsTNOfLsTN₁ : List (Symbol T g₁.nt) → List (Symbol T (Option (Sum g₁.nt g₂.nt))) :=
-  List.map sTNOfSTN₁
-
-/-- similar to `lift_string (option.some ∘ sum.inr)` -/
-def lsTNOfLsTN₂ : List (Symbol T g₂.nt) → List (Symbol T (Option (Sum g₁.nt g₂.nt))) :=
-  List.map sTNOfSTN₂
-
-/-- similar to `lift_rule (option.some ∘ sum.inl)` -/
-def ruleOfRule₁ (r : g₁.nt × List (Symbol T g₁.nt)) :
-    Option (Sum g₁.nt g₂.nt) × List (Symbol T (Option (Sum g₁.nt g₂.nt))) :=
-  (some (Sum.inl (Prod.fst r)), lsTNOfLsTN₁ (Prod.snd r))
-
-/-- similar to `lift_rule (option.some ∘ sum.inr)` -/
-def ruleOfRule₂ (r : g₂.nt × List (Symbol T g₂.nt)) :
-    Option (Sum g₁.nt g₂.nt) × List (Symbol T (Option (Sum g₁.nt g₂.nt))) :=
-  (some (Sum.inr (Prod.fst r)), lsTNOfLsTN₂ (Prod.snd r))
-
--/
+/-- Derivation by `G.g` can be mirrored by `G.g₀` derivation if that the starting word does not
+contain any nonterminals that `G.g₀` lacks. -/
+lemma LiftedCFG.sink_derives (G : LiftedCFG T)
+    {w₁ w₂ : List (Symbol T G.g.nt)} (hG : G.g.Derives w₁ w₂) (hw₁ : GoodString w₁) :
+    G.g₀.Derives (sinkString G.sinkNT w₁) (sinkString G.sinkNT w₂) :=
+  (sink_derives_aux hG hw₁).left

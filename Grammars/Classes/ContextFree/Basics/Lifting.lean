@@ -25,7 +25,7 @@ def sinkString {N₀ N : Type} (sinkN : N → Option N₀) :
   List.filterMap (sinkSymbol sinkN)
 
 /-- Lifting context-free rules to a larger nonterminal type. -/
-def liftRule {N₀ N : Type} (r : N₀ × List (Symbol T N₀)) (liftN : N₀ → N) :
+def liftRule {N₀ N : Type} (liftN : N₀ → N) (r : N₀ × List (Symbol T N₀)) :
     N × List (Symbol T N) :=
   ⟨liftN r.fst, liftString liftN r.snd⟩
 
@@ -46,15 +46,15 @@ structure LiftedCFG (T : Type) where
   /-- The two mappings are essentially inverses. -/
   sinkNT_liftNT : ∀ n₀ : g₀.nt, sinkNT (liftNT n₀) = some n₀
   /-- Each rule of the smaller grammar has a corresponding rule in the bigger grammar. -/
-  corresponding_rules : ∀ r : g₀.nt × List (Symbol T g₀.nt), r ∈ g₀.rules → liftRule r liftNT ∈ g.rules
+  corresponding_rules : ∀ r : g₀.nt × List (Symbol T g₀.nt), r ∈ g₀.rules → liftRule liftNT r ∈ g.rules
   /-- Each rule of the bigger grammar whose input nonterminal the smaller grammar recognizes
       has a corresponding rule in the smaller grammar. -/
   preimage_of_rules :
     ∀ r : g.nt × List (Symbol T g.nt),
       (r ∈ g.rules ∧ ∃ n₀ : g₀.nt, liftNT n₀ = r.fst) →
-        (∃ r₀ ∈ g₀.rules, liftRule r₀ liftNT = r)
+        (∃ r₀ ∈ g₀.rules, liftRule liftNT r₀ = r)
 
-lemma LiftedCFG.sinkNT_inverse_liftNT (G : LiftedCFG T) :
+private lemma LiftedCFG.sinkNT_inverse_liftNT (G : LiftedCFG T) :
     ∀ x : G.g.nt, (∃ n₀, G.sinkNT x = some n₀) → (Option.map G.liftNT (G.sinkNT x) = x) := by
   intro x ⟨n₀, hx⟩
   rw [hx, Option.map_some']
@@ -64,12 +64,12 @@ lemma LiftedCFG.sinkNT_inverse_liftNT (G : LiftedCFG T) :
   | inl case_valu => exact hnx case_valu.symm
   | inr case_none => exact Option.noConfusion (hx ▸ case_none)
 
-lemma LiftedCFG.lift_produces {G : LiftedCFG T}
+private lemma LiftedCFG.lift_produces {G : LiftedCFG T}
     {w₁ w₂ : List (Symbol T G.g₀.nt)} (hG : G.g₀.Transforms w₁ w₂) :
     G.g.Transforms (liftString G.liftNT w₁) (liftString G.liftNT w₂) := by
   rcases hG with ⟨r, rin, hr⟩
   rcases hr with ⟨u, v, bef, aft⟩
-  refine ⟨liftRule r G.liftNT, G.corresponding_rules r rin, ?_⟩
+  refine ⟨liftRule G.liftNT r, G.corresponding_rules r rin, ?_⟩
   use liftString G.liftNT u, liftString G.liftNT v
   constructor
   · simpa only [liftString, List.map_append] using congr_arg (liftString G.liftNT) bef
@@ -94,7 +94,7 @@ def LiftedCFG.GoodString {G : LiftedCFG T}
     (s : List (Symbol T G.g.nt)) : Prop :=
   ∀ a ∈ s, GoodLetter a
 
-lemma LiftedCFG.sink_produces {G : LiftedCFG T}
+private lemma LiftedCFG.sink_produces {G : LiftedCFG T}
     {w₁ w₂ : List (Symbol T G.g.nt)} (hG : G.g.Transforms w₁ w₂) (hw₁ : GoodString w₁) :
     G.g₀.Transforms (sinkString G.sinkNT w₁) (sinkString G.sinkNT w₂) ∧
       GoodString w₂ := by
@@ -148,7 +148,7 @@ lemma LiftedCFG.sink_produces {G : LiftedCFG T}
     | terminal _ => exact False.elim (Symbol.noConfusion hs)
     | nonterminal s' => exact ⟨s', G.sinkNT_liftNT s'⟩
 
-lemma LiftedCFG.sink_derives_aux {G : LiftedCFG T}
+private lemma LiftedCFG.sink_derives_aux {G : LiftedCFG T}
     {w₁ w₂ : List (Symbol T G.g.nt)} (hG : G.g.Derives w₁ w₂) (hw₁ : GoodString w₁) :
     G.g₀.Derives (sinkString G.sinkNT w₁) (sinkString G.sinkNT w₂) ∧
       GoodString w₂ := by
@@ -164,3 +164,19 @@ lemma LiftedCFG.sink_derives (G : LiftedCFG T)
     {w₁ w₂ : List (Symbol T G.g.nt)} (hG : G.g.Derives w₁ w₂) (hw₁ : GoodString w₁) :
     G.g₀.Derives (sinkString G.sinkNT w₁) (sinkString G.sinkNT w₂) :=
   (sink_derives_aux hG hw₁).left
+
+lemma liftString_all_terminals {N₀ N : Type} (liftN : N₀ → N) (w : List T) :
+    liftString liftN (w.map Symbol.terminal) = w.map Symbol.terminal := by
+  induction w with
+  | nil => rfl
+  | cons t _ ih => exact congr_arg (Symbol.terminal t :: ·) ih
+
+lemma sinkString_all_terminals {N₀ N : Type} (sinkN : N → Option N₀) (w : List T) :
+    sinkString sinkN (w.map Symbol.terminal) = w.map Symbol.terminal := by
+  induction w with
+  | nil => rfl
+  | cons t _ ih => exact congr_arg (Symbol.terminal t :: ·) ih
+
+lemma singletonGoodString {G : LiftedCFG T}
+    {s : Symbol T G.g.nt} (hs : G.GoodLetter s) : G.GoodString [s] := by
+  simpa [LiftedCFG.GoodString] using hs

@@ -150,7 +150,7 @@ by
   rw [List.replicate_succ, List.map_cons, List.sum_cons, ih, if_pos rfl]
   apply Nat.one_add
 
-lemma countIn_replicate_neq {a b : α} (hyp : a ≠ b) (n : ℕ) :
+lemma countIn_replicate_neq {a b : α} (hab : a ≠ b) (n : ℕ) :
   countIn (List.replicate n a) b = 0 :=
 by
   unfold countIn
@@ -159,31 +159,31 @@ by
   rw [List.replicate_succ, List.map_cons, List.sum_cons, ih, Nat.add_zero, ite_eq_right_iff]
   intro impos
   exfalso
-  exact hyp impos
+  exact hab impos
 
 lemma countIn_singleton_eq (a : α) :
   countIn [a] a = 1 :=
 List.countIn_replicate_eq a 1
 
-lemma countIn_singleton_neq {a b : α} (hyp : a ≠ b) :
+lemma countIn_singleton_neq {a b : α} (hab : a ≠ b) :
   countIn [a] b = 0 :=
-List.countIn_replicate_neq hyp 1
+List.countIn_replicate_neq hab 1
 
-lemma countIn_pos_of_in {a : α} (hyp : a ∈ x) :
+lemma countIn_pos_of_in {a : α} (hax : a ∈ x) :
   countIn x a > 0 :=
 by
   induction' x with d l ih
   · exfalso
-    rw [List.mem_nil_iff] at hyp
-    exact hyp
+    rw [List.mem_nil_iff] at hax
+    exact hax
   by_contra contr
   rw [not_lt] at contr
   rw [Nat.le_zero] at contr
-  rw [mem_cons] at hyp
+  rw [mem_cons] at hax
   unfold countIn at contr
   unfold List.map at contr
   simp at contr
-  cases' hyp with a_eq_d a_in_l
+  cases' hax with a_eq_d a_in_l
   · exact contr.left a_eq_d.symm
   specialize ih a_in_l
   have zero_in_tail : countIn l a = 0
@@ -192,7 +192,7 @@ by
   rw [zero_in_tail] at ih
   exact Nat.lt_irrefl 0 ih
 
-lemma countIn_zero_of_notin {a : α} (hyp : a ∉ x) :
+lemma countIn_zero_of_notin {a : α} (hax : a ∉ x) :
   countIn x a = 0 :=
 by
   induction' x with d l ih
@@ -201,8 +201,8 @@ by
   rw [List.map_cons, List.sum_cons, Nat.add_eq_zero_iff, ite_eq_right_iff]
   constructor
   · simp only [Nat.one_ne_zero]
-    exact (List.ne_of_not_mem_cons hyp).symm
-  · exact ih (List.not_mem_of_not_mem_cons hyp)
+    exact (List.ne_of_not_mem_cons hax).symm
+  · exact ih (List.not_mem_of_not_mem_cons hax)
 
 lemma countIn_join (L : List (List α)) (a : α) :
   countIn L.flatten a = List.sum (List.map (fun w => countIn w a) L) :=

@@ -15,9 +15,9 @@ private partial def CFG.eliminateEmptyRules (g : CFG T) : CFG T :=
   | none   => g -- TODO prove termination
   | some n => (g.discardEmpty n sorry).eliminateEmptyRules
 
-private lemma CFG.discardEmpty_preserves_language {g : CFG T} {n : g.nt} (ass : (n, []) ∈ g.rules) :
-  (g.discardEmpty n ass).language = g.language  :=
-by -- TODO allow `(g.discardEmpty n ass).language` and `g.language` to differ in `[] ∈ g.language` when `n = g.initial`
+private lemma CFG.discardEmpty_preserves_language {g : CFG T} {n : g.nt} (hng : (n, []) ∈ g.rules) :
+  (g.discardEmpty n hng).language = g.language  :=
+by -- TODO allow `(g.discardEmpty n hng).language` and `g.language` to differ in `[] ∈ g.language` when `n = g.initial`
   sorry
 
 private lemma CFG.eliminateEmptyRules_preserves_language (g : CFG T) :

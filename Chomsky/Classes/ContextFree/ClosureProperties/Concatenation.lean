@@ -1210,7 +1210,7 @@ private lemma in_combined_of_in_concatenated {g₁ g₂ : CFG T} {w : List T}
         ([Symbol.nonterminal (some (Sum.inl g₁.initial))] ++
           [Symbol.nonterminal (some (Sum.inr g₂.initial))])
         (List.map Symbol.terminal u ++ [Symbol.nonterminal (some (Sum.inr g₂.initial))])
-    apply CF_deri_with_postfix
+    apply CF_deri_append
     change CFDerives g₁ [Symbol.nonterminal g₁.initial] (List.map Symbol.terminal u) at hu
     let gg₁ := g₁g g₁ g₂
     change
@@ -1229,7 +1229,7 @@ private lemma in_combined_of_in_concatenated {g₁ g₂ : CFG T} {w : List T}
       rfl
     rw [baz]
     exact lift_deri hu
-  · apply CF_deri_with_prefix
+  · apply CF_append_deri
     change CFDerives g₂ [Symbol.nonterminal g₂.initial] (List.map Symbol.terminal v) at hv
     let gg₂ := g₂g g₁ g₂
     change

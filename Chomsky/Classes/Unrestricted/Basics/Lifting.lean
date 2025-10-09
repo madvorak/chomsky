@@ -37,7 +37,7 @@ structure LiftedGrammar (T : Type) where
   g : Grammar T
   liftNt : g₀.nt → g.nt
   sinkNt : g.nt → Option g₀.nt
-  lift_inj : Function.Injective liftNt
+  lift_inj : liftNt.Injective
   sink_inj : ∀ x y, sinkNt x = sinkNt y → x = y ∨ sinkNt x = none
   sinkNt_liftNt : ∀ n₀ : g₀.nt, sinkNt (liftNt n₀) = some n₀
   corresponding_rules : ∀ r : Grule T g₀.nt, r ∈ g₀.rules → liftRule liftNt r ∈ g.rules
@@ -46,8 +46,8 @@ structure LiftedGrammar (T : Type) where
       (r ∈ g.rules ∧ ∃ n₀ : g₀.nt, liftNt n₀ = r.inputN) →
         (∃ r₀ ∈ g₀.rules, liftRule liftNt r₀ = r)
 
-private lemma lifted_grammar_inverse {T : Type} (lg : LiftedGrammar T) :
-  ∀ x : lg.g.nt, (∃ n₀, lg.sinkNt x = some n₀) → (Option.map lg.liftNt (lg.sinkNt x) = x) :=
+private lemma lifted_grammar_inverse {T : Type} (G : LiftedGrammar T) :
+  ∀ x : G.g.nt, (∃ n₀, G.sinkNt x = some n₀) → (Option.map G.liftNt (G.sinkNt x) = x) :=
 by
   intro x h
   cases' h with n₀ ass
@@ -55,8 +55,8 @@ by
   apply congr_arg
   symm
   by_contra x_neq
-  have inje := lg.sink_inj x (lg.liftNt n₀)
-  rw [lg.sinkNt_liftNt] at inje
+  have inje := G.sink_inj x (G.liftNt n₀)
+  rw [G.sinkNt_liftNt] at inje
   cases' inje ass with case_valu case_none
   · exact x_neq case_valu
   rw [ass] at case_none
@@ -69,49 +69,49 @@ section TranslatingDerivations
 
 variable {T : Type}
 
-private lemma lift_tran {lg : LiftedGrammar T} {w₁ w₂ : List (Symbol T lg.g₀.nt)}
-    (hyp : Grammar.Transforms lg.g₀ w₁ w₂) :
-  Grammar.Transforms lg.g (liftString lg.liftNt w₁) (liftString lg.liftNt w₂) :=
+private lemma lift_tran {G : LiftedGrammar T} {w₁ w₂ : List (Symbol T G.g₀.nt)}
+    (hGww : G.g₀.Transforms w₁ w₂) :
+  G.g.Transforms (liftString G.liftNt w₁) (liftString G.liftNt w₂) :=
 by
-  rcases hyp with ⟨r, rin, u, v, bef, aft⟩
-  use liftRule lg.liftNt r
+  rcases hGww with ⟨r, rin, u, v, bef, aft⟩
+  use liftRule G.liftNt r
   constructor
-  · exact lg.corresponding_rules r rin
-  use liftString lg.liftNt u
-  use liftString lg.liftNt v
+  · exact G.corresponding_rules r rin
+  use liftString G.liftNt u
+  use liftString G.liftNt v
   constructor
-  · have lift_bef := congr_arg (liftString lg.liftNt) bef
+  · have lift_bef := congr_arg (liftString G.liftNt) bef
     unfold liftString at *
     rw [List.map_append_append, List.map_append_append] at lift_bef
     exact lift_bef
-  · have lift_aft := congr_arg (liftString lg.liftNt) aft
+  · have lift_aft := congr_arg (liftString G.liftNt) aft
     unfold liftString at *
     rw [List.map_append_append] at lift_aft
     exact lift_aft
 
-lemma lift_deri (lg : LiftedGrammar T) {w₁ w₂ : List (Symbol T lg.g₀.nt)}
-    (hyp : Grammar.Derives lg.g₀ w₁ w₂) :
-  Grammar.Derives lg.g (liftString lg.liftNt w₁) (liftString lg.liftNt w₂) :=
+lemma lift_deri (G : LiftedGrammar T) {w₁ w₂ : List (Symbol T G.g₀.nt)}
+    (hGww : G.g₀.Derives w₁ w₂) :
+  G.g.Derives (liftString G.liftNt w₁) (liftString G.liftNt w₂) :=
 by
-  induction' hyp with u v _ orig ih
+  induction' hGww with u v _ orig ih
   · apply Grammar.deri_self
   apply Grammar.deri_of_deri_tran
   · exact ih
   exact lift_tran orig
 
-def GoodLetter {lg : LiftedGrammar T} : Symbol T lg.g.nt → Prop
+def GoodLetter {G : LiftedGrammar T} : Symbol T G.g.nt → Prop
   | Symbol.terminal _ => True
-  | Symbol.nonterminal n => ∃ n₀ : lg.g₀.nt, lg.sinkNt n = n₀
+  | Symbol.nonterminal n => ∃ n₀ : G.g₀.nt, G.sinkNt n = n₀
 
-def GoodString {lg : LiftedGrammar T} (s : List (Symbol T lg.g.nt)) : Prop :=
+def GoodString {G : LiftedGrammar T} (s : List (Symbol T G.g.nt)) : Prop :=
   ∀ a ∈ s, GoodLetter a
 
-private lemma sink_tran {lg : LiftedGrammar T} {w₁ w₂ : List (Symbol T lg.g.nt)}
-    (hyp : Grammar.Transforms lg.g w₁ w₂) (ok_input : GoodString w₁) :
-  Grammar.Transforms lg.g₀ (sinkString lg.sinkNt w₁) (sinkString lg.sinkNt w₂) ∧ GoodString w₂ :=
+private lemma sink_tran {G : LiftedGrammar T} {w₁ w₂ : List (Symbol T G.g.nt)}
+    (hGww : G.g.Transforms w₁ w₂) (ok_input : GoodString w₁) :
+  G.g₀.Transforms (sinkString G.sinkNt w₁) (sinkString G.sinkNt w₂) ∧ GoodString w₂ :=
 by
-  rcases hyp with ⟨r, rin, u, v, bef, aft⟩
-  rcases lg.preimage_of_rules r (by
+  rcases hGww with ⟨r, rin, u, v, bef, aft⟩
+  rcases G.preimage_of_rules r (by
       constructor
       · exact rin
       rw [bef] at ok_input
@@ -121,11 +121,11 @@ by
         apply List.mem_append_left
         apply List.mem_append_right
         rw [List.mem_singleton]
-      change ∃ n₀ : lg.g₀.nt, lg.sinkNt r.inputN = some n₀ at good_matched_nonterminal
+      change ∃ n₀ : G.g₀.nt, G.sinkNt r.inputN = some n₀ at good_matched_nonterminal
       cases' good_matched_nonterminal with n₀ hn₀
       use n₀
-      have almost := congr_arg (Option.map lg.liftNt) hn₀
-      rw [lifted_grammar_inverse lg r.inputN ⟨n₀, hn₀⟩] at almost
+      have almost := congr_arg (Option.map G.liftNt) hn₀
+      rw [lifted_grammar_inverse G r.inputN ⟨n₀, hn₀⟩] at almost
       rw [Option.map_some'] at almost
       apply Option.some_injective
       exact almost.symm
@@ -159,22 +159,22 @@ by
       exact Symbol.noConfusion a_from_s
     simp [liftSymbol, GoodLetter]
     use s''
-    exact lg.sinkNt_liftNt s''
+    exact G.sinkNt_liftNt s''
   use r₀
   constructor
   · exact pre_in
-  use sinkString lg.sinkNt u
-  use sinkString lg.sinkNt v
-  have correct_inverse : sinkSymbol lg.sinkNt ∘ liftSymbol lg.liftNt = Option.some
+  use sinkString G.sinkNt u
+  use sinkString G.sinkNt v
+  have correct_inverse : sinkSymbol G.sinkNt ∘ liftSymbol G.liftNt = Option.some
   · ext1 x
     cases x
     · rfl
     rw [Function.comp_apply]
     simp [liftSymbol, sinkSymbol]
-    rw [lg.sinkNt_liftNt]
+    rw [G.sinkNt_liftNt]
     exact T
   constructor
-  · have sink_bef := congr_arg (sinkString lg.sinkNt) bef
+  · have sink_bef := congr_arg (sinkString G.sinkNt) bef
     unfold sinkString at *
     rw [List.filterMap_append_append] at sink_bef
     rw [List.filterMap_append_append] at sink_bef
@@ -185,11 +185,11 @@ by
       rw [List.filterMap_some]
     · change
         [Symbol.nonterminal r₀.inputN] =
-        List.filterMap (sinkSymbol lg.sinkNt) (List.map (liftSymbol lg.liftNt) [Symbol.nonterminal r₀.inputN])
+        List.filterMap (sinkSymbol G.sinkNt) (List.map (liftSymbol G.liftNt) [Symbol.nonterminal r₀.inputN])
       rw [List.filterMap_map, correct_inverse, List.filterMap_some]
     · unfold liftString
       rw [List.filterMap_map, correct_inverse, List.filterMap_some]
-  · have sink_aft := congr_arg (sinkString lg.sinkNt) aft
+  · have sink_aft := congr_arg (sinkString G.sinkNt) aft
     unfold sinkString at *
     rw [List.filterMap_append_append] at sink_aft
     convert sink_aft
@@ -200,11 +200,11 @@ by
     unfold liftString
     rw [List.filterMap_map, correct_inverse, List.filterMap_some]
 
-private lemma sink_deri_aux {lg : LiftedGrammar T} {w₁ w₂ : List (Symbol T lg.g.nt)}
-    (hyp : Grammar.Derives lg.g w₁ w₂) (ok_input : GoodString w₁) :
-  Grammar.Derives lg.g₀ (sinkString lg.sinkNt w₁) (sinkString lg.sinkNt w₂) ∧ GoodString w₂ :=
+private lemma sink_deri_aux {G : LiftedGrammar T} {w₁ w₂ : List (Symbol T G.g.nt)}
+    (hGww : G.g.Derives w₁ w₂) (ok_input : GoodString w₁) :
+  G.g₀.Derives (sinkString G.sinkNt w₁) (sinkString G.sinkNt w₂) ∧ GoodString w₂ :=
 by
-  induction' hyp with u v _ orig ih
+  induction' hGww with u v _ orig ih
   · constructor
     · apply Grammar.deri_self
     · exact ok_input
@@ -215,9 +215,9 @@ by
   · exact ih.1
   · exact both.1
 
-lemma sink_deri (lg : LiftedGrammar T) {w₁ w₂ : List (Symbol T lg.g.nt)}
-    (hyp : Grammar.Derives lg.g w₁ w₂) (ok_input : GoodString w₁) :
-  Grammar.Derives lg.g₀ (sinkString lg.sinkNt w₁) (sinkString lg.sinkNt w₂) :=
-(sink_deri_aux hyp ok_input).1
+lemma sink_deri (G : LiftedGrammar T) {w₁ w₂ : List (Symbol T G.g.nt)}
+    (hGww : G.g.Derives w₁ w₂) (ok_input : GoodString w₁) :
+  G.g₀.Derives (sinkString G.sinkNt w₁) (sinkString G.sinkNt w₂) :=
+(sink_deri_aux hGww ok_input).1
 
 end TranslatingDerivations

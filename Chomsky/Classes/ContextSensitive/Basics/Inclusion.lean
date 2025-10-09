@@ -17,10 +17,10 @@ def grammar_of_csg (g : CSG T) : Grammar T :=
   Grammar.mk (Option g.nt) none (if g.allow_empty then Grule.mk [] none [] [] :: R else R)
 
 private lemma CSderi_of_general {g : CSG T} {w : List (Symbol T g.nt)}
-    (ass : g.Derives [Symbol.nonterminal g.initial] w) :
+    (hgw : g.Derives [Symbol.nonterminal g.initial] w) :
   (grammar_of_csg g).Derives [Symbol.nonterminal none] (List.map woption w) :=
 by
-  induction' ass with a b _ step ih
+  induction' hgw with a b _ step ih
   · apply Grammar.deri_of_tran
     use Grule.mk [] none [] [Symbol.nonterminal (some g.initial)]
     constructor
@@ -51,17 +51,17 @@ by
     simp [List.map_append, grule_of_CSR, woption]
 
 private lemma backwardsTODO {g : CSG T} {w : List (Symbol T g.nt)}
-    (ass : (grammar_of_csg g).Derives [Symbol.nonterminal (some g.initial)] (List.map woption w)) :
+    (hgw : (grammar_of_csg g).Derives [Symbol.nonterminal (some g.initial)] (List.map woption w)) :
   g.Derives [Symbol.nonterminal g.initial] w :=
 by -- TODO instead of wrapping in assumption, dewrap in goal
   sorry
 
 private lemma missingTODO {g : CSG T} {w : List T}
-    (ass : (grammar_of_csg g).Derives [Symbol.nonterminal none] (List.map Symbol.terminal w))
+    (hgw : (grammar_of_csg g).Derives [Symbol.nonterminal none] (List.map Symbol.terminal w))
     (wnn : w ≠ []) :
   g.Derives [Symbol.nonterminal g.initial] (List.map Symbol.terminal w) :=
 by -- maybe useless
-  /-cases' Grammar.eq_or_tran_deri_of_deri ass with imposs possib
+  /-cases' Grammar.eq_or_tran_deri_of_deri hgw with imposs possib
   · exfalso
     have contra := congr_fun (congr_arg (List.get?) imposs) 0
     simp [List.get?, forall_true_left, List.get?_map] at contra

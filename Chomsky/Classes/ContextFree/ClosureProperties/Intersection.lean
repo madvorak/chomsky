@@ -685,7 +685,7 @@ private lemma CF_lang_aux_ab : langAuxAb.IsCF :=
     change
       CFDerives g ([a] ++ [S] ++ [b])
         ([a] ++ List.map Symbol.terminal (List.replicate n a_ ++ List.replicate n b_) ++ [b])
-    apply CF_deri_with_prefix_and_postfix
+    apply CF_append_deri_and_postfix
     convert ih
     rw [List.map_append, List.map_replicate, List.map_replicate, a, b]
 

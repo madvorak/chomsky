@@ -78,7 +78,7 @@ end Construction
 section EasyDirection
 
 private lemma short_induction {g : Grammar T} {w : List (List T)}
-    (ass : ∀ wᵢ ∈ w.reverse, wᵢ ∈ g.language) :
+    (hwg : ∀ wᵢ ∈ w.reverse, wᵢ ∈ g.language) :
   g.star.Derives
     [Z]
     (Z :: List.flatten ((w.reverse.map (List.map Symbol.terminal)).map (List.append · [H]))) ∧
@@ -92,13 +92,13 @@ by
       exact List.not_mem_nil p pin
   have vx_reverse : (v::x).reverse = x.reverse ++ [v]
   · apply List.reverse_cons
-  rw [vx_reverse] at ass
+  rw [vx_reverse] at hwg
   specialize ih (by
       intro wᵢ in_reversed
-      apply ass
+      apply hwg
       apply List.mem_append_left
       exact in_reversed)
-  specialize ass v (by
+  specialize hwg v (by
       apply List.mem_append_right
       apply List.mem_singleton_self)
   sorry /-
@@ -111,11 +111,11 @@ by
       constructor <;> rfl
     rw [List.nil_append, List.append_nil, List.map_append, List.map_append]
     change GrammarDerives (star_grammar g) [Z, S, H] _
-    have ih_plus := grammar_deri_with_postfix ([S, H] : List (Symbol T (star_grammar g).nt)) ih.left
+    have ih_plus := grammar_deri_append ([S, H] : List (Symbol T (star_grammar g).nt)) ih.left
     apply grammar_deri_of_deri_deri ih_plus
-    have ass_lifted : GrammarDerives (star_grammar g) [S] (List.map Symbol.terminal v) :=
+    have hwg_lifted : GrammarDerives (star_grammar g) [S] (List.map Symbol.terminal v) :=
       by
-      clear * - ass
+      clear * - hwg
       have wrap_eq_lift : @wrap_sym T g.nt = liftSymbol_ Sum.inl :=
         by
         ext
@@ -195,10 +195,10 @@ by
         congr
       exact lift_deri_ lifted_g ass
     have ass_postf :=
-      grammar_deri_with_postfix ([H] : List (Symbol T (star_grammar g).nt)) ass_lifted
+      grammar_deri_append ([H] : List (Symbol T (star_grammar g).nt)) ass_lifted
     rw [List.flatten_append]
     rw [← List.cons_append]
-    apply grammar_deri_with_prefix
+    apply grammar_append_deri
     rw [List.map_map]
     rw [List.map_singleton]
     rw [List.flatten_singleton]
@@ -295,12 +295,12 @@ by
       rw [List.nthLe_get? lt_wl]
       rfl
     · rw [List.take_append_drop]
-  apply grammar_deri_with_postfix
+  apply grammar_deri_append
   rw [split_ldw, List.map_append, List.flatten_append, ← List.append_assoc]
-  apply grammar_deri_with_postfix
+  apply grammar_deri_append
   rw [wlk_succ, List.take_succ, List.map_append, List.flatten_append, List.append_assoc,
     List.append_assoc]
-  apply grammar_deri_with_prefix
+  apply grammar_append_deri
   clear * - terminals lt_wl
   specialize
     terminals (w.nth_le (w.length - k.succ) lt_wl) (List.nthLe_mem w (w.length - k.succ) lt_wl)
@@ -408,7 +408,7 @@ lemma length_ge_one_of_not_nil {α : Type _} {l : List α} (lnn : l ≠ []) : l.
   rw [List.length_eq_zero] at llz
   exact lnn llz
 
-private lemma nat_eq_tech {a b c : ℕ} (b_lt_c : b < c) (ass : c = a.succ + c - b.succ) : a = b :=
+private lemma nat_eq_tech {a b c : ℕ} (b_lt_c : b < c) (c_eq : c = a.succ + c - b.succ) : a = b :=
   by omega
 
 private lemma wrap_never_outputs_nt_inr {N : Type} {a : Symbol T N} (i : Fin 3) :
@@ -1223,8 +1223,8 @@ private lemma case_2_match_rule {g : Grammar T} {r₀ : Grule T g.nt}
 -/
 
 private lemma star_case_2 {g : Grammar T} {α α' : List (Symbol T g.star.nt)}
-    (orig : g.star.Transforms α α')
-    (hyp : ∃ x : List (List (Symbol T g.nt)),
+    (hαα : g.star.Transforms α α')
+    (hgg : ∃ x : List (List (Symbol T g.nt)),
         (∀ xᵢ ∈ x, g.Derives [Symbol.nonterminal g.initial] xᵢ) ∧
         α = [R, H] ++ List.flatten (List.map (· ++ [H]) (List.map (List.map wrapSym) x))) :
   (∃ x : List (List (Symbol T g.nt)),
@@ -1240,7 +1240,7 @@ private lemma star_case_2 {g : Grammar T} {α α' : List (Symbol T g.star.nt)}
   (∃ σ : List (Symbol T g.nt), α' = List.map wrapSym σ ++ [R]) ∨
   (∃ ω : List (ns T g.nt), α' = ω ++ [H]) ∧ Z ∉ α' ∧ R ∉ α' :=
 by
-  rcases hyp with ⟨x, valid, cat⟩
+  rcases hgg with ⟨x, valid, cat⟩
   have no_Z_in_alpha : Z ∉ α
   · intro contr
     rw [cat, List.mem_append] at contr
@@ -1252,7 +1252,7 @@ by
     · exact Z_not_in_join_mpHmmw Zin
   --rw [cat] at *
   --clear cat
-  rcases orig with ⟨r, rin, u, v, bef, aft⟩
+  rcases hαα with ⟨r, rin, u, v, bef, aft⟩
   simp only [Grammar.star, List.mem_cons, List.mem_append, List.mem_map] at rin
   rcases rin with rinputZ | rinputZ | RH_R | RH_nil | original | Rt_tR
   iterate 2

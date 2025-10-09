@@ -151,23 +151,23 @@ def lg₂ : LiftedGrammar T :=
 
 
 lemma in_L₁_or_L₂_of_in_union {w : List T}
-    (ass : w ∈ (unionGrammar g₁ g₂).language) :
+    (hwgg : w ∈ (unionGrammar g₁ g₂).language) :
   w ∈ g₁.language ∨ w ∈ g₂.language :=
 by
-  unfold Grammar.language at ass ⊢
-  rw [Set.mem_setOf_eq] at ass ⊢
+  unfold Grammar.language at hwgg ⊢
+  rw [Set.mem_setOf_eq] at hwgg ⊢
   rw [Set.mem_setOf_eq]
-  have hyp := Grammar.eq_or_tran_deri_of_deri ass
-  clear ass
-  cases' hyp with hypo hypot
+  have hggw := Grammar.eq_or_tran_deri_of_deri hwgg
+  clear hwgg
+  cases' hggw with hggw₁ hggw₂
   · exfalso
-    have zeroth := congr_fun (congr_arg List.get? hypo) 0
+    have zeroth := congr_fun (congr_arg List.get? hggw₁) 0
     cases w
     · exact Option.noConfusion zeroth
     · rw [List.get?, List.map_cons, List.get?] at zeroth
       have nt_eq_ter := Option.some.inj zeroth
       exact Symbol.noConfusion nt_eq_ter
-  rcases hypot with ⟨i, ⟨r, rin, u, v, bef, aft⟩, deri⟩
+  rcases hggw₂ with ⟨i, ⟨r, rin, u, v, bef, aft⟩, deri⟩
   have uv_nil : u = [] ∧ v = []
   · have bef_len := congr_arg List.length bef
     clear * - bef_len
@@ -257,11 +257,11 @@ by
     · rw [List.mem_singleton, Symbol.nonterminal.injEq]
       simp [liftRule, unionGrammar]
 
-lemma in_union_of_in_L₁ {w : List T} (ass : w ∈ g₁.language) :
+lemma in_union_of_in_L₁ {w : List T} (hwg : w ∈ g₁.language) :
   w ∈ (unionGrammar g₁ g₂).language :=
 by
-  unfold Grammar.language at ass ⊢
-  rw [Set.mem_setOf_eq] at ass ⊢
+  unfold Grammar.language at hwg ⊢
+  rw [Set.mem_setOf_eq] at hwg ⊢
   apply Grammar.deri_of_tran_deri
   · use ⟨[], none, [], [Symbol.nonterminal (some (Sum.inl g₁.initial))]⟩
     constructor
@@ -272,16 +272,16 @@ by
   change lg₁.g.Derives
       (liftString lg₁.liftNt [Symbol.nonterminal g₁.initial])
       (List.map Symbol.terminal w)
-  convert lift_deri (@lg₁ T g₁ g₂) ass
+  convert lift_deri (@lg₁ T g₁ g₂) hwg
   unfold liftString
   rw [List.map_map]
   rfl
 
-lemma in_union_of_in_L₂ {w : List T} (ass : w ∈ g₂.language) :
+lemma in_union_of_in_L₂ {w : List T} (hwg : w ∈ g₂.language) :
   w ∈ (unionGrammar g₁ g₂).language :=
 by
-  unfold Grammar.language at ass ⊢
-  rw [Set.mem_setOf_eq] at ass ⊢
+  unfold Grammar.language at hwg ⊢
+  rw [Set.mem_setOf_eq] at hwg ⊢
   apply Grammar.deri_of_tran_deri
   · use ⟨[], none, [], [Symbol.nonterminal (some (Sum.inr g₂.initial))]⟩
     constructor
@@ -293,7 +293,7 @@ by
   change lg₂.g.Derives
       (liftString lg₂.liftNt [Symbol.nonterminal g₂.initial])
       (List.map Symbol.terminal w)
-  convert lift_deri (@lg₂ T g₁ g₂) ass
+  convert lift_deri (@lg₂ T g₁ g₂) hwg
   unfold liftString
   rw [List.map_map]
   rfl

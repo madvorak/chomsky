@@ -40,7 +40,7 @@ structure LiftedCFG (T : Type) where
   /-- Mapping nonterminals from the bigger type to the smaller type. -/
   sinkNT : g.nt → Option g₀.nt
   /-- The former map is injective. -/
-  lift_inj : Function.Injective liftNT
+  lift_inj : liftNT.Injective
   /-- The latter map is injective where defined. -/
   sink_inj : ∀ x y, sinkNT x = sinkNT y → x = y ∨ sinkNT x = none
   /-- The two mappings are essentially inverses. -/
@@ -177,6 +177,6 @@ lemma sinkString_all_terminals {N₀ N : Type} (sinkN : N → Option N₀) (w : 
   | nil => rfl
   | cons t _ ih => exact congr_arg (Symbol.terminal t :: ·) ih
 
-lemma singletonGoodString {G : LiftedCFG T}
-    {s : Symbol T G.g.nt} (hs : G.GoodLetter s) : G.GoodString [s] := by
+lemma singletonGoodString {G : LiftedCFG T} {s : Symbol T G.g.nt} (hs : G.GoodLetter s) :
+    G.GoodString [s] := by
   simpa [LiftedCFG.GoodString] using hs

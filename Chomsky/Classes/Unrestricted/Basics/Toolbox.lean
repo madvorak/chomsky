@@ -9,9 +9,9 @@ lemma Grammar.deri_self {w : List (Symbol T g.nt)} :
 Relation.ReflTransGen.refl
 
 lemma Grammar.deri_of_tran {v w : List (Symbol T g.nt)}
-    (ass : g.Transforms v w) :
+    (hgvw : g.Transforms v w) :
   g.Derives v w :=
-Relation.ReflTransGen.single ass
+Relation.ReflTransGen.single hgvw
 
 /-- The relation `Grammar.derives` is transitive. -/
 lemma Grammar.deri_of_deri_deri {u v w : List (Symbol T g.nt)}
@@ -29,20 +29,20 @@ lemma Grammar.deri_of_tran_deri {u v w : List (Symbol T g.nt)}
   g.Derives u w :=
 Grammar.deri_of_deri_deri (Grammar.deri_of_tran huv) hvw
 
-lemma Grammar.eq_or_tran_deri_of_deri {u w : List (Symbol T g.nt)} (ass : g.Derives u w) :
+lemma Grammar.eq_or_tran_deri_of_deri {u w : List (Symbol T g.nt)} (hguw : g.Derives u w) :
   u = w  ∨  ∃ v : List (Symbol T g.nt), g.Transforms u v ∧ g.Derives v w  :=
-Relation.ReflTransGen.cases_head ass
+Relation.ReflTransGen.cases_head hguw
 
-lemma Grammar.eq_or_deri_tran_of_deri {u w : List (Symbol T g.nt)} (ass : g.Derives u w) :
+lemma Grammar.eq_or_deri_tran_of_deri {u w : List (Symbol T g.nt)} (hguw : g.Derives u w) :
   u = w  ∨  ∃ v : List (Symbol T g.nt), g.Derives u v ∧ g.Transforms v w  :=
-(Relation.ReflTransGen.cases_tail ass).casesOn (Or.inl ∘ Eq.symm) Or.inr
+(Relation.ReflTransGen.cases_tail hguw).casesOn (Or.inl ∘ Eq.symm) Or.inr
 
 
-lemma Grammar.deri_with_prefix {w₁ w₂ : List (Symbol T g.nt)}
-    (pᵣ : List (Symbol T g.nt)) (ass : g.Derives w₁ w₂) :
+lemma Grammar.append_deri {w₁ w₂ : List (Symbol T g.nt)}
+    (pᵣ : List (Symbol T g.nt)) (hgww : g.Derives w₁ w₂) :
   g.Derives (pᵣ ++ w₁) (pᵣ ++ w₂) :=
 by
-  induction' ass with x y _ hyp ih
+  induction' hgww with x y _ hyp ih
   · apply Grammar.deri_self
   apply Grammar.deri_of_deri_tran
   · exact ih
@@ -54,11 +54,11 @@ by
   rw [h_bef, h_aft]
   constructor <;> simp only [List.append_assoc]
 
-lemma Grammar.deri_with_postfix {w₁ w₂ : List (Symbol T g.nt)}
-    (pₒ : List (Symbol T g.nt)) (ass : g.Derives w₁ w₂) :
+lemma Grammar.deri_append {w₁ w₂ : List (Symbol T g.nt)}
+    (pₒ : List (Symbol T g.nt)) (hgww : g.Derives w₁ w₂) :
   g.Derives (w₁ ++ pₒ) (w₂ ++ pₒ) :=
 by
-  induction' ass with x y _ hyp ih
+  induction' hgww with x y _ hyp ih
   · apply Grammar.deri_self
   apply Grammar.deri_of_deri_tran
   · exact ih

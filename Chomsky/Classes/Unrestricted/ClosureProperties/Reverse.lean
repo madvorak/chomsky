@@ -78,11 +78,11 @@ by
     exact congr_arg List.reverse aft
 
 private lemma reversed_word_in_original_language {g : Grammar T} {w : List T}
-    (hyp : w ∈ (reversalGrammar g).language) :
+    (hwg : w ∈ (reversalGrammar g).language) :
   w.reverse ∈ g.language :=
 by
   unfold Grammar.language at *
-  have almost_done := derives_reversed g (List.map Symbol.terminal w) hyp
+  have almost_done := derives_reversed g (List.map Symbol.terminal w) hwg
   rw [← List.map_reverse] at almost_done
   exact almost_done
 

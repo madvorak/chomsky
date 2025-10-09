@@ -4,24 +4,24 @@ import Chomsky.Utilities.ListUtils
 
 variable {T : Type}
 
-private def reversalGrammar (g : CFG T) : CFG T :=
+private def CFG.reverse (g : CFG T) : CFG T :=
   CFG.mk
     g.nt
     g.initial
     (List.map (fun r : g.nt × List (Symbol T g.nt) => (r.fst, List.reverse r.snd)) g.rules)
 
 private lemma dual_of_reversalGrammar (g : CFG T) :
-  reversalGrammar (reversalGrammar g) = g :=
+  g.reverse.reverse = g :=
 by
   cases' g with g_nt g_initial g_rules
-  simp only [reversalGrammar, List.map_map, CFG.mk.injEq, heq_eq_eq, true_and]
+  simp only [CFG.reverse, List.map_map, CFG.mk.injEq, heq_eq_eq, true_and]
   convert_to
     List.map (fun r : g_nt × List (Symbol T g_nt) => (r.fst, r.snd.reverse.reverse)) g_rules =
     g_rules
   simp [List.reverse_reverse]
 
 private lemma derives_reversed (g : CFG T) (v : List (Symbol T g.nt)) :
-  (reversalGrammar g).Derives [Symbol.nonterminal (reversalGrammar g).initial] v →
+  g.reverse.Derives [Symbol.nonterminal g.reverse.initial] v →
     g.Derives [Symbol.nonterminal g.initial] v.reverse :=
 by
   intro hv
@@ -50,13 +50,13 @@ by
     exact congr_arg List.reverse aft
 
 private lemma reversed_word_in_original_language {g : CFG T} {w : List T}
-    (hyp : w ∈ (reversalGrammar g).language) :
+    (hgw : w ∈ g.reverse.language) :
   w.reverse ∈ g.language :=
 by
   unfold CFG.language at *
   rw [Set.mem_setOf_eq] at *
   rw [List.map_reverse]
-  exact derives_reversed g (List.map Symbol.terminal w) hyp
+  exact derives_reversed g (List.map Symbol.terminal w) hgw
 
 /-- The class of context-free languages is closed under reversal. -/
 theorem CF_of_reverse_CF (L : Language T) :
@@ -64,13 +64,13 @@ theorem CF_of_reverse_CF (L : Language T) :
 by
   rintro ⟨g, hgL⟩
   rw [← hgL]
-  use reversalGrammar g
+  use g.reverse
   apply Set.eq_of_subset_of_subset
   · intro _
     exact reversed_word_in_original_language
   · intro w hwL
-    have pre_reversal : ∃ g₀, g = reversalGrammar g₀
-    · use reversalGrammar g
+    have pre_reversal : ∃ g₀ : CFG T, g = g₀.reverse
+    · use g.reverse
       rw [dual_of_reversalGrammar]
     cases' pre_reversal with g₀ pre_rev
     rw [pre_rev] at hwL ⊢

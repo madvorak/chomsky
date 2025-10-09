@@ -461,22 +461,22 @@ by
   rw [List.forall₂_reverse_iff] at hxy
   exact hxy
 
-private lemma correspondingStrings_take {N₁ N₂ : Type} {x y : List (nst T N₁ N₂)} (n : ℕ)
-    (hxy : correspondingStrings x y) :
+private lemma correspondingStrings_take {N₁ N₂ : Type} {x y : List (nst T N₁ N₂)}
+    (n : ℕ) (hxy : correspondingStrings x y) :
   correspondingStrings (List.take n x) (List.take n y) :=
 by
   unfold correspondingStrings at *
   exact List.forall₂_take n hxy
 
-private lemma correspondingStrings_drop {N₁ N₂ : Type} {x y : List (nst T N₁ N₂)} (n : ℕ)
-    (hxy : correspondingStrings x y) :
+private lemma correspondingStrings_drop {N₁ N₂ : Type} {x y : List (nst T N₁ N₂)}
+    (n : ℕ) (hxy : correspondingStrings x y) :
   correspondingStrings (List.drop n x) (List.drop n y) :=
 by
   unfold correspondingStrings at *
   exact List.forall₂_drop n hxy
 
-private lemma correspondingStrings_split {N₁ N₂ : Type} {x y : List (nst T N₁ N₂)} (n : ℕ)
-    (hxy : correspondingStrings x y) :
+private lemma correspondingStrings_split {N₁ N₂ : Type} {x y : List (nst T N₁ N₂)}
+    (n : ℕ) (hxy : correspondingStrings x y) :
   correspondingStrings (List.take n x) (List.take n y) ∧
   correspondingStrings (List.drop n x) (List.drop n y) :=
 by
@@ -659,7 +659,7 @@ by
       simp [correspondingStrings, wrapSymbol₁] at hyp
     · use z'
       rw [List.map_cons, correspondingStrings_cons] at hyp
-      exact hyp.2
+      exact hyp.right
   )
   cases' d with t n
   · have unwrap_first_t :
@@ -704,9 +704,25 @@ by
         cases z <;> aesop)
     cases d with
     | terminal t =>
-      sorry
+      exact List.Forall₂.cons rfl ih
     | nonterminal n =>
-      sorry
+      cases n with
+      | inl n₀ =>
+        cases n₀ with
+        | none =>
+          sorry
+        | some n =>
+          cases n with
+          | inl n₁ =>
+            sorry
+          | inr n₂ =>
+            sorry
+      | inr t =>
+        cases t with
+        | inl t₁ =>
+          sorry
+        | inr t₂ =>
+          sorry
 /-induction' w with d l ih
   · unfold corresponding_strings
     unfold List.filterMap
@@ -1039,7 +1055,7 @@ by
           · rfl
           have rearrange_sum_of_four : ∀ a b c d : ℕ, a + b + c + d = a + (b + c + d) := by omega
           rw [rearrange_sum_of_four]
-          change x.length - (u.length + m) = x.length - u.length - m
+          show x.length - (u.length + m) = x.length - u.length - m
           clear * -
           omega
         rw [chunk2, chunk3, chunk4, chunk5] at x_equiv

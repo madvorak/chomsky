@@ -1,17 +1,18 @@
 import Chomsky.Classes.Unrestricted.Basics.Lifting
 import Chomsky.Classes.Unrestricted.ClosureProperties.Concatenation
 
+
 -- new nonterminal type
 private def nn (N : Type) : Type :=
   Sum N (Fin 3)
 
 -- new symbol type
-private def ns (T N : Type) : Type :=
+private abbrev ns (T N : Type) : Type :=
   Symbol T (nn N)
 
 variable {T : Type}
 
-section SpecificSymbols
+section specific_symbols
 
 private def Z {N : Type} : ns T N :=
   Symbol.nonterminal ◪0
@@ -49,9 +50,10 @@ by
   · decide
   exact one_ne_two imposs
 
-end SpecificSymbols
+end specific_symbols
 
-section Construction
+
+section construction
 
 private def wrapSym {N : Type} : Symbol T N → ns T N
   | Symbol.terminal t => Symbol.terminal t
@@ -73,9 +75,10 @@ private def Grammar.star (g : Grammar T) : Grammar T :=
     List.map wrapGr g.rules ++
     rulesThatScanTerminals g)))))
 
-end Construction
+end construction
 
-section EasyDirection
+
+section easy_direction
 
 private lemma short_induction {g : Grammar T} {w : List (List T)}
     (hwg : ∀ wᵢ ∈ w.reverse, wᵢ ∈ g.language) :
@@ -101,27 +104,26 @@ by
   specialize hwg v (by
       apply List.mem_append_right
       apply List.mem_singleton_self)
-  sorry /-
   constructor
   · apply Grammar.deri_of_tran_deri
-    · use (star_grammar g).rules.nthLe 0 (by decide)
+    · use g.star.rules.get ⟨0, Nat.zero_lt_succ _⟩
       constructor
-      · apply List.nthLe_mem
+      · apply List.get_mem
       use [], []
       constructor <;> rfl
-    rw [List.nil_append, List.append_nil, List.map_append, List.map_append]
-    change GrammarDerives (star_grammar g) [Z, S, H] _
-    have ih_plus := grammar_deri_append ([S, H] : List (Symbol T (star_grammar g).nt)) ih.left
-    apply grammar_deri_of_deri_deri ih_plus
-    have hwg_lifted : GrammarDerives (star_grammar g) [S] (List.map Symbol.terminal v) :=
+    rw [List.nil_append, List.append_nil]
+    show g.star.Derives [Z, S, H] _
+    have ih_plus := Grammar.deri_append ([S, H] : List (Symbol T g.star.nt)) ih.left
+    apply Grammar.deri_of_deri_deri ih_plus
+    have hgSv : g.star.Derives [S] (List.map Symbol.terminal v) :=
       by
       clear * - hwg
-      have wrap_eq_lift : @wrap_sym T g.nt = liftSymbol_ Sum.inl :=
+      have wrap_eq_lift : @wrapSym T g.nt = liftSymbol Sum.inl :=
         by
-        ext
+        ext x
         cases x <;> rfl
-      let lifted_g : LiftedGrammar_ T :=
-        LiftedGrammar_.mk g (star_grammar g) Sum.inl Sum.getLeft
+      let G : LiftedGrammar T :=
+        LiftedGrammar.mk g g.star Sum.inl Sum.getLeft?
           (by
             intro x y hyp
             exact Sum.inl.inj hyp)
@@ -129,17 +131,12 @@ by
             intro x y hyp
             cases x
             · cases y
-              · simp only [Sum.getLeft] at hyp
+              · simp [Sum.getLeft?] at hyp
                 left
-                congr
-                exact hyp
-              · simp only [Sum.getLeft] at hyp
-                exfalso
-                exact hyp
+                exact congr_arg Sum.inl hyp
+              · simp [Sum.getLeft?] at hyp
             · cases y
-              · simp only [Sum.getLeft] at hyp
-                exfalso
-                exact hyp
+              · simp [Sum.getLeft?] at hyp
               · right
                 rfl)
           (by
@@ -156,14 +153,14 @@ by
             use r
             constructor
             · exact rin
-            unfold wrap_gr
-            unfold liftRule_
-            unfold liftString_
+            unfold wrapGr
+            unfold liftRule
+            unfold liftString
             rw [wrap_eq_lift])
           (by
             rintro r ⟨rin, n, nrn⟩
-            iterate 4
-              cases rin
+            sorry /-iterate 4
+              cases rin with
               · exfalso
                 rw [rin] at nrn
                 exact Sum.noConfusion nrn
@@ -186,23 +183,22 @@ by
               rw [List.mem_map] at rin
               rcases rin with ⟨t, tin, r_of_tg⟩
               rw [← r_of_tg] at nrn
-              exact Sum.noConfusion nrn)
+              exact Sum.noConfusion nrn-/)
       convert_to
-        GrammarDerives lifted_g.g [Symbol.nonterminal ◩g.initial)]
-          (liftString_ lifted_g.lift_nt (List.map Symbol.terminal v))
-      · unfold liftString_
+        G.g.Derives [Symbol.nonterminal ◩g.initial]
+          (liftString G.liftNt (List.map Symbol.terminal v))
+      · unfold liftString
         rw [List.map_map]
         congr
-      exact lift_deri_ lifted_g ass
-    have ass_postf :=
-      grammar_deri_append ([H] : List (Symbol T (star_grammar g).nt)) ass_lifted
-    rw [List.flatten_append]
+      exact lift_deri G hwg
+    have ass_postf := Grammar.deri_append [H] hgSv
+    sorry/-rw [List.flatten_append]
     rw [← List.cons_append]
     apply grammar_append_deri
     rw [List.map_map]
     rw [List.map_singleton]
     rw [List.flatten_singleton]
-    change GrammarDerives (star_grammar g) [S, H] (List.map Symbol.terminal v ++ [H])
+    change g.star.Derives [S, H] (List.map Symbol.terminal v ++ [H])
     convert ass_postf
   · intro p pin t tin
     cases pin
@@ -229,6 +225,7 @@ by
       · exfalso
         exact Symbol.noConfusion imposs
     · exact ih.right p pin t tin-/
+  sorry
 
 /-private lemma terminal_scan_ind {g : Grammar T} {w : List (List T)} (n : ℕ)
     (n_lt_wl : n ≤ w.length)
@@ -308,7 +305,7 @@ by
   unfold Option.toList
   rw [List.map_singleton, List.flatten_singleton, ← List.map_join, List.flatten_singleton]
   apply grammar_deri_of_tran_deri
-  · use (star_grammar g).rules.nthLe 2 (by decide)
+  · use g.star.rules.nthLe 2 (by decide)
     run_tac
       split_ile
     use [], List.map Symbol.terminal (w.nth_le (w.length - k.succ) lt_wl)
@@ -317,7 +314,7 @@ by
   have scan_segment :
     ∀ m : ℕ,
       m ≤ (w.nth_le (w.length - k.succ) lt_wl).length →
-        GrammarDerives (star_grammar g)
+        g.star.Derives
           ([R] ++ List.map Symbol.terminal (w.nth_le (w.length - k.succ) lt_wl))
           (List.map Symbol.terminal (List.take m (w.nth_le (w.length - k.succ) lt_wl)) ++
             ([R] ++ List.map Symbol.terminal (List.drop m (w.nth_le (w.length - k.succ) lt_wl)))) :=
@@ -392,9 +389,9 @@ by
   · rw [Nat.sub_self]
     rfl-/
 
-end EasyDirection
+end easy_direction
 
-/-section HardDirection
+/-section hard_direction
 
 lemma zero_of_not_ge_one {n : ℕ} (not_pos : ¬n ≥ 1) : n = 0 :=
   by
@@ -927,7 +924,7 @@ private lemma star_case_1 {g : Grammar T} {α α' : List (Ns T g.nt)}
     clear rin
     dsimp only at *
     rw [List.append_nil, List.append_nil] at bef
-    use [Symbol.nonterminal g.initial]::x
+    use Symbol.nonterminal g.initial :: x
     constructor
     · intro xᵢ xin
       cases xin
@@ -1226,16 +1223,15 @@ private lemma star_case_2 {g : Grammar T} {α α' : List (Symbol T g.star.nt)}
     (hαα : g.star.Transforms α α')
     (hgg : ∃ x : List (List (Symbol T g.nt)),
         (∀ xᵢ ∈ x, g.Derives [Symbol.nonterminal g.initial] xᵢ) ∧
-        α = [R, H] ++ List.flatten (List.map (· ++ [H]) (List.map (List.map wrapSym) x))) :
+        α = [R, H] ++ List.flatten (List.map (· ++ [H]) (x.map (List.map wrapSym)))) :
   (∃ x : List (List (Symbol T g.nt)),
     (∀ xᵢ ∈ x, g.Derives [Symbol.nonterminal g.initial] xᵢ) ∧
-    α' = [R, H] ++ List.flatten (List.map (· ++ [H]) (List.map (List.map wrapSym) x))) ∨
+    α' = [R, H] ++ ((x.map (List.map wrapSym)).map (· ++ [H])).flatten) ∨
   (∃ w : List (List T), ∃ β : List T, ∃ γ : List (Symbol T g.nt), ∃ x : List (List (Symbol T g.nt)),
     (∀ wᵢ ∈ w, wᵢ ∈ g.language) ∧
     g.Derives [Symbol.nonterminal g.initial] (List.map Symbol.terminal β ++ γ) ∧
     (∀ xᵢ ∈ x, g.Derives [Symbol.nonterminal g.initial] xᵢ) ∧
-    α' = List.map Symbol.terminal (List.flatten w) ++ sorry) ∨
--- The following expression (ported from Lean 3) does not typecheck `α' = (List.map Symbol.terminal (List.flatten w)).append ((List.map Symbol.terminal β).append ([R] ++ List.map wrapSym γ ++ [H] ++ List.flatten (List.map (· ++ [H]) (List.map (List.map wrapSym) x)))))`
+    α' = w.flatten.map Symbol.terminal ++ (β.map Symbol.terminal ++ ([R] ++ γ.map wrapSym ++ [H] ++ ((x.map (List.map wrapSym)).map (· ++ [H])).flatten))) ∨
   (∃ u : List T, u ∈ KStar.kstar g.language ∧ α' = List.map Symbol.terminal u) ∨
   (∃ σ : List (Symbol T g.nt), α' = List.map wrapSym σ ++ [R]) ∨
   (∃ ω : List (ns T g.nt), α' = ω ++ [H]) ∧ Z ∉ α' ∧ R ∉ α' :=
@@ -1266,7 +1262,6 @@ by
   · sorry
   · sorry
   · sorry
-
 /-cases rin
   · cases' x with x₀ L
     · right; right; right
@@ -2683,7 +2678,7 @@ private lemma star_case_5 {g : Grammar T} {α α' : List (Ns T g.nt)}
       rw [← r_of_r₀]
       dsimp only [wrap_gr]
       rfl
-  -- outside level `(symbol T (star_grammar g).nt) = (ns T g.nt) = (symbol T (nn g.nt))`
+  -- outside level `(symbol T g.star.nt) = (ns T g.nt) = (symbol T (nn g.nt))`
   · exfalso
     unfold rules_that_scan_terminals at rin
     rw [List.mem_map] at rin
@@ -2897,7 +2892,7 @@ private lemma star_case_6 {g : Grammar T} {α α' : List (Ns T g.nt)}
     apply List.mem_singleton_self
 
 private lemma star_induction {g : Grammar T} {α : List (Ns T g.nt)}
-    (ass : GrammarDerives g.star [z] α) :
+    (ass : g.star.Derives [z] α) :
     (∃ x : List (List (Symbol T g.nt)),
         (∀ xᵢ ∈ x, GrammarDerives g [Symbol.nonterminal g.initial] xᵢ) ∧
           α = [z] ++ List.flatten (List.map (· ++ [h]) (List.map (List.map wrapSym) x))) ∨
@@ -2949,7 +2944,7 @@ private lemma star_induction {g : Grammar T} {α : List (Ns T g.nt)}
   · right; right; right; right; right
     exact star_case_6 orig ih
 
-end HardDirection
+end hard_direction
 
 
 /-- The class of grammar-generated languages is closed under the Kleene star. -/
@@ -2998,7 +2993,7 @@ theorem GG_of_star_GG (L : Language T) : L.IsGG → (KStar.kstar L).IsGG :=
     · rcases result with ⟨u, win, map_eq_map⟩
       have w_eq_u : w = u :=
         by
-        have st_inj : Function.Injective (@Symbol.terminal T (star_grammar g).nt) := by
+        have st_inj : Function.Injective (@Symbol.terminal T g.star.nt) := by
           apply Symbol.terminal.inj
         rw [← List.map_injective_iff] at st_inj
         exact st_inj map_eq_map
@@ -3043,7 +3038,7 @@ theorem GG_of_star_GG (L : Language T) : L.IsGG → (KStar.kstar L).IsGG :=
     cases' short_induction parts_in_L with derived terminated
     apply grammar_deri_of_deri_deri derived
     apply grammar_deri_of_tran_deri
-    · use (star_grammar g).rules.nthLe 1 (by decide)
+    · use g.star.rules.nthLe 1 (by decide)
       constructor
       · apply List.nthLe_mem
       use [], (List.map (· ++ [H]) (List.map (List.map Symbol.terminal) v.reverse)).join
@@ -3055,10 +3050,10 @@ theorem GG_of_star_GG (L : Language T) : L.IsGG → (KStar.kstar L).IsGG :=
     rw [List.nil_append]
     rw [v_reverse]
     have final_step :
-      GrammarTransforms (star_grammar g) (List.map Symbol.terminal w.join ++ [R, H])
+      GrammarTransforms g.star (List.map Symbol.terminal w.join ++ [R, H])
         (List.map Symbol.terminal w.join) :=
       by
-      use (star_grammar g).rules.nthLe 3 (by decide)
+      use g.star.rules.nthLe 3 (by decide)
       run_tac
         split_ile
       use List.map Symbol.terminal w.join, List.nil
@@ -3066,11 +3061,11 @@ theorem GG_of_star_GG (L : Language T) : L.IsGG → (KStar.kstar L).IsGG :=
       ·
         trace
           "./././Mathport/Syntax/Translate/Tactic/Builtin.lean:73:14: unsupported tactic `trim #[]"
-      · have out_nil : ((star_grammar g).rules.nthLe 3 _).output = [] := by rfl
+      · have out_nil : (g.star.rules.nthLe 3 _).output = [] := by rfl
         rw [List.append_nil, out_nil, List.append_nil]
     apply grammar_deri_of_deri_tran _ final_step
     convert_to
-      GrammarDerives (star_grammar g)
+      g.star.Derives
         ([R] ++ ([H] ++ (List.map (· ++ [H]) (List.map (List.map Symbol.terminal) w)).join))
         (List.map Symbol.terminal w.join ++ [R, H])
     have rebracket :

@@ -303,7 +303,7 @@ by
 
 /-- The class of grammar-generated languages is closed under union. -/
 theorem GG_of_GG_u_GG (L₁ : Language T) (L₂ : Language T) :
-  IsGG L₁ ∧ IsGG L₂ → IsGG (L₁ + L₂) :=
+  L₁.IsGG ∧ L₂.IsGG → (L₁ + L₂).IsGG :=
 by
   rintro ⟨⟨g₁, eq_L₁⟩, ⟨g₂, eq_L₂⟩⟩
   use unionGrammar g₁ g₂

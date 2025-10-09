@@ -60,7 +60,7 @@ private lemma big_CF_grammar_same_language (g₁ g₂ : CFGrammar T) :
     Compare to `classes.context_free.closure_properties.concatenation.lean` which uses
     a simpler and more effective construction (based on context-gree grammars only). -/
 private lemma bonus_CF_of_CF_c_CF (L₁ : Language T) (L₂ : Language T) :
-    IsCF L₁ ∧ IsCF L₂ → IsCF (L₁ * L₂) :=
+    L₁.IsCF ∧ L₂.IsCF → (L₁ * L₂).IsCF :=
   by
   rintro ⟨⟨g₁, eq_L₁⟩, ⟨g₂, eq_L₂⟩⟩
   rw [cFLanguage_eq_grammarLanguage g₁] at eq_L₁

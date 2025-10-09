@@ -2,7 +2,7 @@
 import Project.Classes.ContextFree.ClosureProperties.Intersection
 
 /-- The class of context-free languages isn't closed under complement. -/
-lemma nnyCF_of_complement_CF : ¬∀ T : Type, ∀ L : Language T, IsCF L → IsCF (Lᶜ) :=
+lemma nnyCF_of_complement_CF : ¬∀ T : Type, ∀ L : Language T, L.IsCF → Lᶜ.IsCF :=
   by
   intro h
   have nny := nnyCF_of_CF_i_CF

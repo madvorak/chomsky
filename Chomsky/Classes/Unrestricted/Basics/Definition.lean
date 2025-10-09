@@ -30,12 +30,12 @@ def Grammar.Derives (g : Grammar T) : List (Symbol T g.nt) → List (Symbol T g.
 
 /-- Accepts a word (a list of terminals) iff it can be derived from the initial nonterminal. -/
 def Grammar.Generates (g : Grammar T) (w : List T) : Prop :=
-  g.Derives [Symbol.nonterminal g.initial] (List.map Symbol.terminal w)
+  g.Derives [Symbol.nonterminal g.initial] (w.map Symbol.terminal)
 
 /-- The set of words that can be derived from the initial nonterminal. -/
 def Grammar.language (g : Grammar T) : Language T :=
   setOf g.Generates
 
 /-- Predicate "is grammar-generated"; defined by existence of a grammar for the given language. -/
-def IsGG (L : Language T) : Prop :=
+def Language.IsGG (L : Language T) : Prop :=
   ∃ g : Grammar T, g.language = L

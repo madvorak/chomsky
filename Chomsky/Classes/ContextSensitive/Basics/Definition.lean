@@ -37,5 +37,5 @@ def CSgrammar.language (g : CSgrammar T) : Language T :=
   setOf g.Generates
 
 /-- Predicate "is context-sensitive"; defined by existence of a context-sensitive grammar for the given language. -/
-def IsCS (L : Language T) : Prop :=
+def Language.IsCS (L : Language T) : Prop :=
   ∃ g : CSgrammar T, g.language = L

@@ -61,7 +61,7 @@ by
 
 /-- The class of context-free languages is closed under reversal. -/
 theorem CF_of_reverse_CF (L : Language T) :
-  IsCF L → IsCF L.reverse :=
+  L.IsCF → L.reverse.IsCF :=
 by
   rintro ⟨g, hgL⟩
   rw [← hgL]

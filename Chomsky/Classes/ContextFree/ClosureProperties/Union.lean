@@ -249,7 +249,7 @@ lemma CFgrammar.mem_union_language_iff_mem_or_mem :
 
 /-- The class of context-free languages is closed under union. -/
 theorem Language.IsContextFree.union (L₁ L₂ : Language T) :
-    IsCF L₁ ∧ IsCF L₂ → IsCF (L₁ + L₂) := by
+    L₁.IsCF ∧ L₂.IsCF → (L₁ + L₂).IsCF := by
   rintro ⟨⟨g₁, rfl⟩, ⟨g₂, rfl⟩⟩
   exact ⟨CFgrammar.union g₁ g₂, Set.ext (fun _ =>
     CFgrammar.mem_union_language_iff_mem_or_mem)⟩

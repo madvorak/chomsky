@@ -1250,7 +1250,7 @@ private lemma in_combined_of_in_concatenated {g₁ g₂ : CFGrammar T} {w : List
     exact lift_deri hv
 
 /-- The class of context-free languages is closed under concatenation. -/
-lemma CF_of_CF_c_CF (L₁ : Language T) (L₂ : Language T) : IsCF L₁ ∧ IsCF L₂ → IsCF (L₁ * L₂) :=
+lemma CF_of_CF_c_CF (L₁ : Language T) (L₂ : Language T) : L₁.IsCF ∧ L₂.IsCF → (L₁ * L₂).IsCF :=
   by
   rintro ⟨⟨g₁, eq_L₁⟩, ⟨g₂, eq_L₂⟩⟩
   use combined_grammar g₁ g₂

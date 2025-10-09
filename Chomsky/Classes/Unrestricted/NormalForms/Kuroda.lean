@@ -189,7 +189,7 @@ by
 -- TODO reduction `Grammar → KurodaGrammar`
 
 theorem GG_iff_kurodaGrammar_exists (L : Language T) :
-  IsGG L ↔ ∃ k : KurodaGrammar T, k.language = L :=
+  L.IsGG ↔ ∃ k : KurodaGrammar T, k.language = L :=
 by
   constructor
   · sorry -- this direction will be very hard

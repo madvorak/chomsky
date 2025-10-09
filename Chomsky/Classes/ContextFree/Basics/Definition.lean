@@ -29,5 +29,5 @@ def CFgrammar.language (g : CFgrammar T) : Language T :=
   setOf g.Generates
 
 /-- Predicate "is context-free"; defined by existence of a context-free grammar for the given language. -/
-def IsCF (L : Language T) : Prop :=
+def Language.IsCF (L : Language T) : Prop :=
   ∃ g : CFgrammar T, g.language = L

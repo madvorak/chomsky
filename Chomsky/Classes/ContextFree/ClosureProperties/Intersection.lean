@@ -164,7 +164,7 @@ private lemma false_of_uvvxyyz {_a _b _c : Fin 3} {n : ℕ} {u v x y z : List (F
     rw [hac] at count_c
     exact LT.lt.false count_c
 
-private lemma notCF_lang_eq_eq : ¬IsCF langEqEq :=
+private lemma notCF_lang_eq_eq : ¬langEqEq.IsCF :=
   by
   intro h
   have pum := CF_pumping h
@@ -462,7 +462,7 @@ private def lang_aux_ab : Language (Fin 3) := fun w =>
 
 /- ./././Mathport/Syntax/Translate/Tactic/Builtin.lean:69:18: unsupported non-interactive tactic split_ile -/
 /- ./././Mathport/Syntax/Translate/Tactic/Builtin.lean:69:18: unsupported non-interactive tactic split_ile -/
-private lemma CF_lang_aux_ab : IsCF langAuxAb :=
+private lemma CF_lang_aux_ab : langAuxAb.IsCF :=
   by
   let S_ : Fin 1 := 0
   let S : Symbol (Fin 3) (Fin 1) := Symbol.nonterminal S_
@@ -691,13 +691,13 @@ private lemma CF_lang_aux_ab : IsCF langAuxAb :=
 
 private def lang_aux_c : Language (Fin 3) := fun w => ∃ n : ℕ, w = List.replicate n c_
 
-private lemma CF_lang_aux_c : IsCF langAuxC :=
+private lemma CF_lang_aux_c : langAuxC.IsCF :=
   by
   use cfgSymbolStar c_
   unfold lang_aux_c
   apply language_of_cfgSymbolStar
 
-private lemma CF_lang_eq_any : IsCF langEqAny :=
+private lemma CF_lang_eq_any : langEqAny.IsCF :=
   by
   have concatenated : lang_eq_any = lang_aux_ab * lang_aux_c :=
     by
@@ -722,7 +722,7 @@ private lemma CF_lang_eq_any : IsCF langEqAny :=
 
 private def lang_aux_a : Language (Fin 3) := fun w => ∃ n : ℕ, w = List.replicate n a_
 
-private lemma CF_lang_aux_a : IsCF langAuxA :=
+private lemma CF_lang_aux_a : langAuxA.IsCF :=
   by
   use cfgSymbolStar a_
   unfold lang_aux_a
@@ -740,7 +740,7 @@ private def permut : Equiv.Perm (Fin 3) :=
       intro x
       fin_cases x <;> rfl)
 
-private lemma CF_lang_aux_bc : IsCF langAuxBc :=
+private lemma CF_lang_aux_bc : langAuxBc.IsCF :=
   by
   have permuted : lang_aux_bc = permuteLang lang_aux_ab permut :=
     by
@@ -764,7 +764,7 @@ private lemma CF_lang_aux_bc : IsCF langAuxBc :=
   rw [permuted]
   exact CF_of_permute_CF permut lang_aux_ab CF_lang_aux_ab
 
-private lemma CF_lang_any_eq : IsCF langAnyEq :=
+private lemma CF_lang_any_eq : langAnyEq.IsCF :=
   by
   have concatenated : lang_any_eq = lang_aux_a * lang_aux_bc :=
     by
@@ -1092,7 +1092,7 @@ end IntersectionInclusions
 
 /-- The class of context-free languages isn't closed under intersection. -/
 lemma nnyCF_of_CF_i_CF :
-    ¬∀ T : Type, ∀ L₁ : Language T, ∀ L₂ : Language T, IsCF L₁ ∧ IsCF L₂ → IsCF (L₁ ⊓ L₂) :=
+    ¬∀ T : Type, ∀ L₁ : Language T, ∀ L₂ : Language T, L₁.IsCF ∧ L₂.IsCF → (L₁ ⊓ L₂).IsCF :=
   by
   by_contra contra
   specialize contra (Fin 3) lang_eq_any lang_any_eq ⟨CF_lang_eq_any, CF_lang_any_eq⟩

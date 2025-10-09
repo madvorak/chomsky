@@ -149,7 +149,7 @@ by
     exact missingTODO ass emptyStr
 
 theorem CS_subclass_RE {L : Language T} :
-  IsCS L → IsGG L :=
+  L.IsCS → L.IsGG :=
 by
   rintro ⟨g, eq_L⟩
   use grammar_of_csg g

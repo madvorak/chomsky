@@ -2953,7 +2953,7 @@ end HardDirection
 
 
 /-- The class of grammar-generated languages is closed under the Kleene star. -/
-theorem GG_of_star_GG (L : Language T) : IsGG L → IsGG (KStar.kstar L) :=
+theorem GG_of_star_GG (L : Language T) : L.IsGG → (KStar.kstar L).IsGG :=
   by
   rintro ⟨g, hg⟩
   use star_grammar g

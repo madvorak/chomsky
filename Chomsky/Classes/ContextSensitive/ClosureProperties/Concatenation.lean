@@ -70,7 +70,7 @@ private lemma big_CS_grammar_same_language (g₁ g₂ : CSGrammar T) :
       finish
 
 private lemma bonus_CS_of_CS_c_CS (L₁ : Language T) (L₂ : Language T) :
-    IsCS L₁ ∧ IsCS L₂ → IsCS (L₁ * L₂) :=
+    L₁.IsCS ∧ L₂.IsCS → (L₁ * L₂).IsCS :=
   by
   rintro ⟨⟨g₁, eq_L₁⟩, ⟨g₂, eq_L₂⟩⟩
   rw [cSLanguage_eq_grammarLanguage g₁] at eq_L₁

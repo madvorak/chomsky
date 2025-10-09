@@ -2306,7 +2306,7 @@ end HardDirection
 
 /-- The class of grammar-generated languages is closed under concatenation. -/
 theorem GG_of_GG_c_GG (L₁ : Language T) (L₂ : Language T) :
-  IsGG L₁ ∧ IsGG L₂ → IsGG (L₁ * L₂)  :=
+  L₁.IsGG ∧ L₂.IsGG → (L₁ * L₂).IsGG :=
 by
   rintro ⟨⟨g₁, eq_L₁⟩, ⟨g₂, eq_L₂⟩⟩
   use bigGrammar g₁ g₂

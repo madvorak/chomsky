@@ -2,7 +2,7 @@ import Chomsky.Classes.ContextFree.Basics.Definition
 import Chomsky.Utilities.ListUtils
 
 /-- Pumping lemma for context-free languages. -/
-lemma CF_pumping {T : Type} {L : Language T} (cf : IsCF L) :
+lemma Language.IsCF.pumping {T : Type} {L : Language T} (cf : L.IsCF) :
   ∃ n : ℕ, ∀ w ∈ L, w.length ≥ n → ∃ u v x y z : List T,
     w = u ++ v ++ x ++ y ++ z ∧
     (v ++ y).length > 0       ∧

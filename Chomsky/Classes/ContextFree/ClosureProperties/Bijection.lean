@@ -18,7 +18,7 @@ private def lsT₁_of_lsT₂ (π : Equiv T₁ T₂) : List (Symbol T₂ N) → L
   List.map (sT₁OfST₂ π)
 
 /-- The class of context-free languages is closed under bijection between terminal alphabets. -/
-lemma CF_of_bijemap_CF (π : Equiv T₁ T₂) (L : Language T₁) : IsCF L → IsCF (bijemapLang L π) :=
+lemma CF_of_bijemap_CF (π : Equiv T₁ T₂) (L : Language T₁) : L.IsCF → (L.bijemap π).IsCF :=
   by
   rintro ⟨g, hg⟩
   let g' : CFGrammar T₂ :=

@@ -194,7 +194,6 @@ by
   rcases ass with ⟨u, hu, v, hv, hw⟩
   unfold Grammar.language at *
   rw [Set.mem_setOf_eq] at *
-  unfold Grammar.Generates at *
   apply Grammar.deri_of_tran_deri first_transformation
   rw [← hw]
   rw [List.map_append]
@@ -2074,7 +2073,6 @@ by
   · clear deri_y
     unfold Grammar.language
     rw [Set.mem_setOf_eq]
-    unfold Grammar.Generates
     convert deri_x
     clear deri_x
     have xylen := correspondingStrings_length concat_xy
@@ -2169,7 +2167,6 @@ by
   · clear deri_x
     unfold Grammar.language
     rw [Set.mem_setOf_eq]
-    unfold Grammar.Generates
     convert deri_y
     clear deri_y
     have xylen := correspondingStrings_length concat_xy

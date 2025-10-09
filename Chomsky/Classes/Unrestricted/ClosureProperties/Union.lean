@@ -157,7 +157,6 @@ by
   unfold Grammar.language at ass ⊢
   rw [Set.mem_setOf_eq] at ass ⊢
   rw [Set.mem_setOf_eq]
-  unfold Grammar.Generates at ass ⊢
   have hyp := Grammar.eq_or_tran_deri_of_deri ass
   clear ass
   cases' hyp with hypo hypot
@@ -263,7 +262,6 @@ lemma in_union_of_in_L₁ {w : List T} (ass : w ∈ g₁.language) :
 by
   unfold Grammar.language at ass ⊢
   rw [Set.mem_setOf_eq] at ass ⊢
-  unfold Grammar.Generates at ass ⊢
   apply Grammar.deri_of_tran_deri
   · use ⟨[], none, [], [Symbol.nonterminal (some (Sum.inl g₁.initial))]⟩
     constructor
@@ -284,7 +282,6 @@ lemma in_union_of_in_L₂ {w : List T} (ass : w ∈ g₂.language) :
 by
   unfold Grammar.language at ass ⊢
   rw [Set.mem_setOf_eq] at ass ⊢
-  unfold Grammar.Generates at ass ⊢
   apply Grammar.deri_of_tran_deri
   · use ⟨[], none, [], [Symbol.nonterminal (some (Sum.inr g₂.initial))]⟩
     constructor

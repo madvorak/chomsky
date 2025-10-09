@@ -21,8 +21,8 @@ private def lsT₁_of_lsT₂ (π : Equiv T₁ T₂) : List (Symbol T₂ N) → L
 lemma CF_of_bijemap_CF (π : Equiv T₁ T₂) (L : Language T₁) : L.IsCF → (L.bijemap π).IsCF :=
   by
   rintro ⟨g, hg⟩
-  let g' : CFGrammar T₂ :=
-    CFGrammar.mk g.nt g.initial
+  let g' : CFG T₂ :=
+    CFG.mk g.nt g.initial
       (List.map (fun r : g.nt × List (Symbol T₁ g.nt) => (r.fst, lsT₂_of_lsT₁ π r.snd)) g.rules)
   use g'
   apply Set.eq_of_subset_of_subset

@@ -12,30 +12,30 @@ private def wrap_CF_rule₂ {N₂ : Type} (N₁ : Type) (r : N₂ × List (Symbo
     Nnn T N₁ N₂ × List (Nst T N₁ N₂) :=
   (Sum.inl (some (Sum.inr r.fst)), List.map (wrapSymbol₂ N₁) r.snd)
 
-private def CF_rules_for_terminals₁ (N₂ : Type) (g : CFGrammar T) :
-    List (Nnn T g.Nt N₂ × List (Nst T g.Nt N₂)) :=
+private def CF_rules_for_terminals₁ (N₂ : Type) (g : CFG T) :
+    List (Nnn T g.nt N₂ × List (Nst T g.nt N₂)) :=
   List.map (fun t => (Sum.inr (Sum.inl t), [Symbol.terminal t])) (allUsedTerminals (grammarOfCfg g))
 
-private def CF_rules_for_terminals₂ (N₁ : Type) (g : CFGrammar T) :
-    List (Nnn T N₁ g.Nt × List (Nst T N₁ g.Nt)) :=
+private def CF_rules_for_terminals₂ (N₁ : Type) (g : CFG T) :
+    List (Nnn T N₁ g.nt × List (Nst T N₁ g.nt)) :=
   List.map (fun t => (Sum.inr (Sum.inr t), [Symbol.terminal t])) (allUsedTerminals (grammarOfCfg g))
 
 /- ./././Mathport/Syntax/Translate/Expr.lean:177:8: unsupported: ambiguous notation -/
-private def big_CF_grammar (g₁ g₂ : CFGrammar T) : CFGrammar T :=
-  CFGrammar.mk (Nnn T g₁.Nt g₂.Nt) (Sum.inl none)
+private def big_CF_grammar (g₁ g₂ : CFG T) : CFG T :=
+  CFG.mk (Nnn T g₁.nt g₂.nt) (Sum.inl none)
     ((Sum.inl none,
         [Symbol.nonterminal (Sum.inl (some (Sum.inl g₁.initial))),
           Symbol.nonterminal
             (Sum.inl
               (some
                 (Sum.inr
-                  g₂.initial)))])::List.map (wrapCFRule₁ g₂.Nt) g₁.rules ++
-          List.map (wrapCFRule₂ g₁.Nt) g₂.rules ++
-        (cFRulesForTerminals₁ g₂.Nt g₁ ++ cFRulesForTerminals₂ g₁.Nt g₂))
+                  g₂.initial)))])::List.map (wrapCFRule₁ g₂.nt) g₁.rules ++
+          List.map (wrapCFRule₂ g₁.nt) g₂.rules ++
+        (cFRulesForTerminals₁ g₂.nt g₁ ++ cFRulesForTerminals₂ g₁.nt g₂))
 
 /- ./././Mathport/Syntax/Translate/Tactic/Builtin.lean:73:14: unsupported tactic `trim #[] -/
-private lemma big_CF_grammar_same_language (g₁ g₂ : CFGrammar T) :
-    cFLanguage (bigCFGrammar g₁ g₂) =
+private lemma big_CF_grammar_same_language (g₁ g₂ : CFG T) :
+    cFLanguage (bigCFG g₁ g₂) =
       grammarLanguage (bigGrammar (grammarOfCfg g₁) (grammarOfCfg g₂)) :=
   by
   rw [cFLanguage_eq_grammarLanguage]

@@ -8,15 +8,15 @@ def woption {N : Type} : Symbol T N → Symbol T (Option N)
   | Symbol.terminal t => Symbol.terminal t
   | Symbol.nonterminal n => Symbol.nonterminal (some n)
 
-def grule_of_CSrule {N : Type} (r : CSrule T N) : Grule T (Option N) :=
+def grule_of_CSR {N : Type} (r : CSR T N) : Grule T (Option N) :=
   Grule.mk (r.contextLeft.map woption) (some r.inputNonterminal) (r.contextRight.map woption) (
     r.contextLeft.map woption ++ r.outputString.map woption ++ r.contextRight.map woption)
 
-def grammar_of_csg (g : CSgrammar T) : Grammar T :=
-  let R := Grule.mk [] none [] [Symbol.nonterminal g.initial] :: List.map grule_of_CSrule g.rules
+def grammar_of_csg (g : CSG T) : Grammar T :=
+  let R := Grule.mk [] none [] [Symbol.nonterminal g.initial] :: List.map grule_of_CSR g.rules
   Grammar.mk (Option g.nt) none (if g.allow_empty then Grule.mk [] none [] [] :: R else R)
 
-private lemma CSderi_of_general {g : CSgrammar T} {w : List (Symbol T g.nt)}
+private lemma CSderi_of_general {g : CSG T} {w : List (Symbol T g.nt)}
     (ass : g.Derives [Symbol.nonterminal g.initial] w) :
   (grammar_of_csg g).Derives [Symbol.nonterminal none] (List.map woption w) :=
 by
@@ -32,7 +32,7 @@ by
     simp [woption]
   apply Grammar.deri_of_deri_tran ih
   rcases step with ⟨r, rin, u, v, bef, aft⟩
-  use grule_of_CSrule r
+  use grule_of_CSR r
   constructor
   · clear * - rin
     dsimp only [grammar_of_csg]
@@ -46,17 +46,17 @@ by
   use List.map woption u, List.map woption v
   constructor
   · convert congr_arg (List.map woption) bef
-    simp [List.map_append, grule_of_CSrule, woption]
+    simp [List.map_append, grule_of_CSR, woption]
   · convert congr_arg (List.map woption) aft
-    simp [List.map_append, grule_of_CSrule, woption]
+    simp [List.map_append, grule_of_CSR, woption]
 
-private lemma backwardsTODO {g : CSgrammar T} {w : List (Symbol T g.nt)}
+private lemma backwardsTODO {g : CSG T} {w : List (Symbol T g.nt)}
     (ass : (grammar_of_csg g).Derives [Symbol.nonterminal (some g.initial)] (List.map woption w)) :
   g.Derives [Symbol.nonterminal g.initial] w :=
 by -- TODO instead of wrapping in assumption, dewrap in goal
   sorry
 
-private lemma missingTODO {g : CSgrammar T} {w : List T}
+private lemma missingTODO {g : CSG T} {w : List T}
     (ass : (grammar_of_csg g).Derives [Symbol.nonterminal none] (List.map Symbol.terminal w))
     (wnn : w ≠ []) :
   g.Derives [Symbol.nonterminal g.initial] (List.map Symbol.terminal w) :=
@@ -69,7 +69,7 @@ by -- maybe useless
   rcases possib with ⟨y, ⟨r, rin, u, v, bef, aft⟩, rest⟩-/
   sorry
 
-lemma csLanguage_eq_grammarLanguage (g : CSgrammar T) :
+lemma csLanguage_eq_grammarLanguage (g : CSG T) :
   g.language = (grammar_of_csg g).language :=
 by
   unfold Grammar.language
@@ -78,7 +78,7 @@ by
   · by_cases emptyCan : g.allow_empty
     · convert_to True ↔ True
       · rw [iff_true]
-        simp only [CSgrammar.language, CSgrammar.Generates, emptyStr, emptyCan, and_true]
+        simp only [CSG.language, emptyStr, emptyCan, and_true]
         rw [Set.mem_setOf_eq]
         left
         tauto
@@ -92,11 +92,11 @@ by
         simp [grammar_of_csg]
       rfl
     · sorry/-convert_to False ↔ False
-      · simp only [CSgrammar.language, CSgrammar.Generates, emptyStr, emptyCan, and_false]
+      · simp only [CSG.language, CSG.Generates, emptyStr, emptyCan, and_false]
         rw [Set.mem_setOf_eq]
         simp only [List.map, false_or, iff_false]
         intro imposs
-        cases' CSgrammar.eq_or_deri_tran_of_deri imposs with case_id case_tr
+        cases' CSG.eq_or_deri_tran_of_deri imposs with case_id case_tr
         · cases case_id
         rcases case_tr with ⟨x, -, r, rin, u, v, bef, aft⟩
         have contra := congr_arg List.length aft
@@ -115,7 +115,7 @@ by
           · simp [ris]
           rcases rof with ⟨r₁, -, eqr⟩
           rw [← eqr]
-          simp only [grule_of_CSrule, List.append_assoc, List.length_append, add_pos_iff]
+          simp only [grule_of_CSR, List.append_assoc, List.length_append, add_pos_iff]
           right; left
           rw [List.length_map]
           exact r₁.output_nonempty
@@ -126,25 +126,21 @@ by
       rfl-/
   rw [Set.mem_setOf_eq]
   constructor
-  · unfold CSgrammar.language
+  · unfold CSG.language
     rw [Set.mem_setOf]
-    unfold CSgrammar.Generates
     intro ass
     cases' ass with impos hyp
     · exfalso
       apply emptyStr
       exact impos.left
-    unfold Grammar.Generates
     convert CSderi_of_general hyp
     apply List.ext_get
     · simp only [List.length_map]
     intro n hnl hnr
     simp [woption]
-  · unfold Grammar.Generates
-    intro ass
-    unfold CSgrammar.language
+  · intro ass
+    unfold CSG.language
     rw [Set.mem_setOf]
-    unfold CSgrammar.Generates
     right
     exact missingTODO ass emptyStr
 

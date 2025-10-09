@@ -466,7 +466,7 @@ private lemma CF_lang_aux_ab : langAuxAb.IsCF :=
   by
   let S_ : Fin 1 := 0
   let S : Symbol (Fin 3) (Fin 1) := Symbol.nonterminal S_
-  let g := CFGrammar.mk (Fin 1) S_ [(S_, [a, S, b]), (S_, ([] : List (Symbol (Fin 3) (Fin 1))))]
+  let g := CFG.mk (Fin 1) S_ [(S_, [a, S, b]), (S_, ([] : List (Symbol (Fin 3) (Fin 1))))]
   use g
   apply Set.eq_of_subset_of_subset
   · intro w ass

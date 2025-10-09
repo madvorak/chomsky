@@ -4,31 +4,31 @@ import Chomsky.Utilities.ListUtils
 
 variable {T : Type}
 
-private def reversalGrammar (g : CFgrammar T) : CFgrammar T :=
-  CFgrammar.mk
+private def reversalGrammar (g : CFG T) : CFG T :=
+  CFG.mk
     g.nt
     g.initial
     (List.map (fun r : g.nt × List (Symbol T g.nt) => (r.fst, List.reverse r.snd)) g.rules)
 
-private lemma dual_of_reversalGrammar (g : CFgrammar T) :
+private lemma dual_of_reversalGrammar (g : CFG T) :
   reversalGrammar (reversalGrammar g) = g :=
 by
   cases' g with g_nt g_initial g_rules
-  simp only [reversalGrammar, List.map_map, CFgrammar.mk.injEq, heq_eq_eq, true_and]
+  simp only [reversalGrammar, List.map_map, CFG.mk.injEq, heq_eq_eq, true_and]
   convert_to
     List.map (fun r : g_nt × List (Symbol T g_nt) => (r.fst, r.snd.reverse.reverse)) g_rules =
     g_rules
   simp [List.reverse_reverse]
 
-private lemma derives_reversed (g : CFgrammar T) (v : List (Symbol T g.nt)) :
+private lemma derives_reversed (g : CFG T) (v : List (Symbol T g.nt)) :
   (reversalGrammar g).Derives [Symbol.nonterminal (reversalGrammar g).initial] v →
     g.Derives [Symbol.nonterminal g.initial] v.reverse :=
 by
   intro hv
   induction' hv with u w _ orig ih
   · rw [List.reverse_singleton]
-    apply CFgrammar.deri_self
-  apply CFgrammar.deri_of_deri_tran ih
+    apply CFG.deri_self
+  apply CFG.deri_of_deri_tran ih
   rcases orig with ⟨r, rin, x, y, bef, aft⟩
   change r ∈ List.map (fun r : g.nt × List (Symbol T g.nt) => (r.fst, List.reverse r.snd)) g.rules at rin
   rw [List.mem_map] at rin
@@ -49,13 +49,12 @@ by
     rw [snd_from_r, ← List.reverse_append_append]
     exact congr_arg List.reverse aft
 
-private lemma reversed_word_in_original_language {g : CFgrammar T} {w : List T}
+private lemma reversed_word_in_original_language {g : CFG T} {w : List T}
     (hyp : w ∈ (reversalGrammar g).language) :
   w.reverse ∈ g.language :=
 by
-  unfold CFgrammar.language at *
+  unfold CFG.language at *
   rw [Set.mem_setOf_eq] at *
-  unfold CFgrammar.Generates at *
   rw [List.map_reverse]
   exact derives_reversed g (List.map Symbol.terminal w) hyp
 

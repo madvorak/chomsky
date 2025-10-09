@@ -3,8 +3,8 @@ import Chomsky.Classes.ContextFree.Basics.Lifting
 variable {T : Type}
 
 /-- Grammar for a union of two context-free languages. -/
-def CFgrammar.union (g₁ g₂ : CFgrammar T) : CFgrammar T :=
-  CFgrammar.mk (Option (g₁.nt ⊕ g₂.nt)) none (
+def CFG.union (g₁ g₂ : CFG T) : CFG T :=
+  CFG.mk (Option (g₁.nt ⊕ g₂.nt)) none (
     ⟨none, [Symbol.nonterminal (some (Sum.inl g₁.initial))]⟩ :: (
     ⟨none, [Symbol.nonterminal (some (Sum.inr g₂.initial))]⟩ :: (
     List.map (liftRule (Option.some ∘ Sum.inl)) g₁.rules ++
@@ -14,20 +14,20 @@ private lemma both_empty {u v : List T} {a b : T} (ha : [a] = u ++ [b] ++ v) :
     u = [] ∧ v = [] := by
   cases u <;> cases v <;> simp at ha; trivial
 
-variable {g₁ g₂ : CFgrammar T}
+variable {g₁ g₂ : CFG T}
 
-private def oN₁_of_N : (CFgrammar.union g₁ g₂).nt → Option g₁.nt
+private def oN₁_of_N : (CFG.union g₁ g₂).nt → Option g₁.nt
   | none => none
   | some (Sum.inl n) => some n
   | some (Sum.inr _) => none
 
-private def oN₂_of_N : (CFgrammar.union g₁ g₂).nt → Option g₂.nt
+private def oN₂_of_N : (CFG.union g₁ g₂).nt → Option g₂.nt
   | none => none
   | some (Sum.inl _) => none
   | some (Sum.inr n) => some n
 
 private def g₁g : LiftedCFG T :=
-  ⟨g₁, CFgrammar.union g₁ g₂, some ∘ Sum.inl, oN₁_of_N,
+  ⟨g₁, CFG.union g₁ g₂, some ∘ Sum.inl, oN₁_of_N,
     (fun x y hxy => Sum.inl_injective (Option.some_injective _ hxy)),
     (by
       intro x y hxy
@@ -90,7 +90,7 @@ private def g₁g : LiftedCFG T :=
             exact Sum.noConfusion imposs)⟩
 
 private def g₂g : LiftedCFG T :=
-  ⟨g₂, CFgrammar.union g₁ g₂, some ∘ Sum.inr, oN₂_of_N,
+  ⟨g₂, CFG.union g₁ g₂, some ∘ Sum.inr, oN₂_of_N,
     (fun x y hxy => Sum.inr_injective (Option.some_injective _ hxy)),
     (by
       intro x y hxy
@@ -155,22 +155,22 @@ private def g₂g : LiftedCFG T :=
 variable {w : List T}
 
 private lemma in_union_of_in_left (hw : w ∈ g₁.language) :
-    w ∈ (CFgrammar.union g₁ g₂).language := by
+    w ∈ (CFG.union g₁ g₂).language := by
   have deri_start :
-    (CFgrammar.union g₁ g₂).Derives [Symbol.nonterminal none]
+    (CFG.union g₁ g₂).Derives [Symbol.nonterminal none]
       [Symbol.nonterminal (some (Sum.inl g₁.initial))] := by
-    refine CFgrammar.deri_of_tran
+    refine CFG.deri_of_tran
       ⟨⟨none, [Symbol.nonterminal (some (Sum.inl g₁.initial))]⟩, List.mem_cons_self .., ?_⟩
     use [], []
     simp
   exact deri_start.trans (liftString_all_terminals g₁g.liftNT w ▸ g₁g.lift_derives hw)
 
 private lemma in_union_of_in_right (hw : w ∈ g₂.language) :
-    w ∈ (CFgrammar.union g₁ g₂).language := by
+    w ∈ (CFG.union g₁ g₂).language := by
   have deri_start :
-    (CFgrammar.union g₁ g₂).Derives [Symbol.nonterminal none]
+    (CFG.union g₁ g₂).Derives [Symbol.nonterminal none]
       [Symbol.nonterminal (some (Sum.inr g₂.initial))] := by
-    refine CFgrammar.deri_of_tran
+    refine CFG.deri_of_tran
       ⟨⟨none, [Symbol.nonterminal (some (Sum.inr g₂.initial))]⟩,
         List.mem_cons_of_mem _ (List.mem_cons_self ..), ?_⟩
     use [], []
@@ -178,7 +178,7 @@ private lemma in_union_of_in_right (hw : w ∈ g₂.language) :
   exact deri_start.trans (liftString_all_terminals g₂g.liftNT w ▸ g₂g.lift_derives hw)
 
 private lemma in_left_of_in_union (hw :
-    (CFgrammar.union g₁ g₂).Derives
+    (CFG.union g₁ g₂).Derives
       [Symbol.nonterminal (some (Sum.inl g₁.initial))]
       (List.map Symbol.terminal w)) :
     w ∈ g₁.language := by
@@ -188,7 +188,7 @@ private lemma in_left_of_in_union (hw :
   rfl
 
 private lemma in_right_of_in_union (hw :
-    (CFgrammar.union g₁ g₂).Derives
+    (CFG.union g₁ g₂).Derives
       [Symbol.nonterminal (some (Sum.inr g₂.initial))]
       (List.map Symbol.terminal w)) :
     w ∈ g₂.language := by
@@ -198,9 +198,9 @@ private lemma in_right_of_in_union (hw :
   rfl
 
 private lemma impossible_rule {r : Option (g₁.nt ⊕ g₂.nt) × List (Symbol T (Option (g₁.nt ⊕ g₂.nt)))}
-    (hg : [Symbol.nonterminal (CFgrammar.union g₁ g₂).initial] =
-      ([] : List (Symbol T (CFgrammar.union g₁ g₂).nt)) ++ [Symbol.nonterminal r.fst] ++
-      ([] : List (Symbol T (CFgrammar.union g₁ g₂).nt)))
+    (hg : [Symbol.nonterminal (CFG.union g₁ g₂).initial] =
+      ([] : List (Symbol T (CFG.union g₁ g₂).nt)) ++ [Symbol.nonterminal r.fst] ++
+      ([] : List (Symbol T (CFG.union g₁ g₂).nt)))
     (hr : r ∈
       List.map (liftRule (Option.some ∘ Sum.inl)) g₁.rules ++
       List.map (liftRule (Option.some ∘ Sum.inr)) g₂.rules) :
@@ -217,9 +217,9 @@ private lemma impossible_rule {r : Option (g₁.nt ⊕ g₂.nt) × List (Symbol 
     rcases hr' with ⟨_, -, rfl⟩
     exact Option.noConfusion rule_root
 
-private lemma in_language_of_in_union (hw : w ∈ (CFgrammar.union g₁ g₂).language) :
+private lemma in_language_of_in_union (hw : w ∈ (CFG.union g₁ g₂).language) :
     w ∈ g₁.language ∨ w ∈ g₂.language := by
-  cases CFgrammar.eq_or_tran_deri_of_deri hw with
+  cases CFG.eq_or_tran_deri_of_deri hw with
   | inl impossible =>
     exfalso
     sorry/-have h0 := congr_arg (List.get? · 0) impossible
@@ -243,13 +243,13 @@ private lemma in_language_of_in_union (hw : w ∈ (CFgrammar.union g₁ g₂).la
         exfalso
         exact impossible_rule huv hr''
 
-lemma CFgrammar.mem_union_language_iff_mem_or_mem :
-    w ∈ (CFgrammar.union g₁ g₂).language ↔ w ∈ g₁.language ∨ w ∈ g₂.language :=
+lemma CFG.mem_union_language_iff_mem_or_mem :
+    w ∈ (CFG.union g₁ g₂).language ↔ w ∈ g₁.language ∨ w ∈ g₂.language :=
   ⟨in_language_of_in_union, fun hw => hw.elim in_union_of_in_left in_union_of_in_right⟩
 
 /-- The class of context-free languages is closed under union. -/
 theorem Language.IsContextFree.union (L₁ L₂ : Language T) :
     L₁.IsCF ∧ L₂.IsCF → (L₁ + L₂).IsCF := by
   rintro ⟨⟨g₁, rfl⟩, ⟨g₂, rfl⟩⟩
-  exact ⟨CFgrammar.union g₁ g₂, Set.ext (fun _ =>
-    CFgrammar.mem_union_language_iff_mem_or_mem)⟩
+  exact ⟨CFG.union g₁ g₂, Set.ext (fun _ =>
+    CFG.mem_union_language_iff_mem_or_mem)⟩

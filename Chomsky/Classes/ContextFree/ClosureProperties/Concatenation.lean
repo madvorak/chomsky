@@ -4,8 +4,8 @@ import Project.Utilities.WrittenByOthers.TrimAssoc
 variable {T : Type}
 
 /- ./././Mathport/Syntax/Translate/Expr.lean:177:8: unsupported: ambiguous notation -/
-private def combined_grammar (gₗ gᵣ : CFGrammar T) : CFGrammar T :=
-  CFGrammar.mk (Option (Sum gₗ.Nt gᵣ.Nt)) none
+private def combined_grammar (gₗ gᵣ : CFG T) : CFG T :=
+  CFG.mk (Option (Sum gₗ.nt gᵣ.nt)) none
     ((none,
         [Symbol.nonterminal (some (Sum.inl gₗ.initial)),
           Symbol.nonterminal
@@ -14,20 +14,20 @@ private def combined_grammar (gₗ gᵣ : CFGrammar T) : CFGrammar T :=
                 gᵣ.initial))])::List.map ruleOfRule₁ gₗ.rules ++ List.map ruleOfRule₂ gᵣ.rules)
 
 /-- similar to `sink_symbol` -/
-private def oN₁_of_N {g₁ g₂ : CFGrammar T} : (combinedGrammar g₁ g₂).Nt → Option g₁.Nt
+private def oN₁_of_N {g₁ g₂ : CFG T} : (combinedGrammar g₁ g₂).nt → Option g₁.nt
   | none => none
   | some (Sum.inl nt) => some nt
   | some (Sum.inr _) => none
 
 /-- similar to `sink_symbol` -/
-private def oN₂_of_N {g₁ g₂ : CFGrammar T} : (combinedGrammar g₁ g₂).Nt → Option g₂.Nt
+private def oN₂_of_N {g₁ g₂ : CFG T} : (combinedGrammar g₁ g₂).nt → Option g₂.nt
   | none => none
   | some (Sum.inl _) => none
   | some (Sum.inr nt) => some nt
 
 /- ./././Mathport/Syntax/Translate/Tactic/Builtin.lean:69:18: unsupported non-interactive tactic five_steps -/
 /- ./././Mathport/Syntax/Translate/Tactic/Builtin.lean:69:18: unsupported non-interactive tactic five_steps -/
-private def g₁g (g₁ g₂ : CFGrammar T) : @LiftedGrammar T :=
+private def g₁g (g₁ g₂ : CFG T) : @LiftedGrammar T :=
   LiftedGrammar.mk g₁ (combinedGrammar g₁ g₂) (some ∘ Sum.inl)
     (by
       -- prove `function.injective (some ∘ sum.inl)` here
@@ -106,7 +106,7 @@ private def g₁g (g₁ g₂ : CFGrammar T) : @LiftedGrammar T :=
 
 /- ./././Mathport/Syntax/Translate/Tactic/Builtin.lean:69:18: unsupported non-interactive tactic five_steps -/
 /- ./././Mathport/Syntax/Translate/Tactic/Builtin.lean:69:18: unsupported non-interactive tactic five_steps -/
-private def g₂g (g₁ g₂ : CFGrammar T) : @LiftedGrammar T :=
+private def g₂g (g₁ g₂ : CFG T) : @LiftedGrammar T :=
   LiftedGrammar.mk g₂ (combinedGrammar g₁ g₂) (some ∘ Sum.inr)
     (by
       -- prove `function.injective (some ∘ sum.inr)` here
@@ -183,15 +183,15 @@ private def g₂g (g₁ g₂ : CFGrammar T) : @LiftedGrammar T :=
           five_steps)
     (by intro; rfl)
 
-private def oT_of_sTN₃ {g₃ : CFGrammar T} : Symbol T g₃.Nt → Option T
+private def oT_of_sTN₃ {g₃ : CFG T} : Symbol T g₃.nt → Option T
   | Symbol.terminal t => some t
   | Symbol.nonterminal _ => none
 
-private def liT_of_lsTN₃ {g₃ : CFGrammar T} : List (Symbol T g₃.Nt) → List T :=
+private def liT_of_lsTN₃ {g₃ : CFG T} : List (Symbol T g₃.nt) → List T :=
   List.filterMap oTOfSTN₃
 
-private lemma u_eq_take_map_w {g₁ g₂ : CFGrammar T} (u : List (Symbol T g₁.Nt))
-    (v : List (Symbol T g₂.Nt)) (w : List T) (len : u.length ≤ w.length)
+private lemma u_eq_take_map_w {g₁ g₂ : CFG T} (u : List (Symbol T g₁.nt))
+    (v : List (Symbol T g₂.nt)) (w : List T) (len : u.length ≤ w.length)
     (hyp :
       List.take u.length (List.map sTNOfSTN₁ u ++ lsTNOfLsTN₂ v) =
         List.take u.length (List.map Symbol.terminal w)) :
@@ -248,8 +248,8 @@ private lemma u_eq_take_map_w {g₁ g₂ : CFGrammar T} (u : List (Symbol T g₁
     exact min_le_of_left_le h
   rfl
 
-private lemma v_eq_drop_map_w {g₁ g₂ : CFGrammar T} (u : List (Symbol T g₁.Nt))
-    (v : List (Symbol T g₂.Nt)) (w : List T) (total_len : u.length + v.length = w.length)
+private lemma v_eq_drop_map_w {g₁ g₂ : CFG T} (u : List (Symbol T g₁.nt))
+    (v : List (Symbol T g₂.nt)) (w : List T) (total_len : u.length + v.length = w.length)
     (hyp :
       List.drop u.length (List.map sTNOfSTN₁ u ++ List.map sTNOfSTN₂ v) =
         List.drop u.length (List.map Symbol.terminal w)) :
@@ -324,31 +324,31 @@ private lemma v_eq_drop_map_w {g₁ g₂ : CFGrammar T} (u : List (Symbol T g₁
     apply add_le_add_left h
   rfl
 
-private def sTN₁_of_sTN {g₁ g₂ : CFGrammar T} :
-    Symbol T (Option (Sum g₁.Nt g₂.Nt)) → Option (Symbol T g₁.Nt)
+private def sTN₁_of_sTN {g₁ g₂ : CFG T} :
+    Symbol T (Option (Sum g₁.nt g₂.nt)) → Option (Symbol T g₁.nt)
   | Symbol.terminal te => some (Symbol.terminal te)
   | Symbol.nonterminal nont => Option.map Symbol.nonterminal (oN₁OfN nont)
 
-private def sTN₂_of_sTN {g₁ g₂ : CFGrammar T} :
-    Symbol T (Option (Sum g₁.Nt g₂.Nt)) → Option (Symbol T g₂.Nt)
+private def sTN₂_of_sTN {g₁ g₂ : CFG T} :
+    Symbol T (Option (Sum g₁.nt g₂.nt)) → Option (Symbol T g₂.nt)
   | Symbol.terminal te => some (Symbol.terminal te)
   | Symbol.nonterminal nont => Option.map Symbol.nonterminal (oN₂OfN nont)
 
-private def lsTN₁_of_lsTN {g₁ g₂ : CFGrammar T} (lis : List (Symbol T (Option (Sum g₁.Nt g₂.Nt)))) :
-    List (Symbol T g₁.Nt) :=
+private def lsTN₁_of_lsTN {g₁ g₂ : CFG T} (lis : List (Symbol T (Option (Sum g₁.nt g₂.nt)))) :
+    List (Symbol T g₁.nt) :=
   List.filterMap sTN₁OfSTN lis
 
-private def lsTN₂_of_lsTN {g₁ g₂ : CFGrammar T} (lis : List (Symbol T (Option (Sum g₁.Nt g₂.Nt)))) :
-    List (Symbol T g₂.Nt) :=
+private def lsTN₂_of_lsTN {g₁ g₂ : CFG T} (lis : List (Symbol T (Option (Sum g₁.nt g₂.nt)))) :
+    List (Symbol T g₂.nt) :=
   List.filterMap sTN₂OfSTN lis
 
-private lemma self_of_sTN₁ {g₁ g₂ : CFGrammar T} (a : Symbol T g₁.Nt) :
+private lemma self_of_sTN₁ {g₁ g₂ : CFG T} (a : Symbol T g₁.nt) :
     sTN₁OfSTN (@sTNOfSTN₁ _ _ g₂ a) = a := by cases a <;> rfl
 
-private lemma self_of_sTN₂ {g₁ g₂ : CFGrammar T} (a : Symbol T g₂.Nt) :
+private lemma self_of_sTN₂ {g₁ g₂ : CFG T} (a : Symbol T g₂.nt) :
     sTN₂OfSTN (@sTNOfSTN₂ _ g₁ _ a) = a := by cases a <;> rfl
 
-private lemma self_of_lsTN₁ {g₁ g₂ : CFGrammar T} (stri : List (Symbol T g₁.Nt)) :
+private lemma self_of_lsTN₁ {g₁ g₂ : CFG T} (stri : List (Symbol T g₁.nt)) :
     lsTN₁OfLsTN (@lsTNOfLsTN₁ _ _ g₂ stri) = stri :=
   by
   unfold lsTNOfLsTN₁
@@ -369,7 +369,7 @@ private lemma self_of_lsTN₁ {g₁ g₂ : CFGrammar T} (stri : List (Symbol T g
     rfl
   apply List.filterMap_some
 
-private lemma self_of_lsTN₂ {g₁ g₂ : CFGrammar T} (stri : List (Symbol T g₂.Nt)) :
+private lemma self_of_lsTN₂ {g₁ g₂ : CFG T} (stri : List (Symbol T g₂.nt)) :
     lsTN₂OfLsTN (@lsTNOfLsTN₂ _ g₁ _ stri) = stri :=
   by
   unfold lsTNOfLsTN₂
@@ -393,7 +393,7 @@ private lemma self_of_lsTN₂ {g₁ g₂ : CFGrammar T} (stri : List (Symbol T g
 /- ./././Mathport/Syntax/Translate/Expr.lean:177:8: unsupported: ambiguous notation -/
 /- ./././Mathport/Syntax/Translate/Tactic/Builtin.lean:73:14: unsupported tactic `trim #[] -/
 /- ./././Mathport/Syntax/Translate/Tactic/Builtin.lean:73:14: unsupported tactic `trim #[] -/
-private lemma in_concatenated_of_in_combined {g₁ g₂ : CFGrammar T} {w : List T}
+private lemma in_concatenated_of_in_combined {g₁ g₂ : CFG T} {w : List T}
     (hyp : w ∈ cFLanguage (combinedGrammar g₁ g₂)) : w ∈ cFLanguage g₁ * cFLanguage g₂ :=
   by
   rw [Language.mem_mul]
@@ -406,7 +406,7 @@ private lemma in_concatenated_of_in_combined {g₁ g₂ : CFGrammar T} {w : List
     exfalso
     have hh := congr_fun (congr_arg List.get? refl_contr) 0
     rw [List.get?] at hh
-    by_cases (List.map (@Symbol.terminal T (combined_grammar g₁ g₂).Nt) w).length = 0
+    by_cases (List.map (@Symbol.terminal T (combined_grammar g₁ g₂).nt) w).length = 0
     · have empty_none : (List.map Symbol.terminal w).get? 0 = none := by finish
       rw [empty_none] at hh
       exact Option.noConfusion hh
@@ -501,7 +501,7 @@ private lemma in_concatenated_of_in_combined {g₁ g₂ : CFGrammar T} {w : List
   rw [only_option] at derivation
   clear only_option y
   have complicated_induction :
-    ∀ x : List (Symbol T (combined_grammar g₁ g₂).Nt),
+    ∀ x : List (Symbol T (combined_grammar g₁ g₂).nt),
       CFDerives (combined_grammar g₁ g₂)
           [Symbol.nonterminal (some (Sum.inl g₁.initial)),
             Symbol.nonterminal (some (Sum.inr g₂.initial))]
@@ -610,7 +610,7 @@ private lemma in_concatenated_of_in_combined {g₁ g₂ : CFGrammar T} {w : List
           exact List.get?_mem lcth
         exact not_in yes_in
       -- nonterminal was rewritten in the left half of `a` ... upgrade `u`
-      let d' : List (Symbol T (combined_grammar g₁ g₂).Nt) :=
+      let d' : List (Symbol T (combined_grammar g₁ g₂).nt) :=
         List.take ((@lsTNOfLsTN₁ T g₁ g₂ u).length - (c.length + 1)) d
       let u' := lsTN₁_of_lsTN (c ++ (ruleOfRule₁ r₁).snd ++ d')
       use u'
@@ -972,7 +972,7 @@ private lemma in_concatenated_of_in_combined {g₁ g₂ : CFGrammar T} {w : List
         rw [List.length_map] at hlen_uc
         exact hlen_uc
       -- nonterminal was rewritten in the right half of `a` ... upgrade `v`
-      let c' : List (Symbol T (combined_grammar g₁ g₂).Nt) :=
+      let c' : List (Symbol T (combined_grammar g₁ g₂).nt) :=
         List.drop (@lsTNOfLsTN₁ T g₁ g₂ u).length c
       let v' := lsTN₂_of_lsTN (c' ++ (ruleOfRule₂ r₂).snd ++ d)
       use u
@@ -1178,7 +1178,7 @@ private lemma in_concatenated_of_in_combined {g₁ g₂ : CFGrammar T} {w : List
   rw [bundle_unbundle]
   rw [List.filterMap_some]
 
-private lemma in_combined_of_in_concatenated {g₁ g₂ : CFGrammar T} {w : List T}
+private lemma in_combined_of_in_concatenated {g₁ g₂ : CFG T} {w : List T}
     (hyp : w ∈ cFLanguage g₁ * cFLanguage g₂) : w ∈ cFLanguage (combinedGrammar g₁ g₂) :=
   by
   rw [Language.mem_mul] at hyp

@@ -1,5 +1,6 @@
 import Chomsky.Classes.Unrestricted.Basics.Definition
 
+
 /-- Transformation rule for a grammar in the Kuroda Normal Form. -/
 inductive KurodaRule (T : Type) (N : Type)
   | two_two (A B C D : N) : KurodaRule T N
@@ -39,13 +40,9 @@ def KurodaGrammar.Transforms (g : KurodaGrammar T) (w₁ w₂ : List (Symbol T g
 def KurodaGrammar.Derives (g : KurodaGrammar T) : List (Symbol T g.nt) → List (Symbol T g.nt) → Prop :=
   Relation.ReflTransGen g.Transforms
 
-/-- Accepts a word (a list of terminals) iff it can be derived from the initial nonterminal. -/
-def KurodaGrammar.Generates (g : KurodaGrammar T) (w : List T) : Prop :=
-  g.Derives [Symbol.nonterminal g.initial] (List.map Symbol.terminal w)
-
 /-- The set of words that can be derived from the initial nonterminal. -/
 def KurodaGrammar.language (g : KurodaGrammar T) : Language T :=
-  setOf g.Generates
+  { w : List T | g.Derives [Symbol.nonterminal g.initial] (w.map Symbol.terminal) }
 
 -- end of definition
 
@@ -163,7 +160,7 @@ by
 lemma KurodaGrammar.tran_rel_eq (k : KurodaGrammar T) :
   k.Transforms = (grammar_of_kurodaGrammar k).Transforms :=
 by
-  ext w₁ w₂
+  ext
   apply KurodaGrammar.tran_iff
 
 lemma KurodaGrammar.deri_iff (k : KurodaGrammar T) (w₁ w₂ : List (Symbol T k.nt)) :
@@ -173,18 +170,11 @@ by
   rw [KurodaGrammar.tran_rel_eq]
   rfl
 
-lemma KurodaGrammar.gene_iff (k : KurodaGrammar T) (w : List T) :
-  k.Generates w ↔ (grammar_of_kurodaGrammar k).Generates w :=
-by
-  unfold KurodaGrammar.Generates
-  rw [KurodaGrammar.deri_iff]
-  rfl
-
 lemma KurodaGrammar.lang_eq (k : KurodaGrammar T) :
   k.language = (grammar_of_kurodaGrammar k).language :=
 by
-  ext w
-  apply KurodaGrammar.gene_iff
+  ext
+  apply KurodaGrammar.deri_iff
 
 -- TODO reduction `Grammar → KurodaGrammar`
 

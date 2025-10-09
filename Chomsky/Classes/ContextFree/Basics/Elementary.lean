@@ -5,13 +5,13 @@ variable {T : Type}
 
 
 /-- Context-free grammar for the empty language (i.e., `∈` always gives `false`). -/
-def cfgEmptyLang : CFgrammar T :=
-  CFgrammar.mk (Fin 1) 0 []
+def cfgEmptyLang : CFG T :=
+  CFG.mk (Fin 1) 0 []
 
 /-- Characterization of the empty language. -/
-lemma language_of_cfgEmptyLang : CFgrammar.language (@cfgEmptyLang T) = 0 :=
+lemma language_of_cfgEmptyLang : CFG.language (@cfgEmptyLang T) = 0 :=
   by
-  unfold CFgrammar.language
+  unfold CFG.language
   ext1 w
   constructor; swap
   · intro h
@@ -34,13 +34,13 @@ lemma language_of_cfgEmptyLang : CFgrammar.language (@cfgEmptyLang T) = 0 :=
     cases rin -/
 
 /-- Context-free grammar for the singleton language that contains `[]` as its only word. -/
-def cfgEmptyWord : CFgrammar T :=
-  CFgrammar.mk (Fin 1) 0 [(0, [])]
+def cfgEmptyWord : CFG T :=
+  CFG.mk (Fin 1) 0 [(0, [])]
 
 /-- Characterization of the singleton language. -/
-lemma language_of_cfgEmptyWord : CFgrammar.language (@cfgEmptyWord T) = singleton [] :=
+lemma language_of_cfgEmptyWord : CFG.language (@cfgEmptyWord T) = singleton [] :=
   by
-  unfold CFgrammar.language
+  unfold CFG.language
   ext1 w
   sorry /-
   constructor; swap
@@ -134,8 +134,8 @@ lemma language_of_cfgEmptyWord : CFgrammar.language (@cfgEmptyWord T) = singleto
     linarith -/
 
 /-- Context-free grammar for a language `{a}.star` where `a` is a given terminal symbol. -/
-def cfgSymbolStar (a : T) : CFgrammar T :=
-  CFgrammar.mk (Fin 1) 0 [(0, [Symbol.terminal a, Symbol.nonterminal 0]), (0, [])]
+def cfgSymbolStar (a : T) : CFG T :=
+  CFG.mk (Fin 1) 0 [(0, [Symbol.terminal a, Symbol.nonterminal 0]), (0, [])]
 
 /- ./././Mathport/Syntax/Translate/Expr.lean:177:8: unsupported: ambiguous notation -/
 /- ./././Mathport/Syntax/Translate/Tactic/Builtin.lean:73:14: unsupported tactic `trim #[] -/
@@ -187,7 +187,7 @@ lemma language_of_cfgSymbolStar (a : T) :
       change CFGeneratesStr (cfgSymbolStar a) (List.map Symbol.terminal w) at ass
       unfold CFGeneratesStr at ass
       have indu :
-        ∀ v : List (Symbol T (cfgSymbolStar a).Nt),
+        ∀ v : List (Symbol T (cfgSymbolStar a).nt),
           CFDerives (cfgSymbolStar a) [Symbol.nonterminal (cfgSymbolStar a).initial] v →
             Symbol.terminal t ∉ v :=
         by
@@ -215,8 +215,8 @@ lemma language_of_cfgSymbolStar (a : T) :
             exact Symbol.terminal.inj imposs
           cases imposs
           · norm_cast at imposs
-          exact List.not_mem_nil (@Symbol.terminal T (cfgSymbolStar a).Nt t) imposs
-        · change r ∈ [((0 : Fin 1), ([] : List (Symbol T (cfgSymbolStar a).Nt)))] at rin
+          exact List.not_mem_nil (@Symbol.terminal T (cfgSymbolStar a).nt t) imposs
+        · change r ∈ [((0 : Fin 1), ([] : List (Symbol T (cfgSymbolStar a).nt)))] at rin
           rw [List.mem_singleton] at rin
           rw [rin]
           exact List.not_mem_nil (Symbol.terminal t)

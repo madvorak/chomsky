@@ -3,39 +3,39 @@ import Project.Classes.Unrestricted.ClosureProperties.Concatenation
 
 variable {T : Type}
 
-private def wrap_CS_rule₁ {N₁ : Type} (N₂ : Type) (r : Csrule T N₁) : Csrule T (Nnn T N₁ N₂) :=
-  Csrule.mk (List.map (wrapSymbol₁ N₂) r.contextLeft) (Sum.inl (some (Sum.inl r.inputNonterminal)))
+private def wrap_CS_rule₁ {N₁ : Type} (N₂ : Type) (r : CSR T N₁) : CSR T (Nnn T N₁ N₂) :=
+  CSR.mk (List.map (wrapSymbol₁ N₂) r.contextLeft) (Sum.inl (some (Sum.inl r.inputNonterminal)))
     (List.map (wrapSymbol₁ N₂) r.contextRight) (List.map (wrapSymbol₁ N₂) r.outputString)
 
-private def wrap_CS_rule₂ {N₂ : Type} (N₁ : Type) (r : Csrule T N₂) : Csrule T (Nnn T N₁ N₂) :=
-  Csrule.mk (List.map (wrapSymbol₂ N₁) r.contextLeft) (Sum.inl (some (Sum.inr r.inputNonterminal)))
+private def wrap_CS_rule₂ {N₂ : Type} (N₁ : Type) (r : CSR T N₂) : CSR T (Nnn T N₁ N₂) :=
+  CSR.mk (List.map (wrapSymbol₂ N₁) r.contextLeft) (Sum.inl (some (Sum.inr r.inputNonterminal)))
     (List.map (wrapSymbol₂ N₁) r.contextRight) (List.map (wrapSymbol₂ N₁) r.outputString)
 
-private def CS_rules_for_terminals₁ (N₂ : Type) (g : CSGrammar T) :
-    List (Csrule T (Nnn T g.Nt N₂)) :=
-  List.map (fun t => Csrule.mk [] (Sum.inr (Sum.inl t)) [] [Symbol.terminal t])
+private def CS_rules_for_terminals₁ (N₂ : Type) (g : CSG T) :
+    List (CSR T (Nnn T g.nt N₂)) :=
+  List.map (fun t => CSR.mk [] (Sum.inr (Sum.inl t)) [] [Symbol.terminal t])
     (allUsedTerminals (grammarOfCsg g))
 
-private def CS_rules_for_terminals₂ (N₁ : Type) (g : CSGrammar T) :
-    List (Csrule T (Nnn T N₁ g.Nt)) :=
-  List.map (fun t => Csrule.mk [] (Sum.inr (Sum.inr t)) [] [Symbol.terminal t])
+private def CS_rules_for_terminals₂ (N₁ : Type) (g : CSG T) :
+    List (CSR T (Nnn T N₁ g.nt)) :=
+  List.map (fun t => CSR.mk [] (Sum.inr (Sum.inr t)) [] [Symbol.terminal t])
     (allUsedTerminals (grammarOfCsg g))
 
 /- ./././Mathport/Syntax/Translate/Expr.lean:177:8: unsupported: ambiguous notation -/
-private def big_CS_grammar (g₁ g₂ : CSGrammar T) : CSGrammar T :=
-  CSGrammar.mk (Nnn T g₁.Nt g₂.Nt) (Sum.inl none)
-    (Csrule.mk [] (Sum.inl none) []
+private def big_CS_grammar (g₁ g₂ : CSG T) : CSG T :=
+  CSG.mk (Nnn T g₁.nt g₂.nt) (Sum.inl none)
+    (CSR.mk [] (Sum.inl none) []
         [Symbol.nonterminal (Sum.inl (some (Sum.inl g₁.initial))),
           Symbol.nonterminal
             (Sum.inl
               (some
                 (Sum.inr
-                  g₂.initial)))]::List.map (wrapCSRule₁ g₂.Nt) g₁.rules ++
-          List.map (wrapCSRule₂ g₁.Nt) g₂.rules ++
-        (cSRulesForTerminals₁ g₂.Nt g₁ ++ cSRulesForTerminals₂ g₁.Nt g₂))
+                  g₂.initial)))]::List.map (wrapCSR₁ g₂.nt) g₁.rules ++
+          List.map (wrapCSR₂ g₁.nt) g₂.rules ++
+        (CSRsForTerminals₁ g₂.nt g₁ ++ CSRsForTerminals₂ g₁.nt g₂))
 
-private lemma big_CS_grammar_same_language (g₁ g₂ : CSGrammar T) :
-    cSLanguage (bigCSGrammar g₁ g₂) =
+private lemma big_CS_grammar_same_language (g₁ g₂ : CSG T) :
+    cSLanguage (bigCSG g₁ g₂) =
       grammarLanguage (bigGrammar (grammarOfCsg g₁) (grammarOfCsg g₂)) :=
   by
   rw [cSLanguage_eq_grammarLanguage]

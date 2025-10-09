@@ -116,24 +116,19 @@ infixl:100 " ^^ " => nTimes
 
 end ListJoin
 
-lemma mem_doubleton {a b c : α} :
-  a ∈ [b, c] ↔ a = b ∨ a = c :=
-by
-  rw [List.mem_cons, List.mem_singleton]
-
 variable [DecidableEq α]
 
 section ListCountIn
 
 def countIn (l : List α) (a : α) : ℕ :=
-  List.sum (List.map (fun s => ite (s = a) 1 0) l)
+  List.sum (List.map (fun s => if s = a then 1 else 0) l)
 
 lemma countIn_nil (a : α) :
   countIn [] a = 0 :=
 rfl
 
 lemma countIn_cons (a b : α) :
-  countIn (b::x) a = ite (b = a) 1 0 + countIn x a :=
+  countIn (b::x) a = (if b = a then 1 else 0) + countIn x a :=
 by
   unfold countIn
   rw [List.map_cons]

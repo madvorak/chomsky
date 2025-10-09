@@ -61,15 +61,14 @@ by
 
 /-- The class of context-free languages is closed under reversal. -/
 theorem CF_of_reverse_CF (L : Language T) :
-  IsCF L → IsCF (reverseLang L) :=
+  IsCF L → IsCF L.reverse :=
 by
   rintro ⟨g, hgL⟩
   rw [← hgL]
   use reversalGrammar g
-  unfold reverseLang
   apply Set.eq_of_subset_of_subset
-  · intro w hwL
-    exact reversed_word_in_original_language hwL
+  · intro _
+    exact reversed_word_in_original_language
   · intro w hwL
     have pre_reversal : ∃ g₀, g = reversalGrammar g₀
     · use reversalGrammar g

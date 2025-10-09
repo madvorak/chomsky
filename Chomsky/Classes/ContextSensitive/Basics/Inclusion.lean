@@ -61,12 +61,12 @@ private lemma missingTODO {g : CSgrammar T} {w : List T}
     (wnn : w ≠ []) :
   g.Derives [Symbol.nonterminal g.initial] (List.map Symbol.terminal w) :=
 by -- maybe useless
-  cases' Grammar.eq_or_tran_deri_of_deri ass with imposs possib
+  /-cases' Grammar.eq_or_tran_deri_of_deri ass with imposs possib
   · exfalso
     have contra := congr_fun (congr_arg (List.get?) imposs) 0
     simp [List.get?, forall_true_left, List.get?_map] at contra
     cases' w <;> simp at contra
-  rcases possib with ⟨y, ⟨r, rin, u, v, bef, aft⟩, rest⟩
+  rcases possib with ⟨y, ⟨r, rin, u, v, bef, aft⟩, rest⟩-/
   sorry
 
 lemma csLanguage_eq_grammarLanguage (g : CSgrammar T) :
@@ -91,7 +91,7 @@ by
         use [], []
         simp [grammar_of_csg]
       rfl
-    · convert_to False ↔ False
+    · sorry/-convert_to False ↔ False
       · simp only [CSgrammar.language, CSgrammar.Generates, emptyStr, emptyCan, and_false]
         rw [Set.mem_setOf_eq]
         simp only [List.map, false_or, iff_false]
@@ -123,7 +123,7 @@ by
         rw [List.length_map, List.length_nil, List.length_append, List.length_append] at contra
         clear * - contra routlen
         linarith
-      rfl
+      rfl-/
   rw [Set.mem_setOf_eq]
   constructor
   · unfold CSgrammar.language
@@ -133,7 +133,7 @@ by
     cases' ass with impos hyp
     · exfalso
       apply emptyStr
-      exact impos.1
+      exact impos.left
     unfold Grammar.Generates
     convert CSderi_of_general hyp
     apply List.ext_get

@@ -13,3 +13,4 @@ rev = "main"
 
 [[lean_lib]]
 name = "Chomsky"
+globs = ["Chomsky.*"]

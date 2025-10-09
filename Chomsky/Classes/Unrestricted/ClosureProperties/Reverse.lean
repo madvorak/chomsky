@@ -90,16 +90,14 @@ end Auxiliary
 
 /-- The class of grammar-generated languages is closed under reversal. -/
 theorem GG_of_reverse_GG (L : Language T) :
-  IsGG L → IsGG (reverseLang L) :=
+  IsGG L → IsGG L.reverse :=
 by
   rintro ⟨g, hgL⟩
   rw [← hgL]
   use reversalGrammar g
-  unfold reverseLang
   apply Set.eq_of_subset_of_subset
-  · intro w hwL
-    change w.reverse ∈ g.language
-    exact reversed_word_in_original_language hwL
+  · intro _
+    exact reversed_word_in_original_language
   · intro w hwL
     change w.reverse ∈ g.language at hwL
     obtain ⟨g₀, pre_reversal⟩ : ∃ g₀, g = reversalGrammar g₀

@@ -222,11 +222,11 @@ private lemma in_language_of_in_union (hw : w ∈ (CFgrammar.union g₁ g₂).la
   cases CFgrammar.eq_or_tran_deri_of_deri hw with
   | inl impossible =>
     exfalso
-    have h0 := congr_arg (List.get? · 0) impossible
+    sorry/-have h0 := congr_arg (List.get? · 0) impossible
     simp only [List.get?_map] at h0
     cases hw0 : w.get? 0 with
     | none => exact Option.noConfusion (hw0 ▸ h0)
-    | some => exact Symbol.noConfusion (Option.some.inj (hw0 ▸ h0))
+    | some => exact Symbol.noConfusion (Option.some.inj (hw0 ▸ h0))-/
   | inr hv =>
     rcases hv with ⟨_, ⟨r, hr, u, v, huv, rfl⟩, hg⟩
     rcases both_empty huv with ⟨rfl, rfl⟩

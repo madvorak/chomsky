@@ -6,25 +6,25 @@ variable {T : Type}
 
 private def wrap_CF_rule₁ {N₁ : Type} (N₂ : Type) (r : N₁ × List (Symbol T N₁)) :
     Nnn T N₁ N₂ × List (Nst T N₁ N₂) :=
-  (Sum.inl (some (Sum.inl r.fst)), List.map (wrapSymbol₁ N₂) r.snd)
+  ◩(some ◩r.fst)), List.map (wrapSymbol₁ N₂) r.snd)
 
 private def wrap_CF_rule₂ {N₂ : Type} (N₁ : Type) (r : N₂ × List (Symbol T N₂)) :
     Nnn T N₁ N₂ × List (Nst T N₁ N₂) :=
-  (Sum.inl (some (Sum.inr r.fst)), List.map (wrapSymbol₂ N₁) r.snd)
+  ◩(some ◪r.fst)), List.map (wrapSymbol₂ N₁) r.snd)
 
 private def CF_rules_for_terminals₁ (N₂ : Type) (g : CFG T) :
     List (Nnn T g.nt N₂ × List (Nst T g.nt N₂)) :=
-  List.map (fun t => (Sum.inr (Sum.inl t), [Symbol.terminal t])) (allUsedTerminals (grammarOfCfg g))
+  List.map (fun t => ◪◩t), [Symbol.terminal t])) (allUsedTerminals (grammarOfCfg g))
 
 private def CF_rules_for_terminals₂ (N₁ : Type) (g : CFG T) :
     List (Nnn T N₁ g.nt × List (Nst T N₁ g.nt)) :=
-  List.map (fun t => (Sum.inr (Sum.inr t), [Symbol.terminal t])) (allUsedTerminals (grammarOfCfg g))
+  List.map (fun t => ◪◪t), [Symbol.terminal t])) (allUsedTerminals (grammarOfCfg g))
 
 /- ./././Mathport/Syntax/Translate/Expr.lean:177:8: unsupported: ambiguous notation -/
 private def big_CF_grammar (g₁ g₂ : CFG T) : CFG T :=
-  CFG.mk (Nnn T g₁.nt g₂.nt) (Sum.inl none)
-    ((Sum.inl none,
-        [Symbol.nonterminal (Sum.inl (some (Sum.inl g₁.initial))),
+  CFG.mk (Nnn T g₁.nt g₂.nt) ◩none)
+    (◩none,
+        [Symbol.nonterminal ◩(some ◩g₁.initial))),
           Symbol.nonterminal
             (Sum.inl
               (some

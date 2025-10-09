@@ -59,7 +59,7 @@ lemma KurodaGrammar.tran_iff (k : KurodaGrammar T) (w₁ w₂ : List (Symbol T k
   k.Transforms w₁ w₂ ↔ (grammar_of_kurodaGrammar k).Transforms w₁ w₂ :=
 by
   constructor
-  · rintro ⟨r, rin, u, v, ass⟩
+  · rintro ⟨r, rin, u, v, hruv⟩
     use grule_of_kurodaRule r
     constructor
     · simp only [grammar_of_kurodaGrammar, List.mem_map]
@@ -67,8 +67,8 @@ by
     use u, v
     cases r with
     | two_two A B C D =>
-      dsimp only at ass
-      cases' ass with bef aft
+      dsimp only at hruv
+      cases' hruv with bef aft
       constructor
       · simp only [grule_of_kurodaRule, List.append_nil, List.append_assoc, List.singleton_append]
         rw [← List.append_assoc]
@@ -76,41 +76,41 @@ by
       · simp only [grule_of_kurodaRule]
         exact aft
     | one_two A B C =>
-      dsimp only at ass
-      cases' ass with bef aft
+      dsimp only at hruv
+      cases' hruv with bef aft
       constructor
       · simp only [grule_of_kurodaRule, List.append_nil]
         exact bef
       · simp only [grule_of_kurodaRule]
         exact aft
     | one_one A t =>
-      dsimp only at ass
-      cases' ass with bef aft
+      dsimp only at hruv
+      cases' hruv with bef aft
       constructor
       · simp only [grule_of_kurodaRule, List.append_nil]
         exact bef
       · simp only [grule_of_kurodaRule]
         exact aft
     | one_nil A =>
-      cases' ass with bef aft
+      cases' hruv with bef aft
       constructor
       · simp only [grule_of_kurodaRule, List.append_nil]
         exact bef
       · simp only [grule_of_kurodaRule, List.append_nil]
         exact aft
-  · rintro ⟨r, rin, u, v, ass⟩
+  · rintro ⟨r, rin, u, v, hruv⟩
     simp [grammar_of_kurodaGrammar, grule_of_kurodaRule] at rin
-    rcases rin with ⟨r₀, rink, hyp⟩
+    rcases rin with ⟨r₀, rink, hr₀⟩
     cases r₀ with
     | two_two A B C D =>
       use KurodaRule.two_two A B C D
       constructor
       · exact rink
       use u, v
-      dsimp only at hyp ⊢
-      rw [← hyp] at ass
-      dsimp only at ass
-      cases' ass with bef aft
+      dsimp only at hr₀ ⊢
+      rw [← hr₀] at hruv
+      dsimp only at hruv
+      cases' hruv with bef aft
       constructor
       · simp only [List.append_nil, List.append_assoc, List.singleton_append] at bef
         rw [← List.append_assoc] at bef
@@ -121,10 +121,10 @@ by
       constructor
       · exact rink
       use u, v
-      dsimp only at hyp ⊢
-      rw [← hyp] at ass
-      dsimp only at ass
-      cases' ass with bef aft
+      dsimp only at hr₀ ⊢
+      rw [← hr₀] at hruv
+      dsimp only at hruv
+      cases' hruv with bef aft
       constructor
       · simp only [List.append_nil] at bef
         exact bef
@@ -134,10 +134,10 @@ by
       constructor
       · exact rink
       use u, v
-      dsimp only at hyp ⊢
-      rw [← hyp] at ass
-      dsimp only at ass
-      cases' ass with bef aft
+      dsimp only at hr₀ ⊢
+      rw [← hr₀] at hruv
+      dsimp only at hruv
+      cases' hruv with bef aft
       constructor
       · simp only [List.append_nil] at bef
         exact bef
@@ -147,10 +147,10 @@ by
       constructor
       · exact rink
       use u, v
-      dsimp only at hyp ⊢
-      rw [← hyp] at ass
-      dsimp only at ass
-      cases' ass with bef aft
+      dsimp only at hr₀ ⊢
+      rw [← hr₀] at hruv
+      dsimp only at hruv
+      cases' hruv with bef aft
       constructor
       · simp only [List.append_nil] at bef
         exact bef

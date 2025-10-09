@@ -14,19 +14,19 @@ Relation.ReflTransGen.single hgvw
 
 /-- The relation `CSG.Derives` is transitive. -/
 lemma CSG.deri_of_deri_deri {u v w : List (Symbol T g.nt)}
-    (huv : g.Derives u v) (hvw : g.Derives v w) :
+    (hguv : g.Derives u v) (hgvw : g.Derives v w) :
   g.Derives u w :=
-Relation.ReflTransGen.trans huv hvw
+Relation.ReflTransGen.trans hguv hgvw
 
 lemma CSG.deri_of_deri_tran {u v w : List (Symbol T g.nt)}
-    (huv : g.Derives u v) (hvw : g.Transforms v w) :
+    (hguv : g.Derives u v) (hgvw : g.Transforms v w) :
   g.Derives u w :=
-CSG.deri_of_deri_deri huv (CSG.deri_of_tran hvw)
+CSG.deri_of_deri_deri hguv (CSG.deri_of_tran hgvw)
 
 lemma CSG.deri_of_tran_deri {u v w : List (Symbol T g.nt)}
-    (huv : g.Transforms u v) (hvw : g.Derives v w) :
+    (hguv : g.Transforms u v) (hgvw : g.Derives v w) :
   g.Derives u w :=
-CSG.deri_of_deri_deri (CSG.deri_of_tran huv) hvw
+CSG.deri_of_deri_deri (CSG.deri_of_tran hguv) hgvw
 
 lemma CSG.eq_or_tran_deri_of_deri {u w : List (Symbol T g.nt)} (hguw : g.Derives u w) :
   u = w  ∨  ∃ v : List (Symbol T g.nt), g.Transforms u v ∧ g.Derives v w  :=

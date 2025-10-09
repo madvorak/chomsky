@@ -6,8 +6,8 @@ variable {T : Type}
 
 def unionGrammar (g₁ g₂ : Grammar T) : Grammar T :=
   Grammar.mk (Option (Sum g₁.nt g₂.nt)) none (
-    ⟨[], none, [], [Symbol.nonterminal (some (Sum.inl g₁.initial))]⟩ :: (
-    ⟨[], none, [], [Symbol.nonterminal (some (Sum.inr g₂.initial))]⟩ :: (
+    ⟨[], none, [], [Symbol.nonterminal (some ◩g₁.initial)]⟩ :: (
+    ⟨[], none, [], [Symbol.nonterminal (some ◪g₂.initial)]⟩ :: (
     List.map (liftRule (some ∘ Sum.inl)) g₁.rules ++
     List.map (liftRule (some ∘ Sum.inr)) g₂.rules)))
 
@@ -16,13 +16,13 @@ variable {g₁ g₂ : Grammar T}
 
 private def oN₁_of_N : (unionGrammar g₁ g₂).nt → Option g₁.nt
   | none => none
-  | some (Sum.inl n) => some n
-  | some (Sum.inr _) => none
+  | some ◩n => some n
+  | some ◪_ => none
 
 private def oN₂_of_N : (unionGrammar g₁ g₂).nt → Option g₂.nt
   | none => none
-  | some (Sum.inl _) => none
-  | some (Sum.inr n) => some n
+  | some ◩_ => none
+  | some ◪n => some n
 
 
 def lg₁ : LiftedGrammar T :=
@@ -263,7 +263,7 @@ by
   unfold Grammar.language at hwg ⊢
   rw [Set.mem_setOf_eq] at hwg ⊢
   apply Grammar.deri_of_tran_deri
-  · use ⟨[], none, [], [Symbol.nonterminal (some (Sum.inl g₁.initial))]⟩
+  · use ⟨[], none, [], [Symbol.nonterminal (some ◩g₁.initial)]⟩
     constructor
     · apply List.mem_cons_self
     use [], []
@@ -283,7 +283,7 @@ by
   unfold Grammar.language at hwg ⊢
   rw [Set.mem_setOf_eq] at hwg ⊢
   apply Grammar.deri_of_tran_deri
-  · use ⟨[], none, [], [Symbol.nonterminal (some (Sum.inr g₂.initial))]⟩
+  · use ⟨[], none, [], [Symbol.nonterminal (some ◪g₂.initial)]⟩
     constructor
     · apply List.mem_cons_of_mem
       apply List.mem_cons_self
@@ -315,3 +315,5 @@ by
       exact in_union_of_in_L₁ case₁
     · rw [← eq_L₂] at case₂
       exact in_union_of_in_L₂ case₂
+
+#print axioms GG_of_GG_u_GG

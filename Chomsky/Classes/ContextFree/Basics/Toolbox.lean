@@ -14,19 +14,19 @@ Relation.ReflTransGen.single hgvw
 
 /-- The relation `CFG.Derives` is transitive. -/
 lemma CFG.deri_of_deri_deri {u v w : List (Symbol T g.nt)}
-    (huv : g.Derives u v) (hvw : g.Derives v w) :
+    (hguv : g.Derives u v) (hgvw : g.Derives v w) :
   g.Derives u w :=
-Relation.ReflTransGen.trans huv hvw
+Relation.ReflTransGen.trans hguv hgvw
 
 lemma CFG.deri_of_deri_tran {u v w : List (Symbol T g.nt)}
-    (huv : g.Derives u v) (hvw : g.Transforms v w) :
+    (hguv : g.Derives u v) (hgvw : g.Transforms v w) :
   g.Derives u w :=
-CFG.deri_of_deri_deri huv (CFG.deri_of_tran hvw)
+CFG.deri_of_deri_deri hguv (CFG.deri_of_tran hgvw)
 
 lemma CFG.deri_of_tran_deri {u v w : List (Symbol T g.nt)}
-    (huv : g.Transforms u v) (hvw : g.Derives v w) :
+    (hguv : g.Transforms u v) (hgvw : g.Derives v w) :
   g.Derives u w :=
-CFG.deri_of_deri_deri (CFG.deri_of_tran huv) hvw
+CFG.deri_of_deri_deri (CFG.deri_of_tran hguv) hgvw
 
 lemma CFG.eq_or_tran_deri_of_deri {u w : List (Symbol T g.nt)} (hguw : g.Derives u w) :
   u = w  ∨  ∃ v : List (Symbol T g.nt), g.Transforms u v ∧ g.Derives v w  :=
@@ -41,11 +41,11 @@ lemma CFG.append_deri {w₁ w₂ : List (Symbol T g.nt)}
     (pᵣ : List (Symbol T g.nt)) (hgww : g.Derives w₁ w₂) :
   g.Derives (pᵣ ++ w₁) (pᵣ ++ w₂) :=
 by
-  induction' hgww with a b _ hyp ih
+  induction' hgww with a b _ hgab ih
   · apply CFG.deri_self
   apply CFG.deri_of_deri_tran
   · exact ih
-  rcases hyp with ⟨r, r_in, v, w, h_bef, h_aft⟩
+  rcases hgab with ⟨r, r_in, v, w, h_bef, h_aft⟩
   use r
   constructor
   · exact r_in
@@ -59,11 +59,11 @@ lemma CFG.deri_append {w₁ w₂ : List (Symbol T g.nt)}
     (pₒ : List (Symbol T g.nt)) (hgww : g.Derives w₁ w₂) :
   g.Derives (w₁ ++ pₒ) (w₂ ++ pₒ) :=
 by
-  induction' hgww with a b _ hyp ih
+  induction' hgww with a b _ hgab ih
   · apply CFG.deri_self
   apply CFG.deri_of_deri_tran
   · exact ih
-  rcases hyp with ⟨r, r_in, v, w, h_bef, h_aft⟩
+  rcases hgab with ⟨r, r_in, v, w, h_bef, h_aft⟩
   use r
   constructor
   · exact r_in

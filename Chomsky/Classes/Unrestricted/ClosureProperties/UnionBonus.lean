@@ -6,16 +6,16 @@ variable {T : Type}
 
 private def liftCFrule₁ {N₁ : Type} (N₂ : Type) (r : N₁ × List (Symbol T N₁)) :
   Option (Sum N₁ N₂) × List (Symbol T (Option (Sum N₁ N₂))) :=
-(some (Sum.inl r.fst), liftString (Option.some ∘ Sum.inl) r.snd)
+(some ◩r.fst, liftString (Option.some ∘ Sum.inl) r.snd)
 
 private def liftCFrule₂ (N₁ : Type) {N₂ : Type} (r : N₂ × List (Symbol T N₂)) :
   Option (Sum N₁ N₂) × List (Symbol T (Option (Sum N₁ N₂))) :=
-(some (Sum.inr r.fst), liftString (Option.some ∘ Sum.inr) r.snd)
+(some ◪r.fst, liftString (Option.some ∘ Sum.inr) r.snd)
 
 private def unionCFG (g₁ g₂ : CFG T) : CFG T :=
   CFG.mk (Option (Sum g₁.nt g₂.nt)) none (
-    (none, [Symbol.nonterminal (some (Sum.inl g₁.initial))]) ::
-    (none, [Symbol.nonterminal (some (Sum.inr g₂.initial))]) ::
+    (none, [Symbol.nonterminal (some ◩g₁.initial)]) ::
+    (none, [Symbol.nonterminal (some ◪g₂.initial)]) ::
     List.map (liftCFrule₁ g₂.nt) g₁.rules ++
     List.map (liftCFrule₂ g₁.nt) g₂.rules)
 
@@ -24,10 +24,8 @@ private lemma unionCFG_same_language (g₁ g₂ : CFG T) :
   (unionGrammar (grammar_of_cfg g₁) (grammar_of_cfg g₂)).language :=
 by
   rw [cfLanguage_eq_grammarLanguage]
-  congr
   unfold unionCFG grammar_of_cfg unionGrammar
   dsimp only [List.map]
-  congr
   repeat' rw [List.map_append]
   simp
   sorry

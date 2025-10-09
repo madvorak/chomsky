@@ -5,8 +5,8 @@ variable {T : Type}
 /-- Grammar for a union of two context-free languages. -/
 def CFG.union (g₁ g₂ : CFG T) : CFG T :=
   CFG.mk (Option (g₁.nt ⊕ g₂.nt)) none (
-    ⟨none, [Symbol.nonterminal (some (Sum.inl g₁.initial))]⟩ :: (
-    ⟨none, [Symbol.nonterminal (some (Sum.inr g₂.initial))]⟩ :: (
+    ⟨none, [Symbol.nonterminal (some ◩g₁.initial)]⟩ :: (
+    ⟨none, [Symbol.nonterminal (some ◪g₂.initial)]⟩ :: (
     List.map (liftRule (Option.some ∘ Sum.inl)) g₁.rules ++
     List.map (liftRule (Option.some ∘ Sum.inr)) g₂.rules)))
 
@@ -18,13 +18,13 @@ variable {g₁ g₂ : CFG T}
 
 private def oN₁_of_N : (CFG.union g₁ g₂).nt → Option g₁.nt
   | none => none
-  | some (Sum.inl n) => some n
-  | some (Sum.inr _) => none
+  | some ◩n => some n
+  | some ◪_ => none
 
 private def oN₂_of_N : (CFG.union g₁ g₂).nt → Option g₂.nt
   | none => none
-  | some (Sum.inl _) => none
-  | some (Sum.inr n) => some n
+  | some ◩_ => none
+  | some ◪n => some n
 
 private def g₁g : LiftedCFG T :=
   ⟨g₁, CFG.union g₁ g₂, some ∘ Sum.inl, oN₁_of_N,
@@ -158,9 +158,9 @@ private lemma in_union_of_in_left (hw : w ∈ g₁.language) :
     w ∈ (CFG.union g₁ g₂).language := by
   have deri_start :
     (CFG.union g₁ g₂).Derives [Symbol.nonterminal none]
-      [Symbol.nonterminal (some (Sum.inl g₁.initial))] := by
+      [Symbol.nonterminal (some ◩g₁.initial)] := by
     refine CFG.deri_of_tran
-      ⟨⟨none, [Symbol.nonterminal (some (Sum.inl g₁.initial))]⟩, List.mem_cons_self .., ?_⟩
+      ⟨⟨none, [Symbol.nonterminal (some ◩g₁.initial)]⟩, List.mem_cons_self .., ?_⟩
     use [], []
     simp
   exact deri_start.trans (liftString_all_terminals g₁g.liftNT w ▸ g₁g.lift_derives hw)
@@ -169,9 +169,9 @@ private lemma in_union_of_in_right (hw : w ∈ g₂.language) :
     w ∈ (CFG.union g₁ g₂).language := by
   have deri_start :
     (CFG.union g₁ g₂).Derives [Symbol.nonterminal none]
-      [Symbol.nonterminal (some (Sum.inr g₂.initial))] := by
+      [Symbol.nonterminal (some ◪g₂.initial)] := by
     refine CFG.deri_of_tran
-      ⟨⟨none, [Symbol.nonterminal (some (Sum.inr g₂.initial))]⟩,
+      ⟨⟨none, [Symbol.nonterminal (some ◪g₂.initial)]⟩,
         List.mem_cons_of_mem _ (List.mem_cons_self ..), ?_⟩
     use [], []
     simp
@@ -179,7 +179,7 @@ private lemma in_union_of_in_right (hw : w ∈ g₂.language) :
 
 private lemma in_left_of_in_union (hw :
     (CFG.union g₁ g₂).Derives
-      [Symbol.nonterminal (some (Sum.inl g₁.initial))]
+      [Symbol.nonterminal (some ◩g₁.initial)]
       (List.map Symbol.terminal w)) :
     w ∈ g₁.language := by
   apply sinkString_all_terminals g₁g.sinkNT w ▸ g₁g.sink_derives hw
@@ -189,7 +189,7 @@ private lemma in_left_of_in_union (hw :
 
 private lemma in_right_of_in_union (hw :
     (CFG.union g₁ g₂).Derives
-      [Symbol.nonterminal (some (Sum.inr g₂.initial))]
+      [Symbol.nonterminal (some ◪g₂.initial)]
       (List.map Symbol.terminal w)) :
     w ∈ g₂.language := by
   apply sinkString_all_terminals g₂g.sinkNT w ▸ g₂g.sink_derives hw

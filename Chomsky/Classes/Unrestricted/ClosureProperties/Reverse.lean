@@ -108,3 +108,5 @@ by
     rw [dual_of_reversalGrammar]
     rw [List.reverse_reverse] at finished_up_to_reverses
     exact finished_up_to_reverses
+
+#print axioms GG_of_reverse_GG

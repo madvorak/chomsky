@@ -4,28 +4,28 @@ import Project.Classes.Unrestricted.ClosureProperties.Concatenation
 variable {T : Type}
 
 private def wrap_CS_rule₁ {N₁ : Type} (N₂ : Type) (r : CSR T N₁) : CSR T (Nnn T N₁ N₂) :=
-  CSR.mk (List.map (wrapSymbol₁ N₂) r.contextLeft) (Sum.inl (some (Sum.inl r.inputNonterminal)))
+  CSR.mk (List.map (wrapSymbol₁ N₂) r.contextLeft) ◩(some ◩r.inputNonterminal)))
     (List.map (wrapSymbol₁ N₂) r.contextRight) (List.map (wrapSymbol₁ N₂) r.outputString)
 
 private def wrap_CS_rule₂ {N₂ : Type} (N₁ : Type) (r : CSR T N₂) : CSR T (Nnn T N₁ N₂) :=
-  CSR.mk (List.map (wrapSymbol₂ N₁) r.contextLeft) (Sum.inl (some (Sum.inr r.inputNonterminal)))
+  CSR.mk (List.map (wrapSymbol₂ N₁) r.contextLeft) ◩(some ◪r.inputNonterminal)))
     (List.map (wrapSymbol₂ N₁) r.contextRight) (List.map (wrapSymbol₂ N₁) r.outputString)
 
 private def CS_rules_for_terminals₁ (N₂ : Type) (g : CSG T) :
     List (CSR T (Nnn T g.nt N₂)) :=
-  List.map (fun t => CSR.mk [] (Sum.inr (Sum.inl t)) [] [Symbol.terminal t])
+  List.map (fun t => CSR.mk [] ◪◩t)) [] [Symbol.terminal t])
     (allUsedTerminals (grammarOfCsg g))
 
 private def CS_rules_for_terminals₂ (N₁ : Type) (g : CSG T) :
     List (CSR T (Nnn T N₁ g.nt)) :=
-  List.map (fun t => CSR.mk [] (Sum.inr (Sum.inr t)) [] [Symbol.terminal t])
+  List.map (fun t => CSR.mk [] ◪◪t)) [] [Symbol.terminal t])
     (allUsedTerminals (grammarOfCsg g))
 
 /- ./././Mathport/Syntax/Translate/Expr.lean:177:8: unsupported: ambiguous notation -/
 private def big_CS_grammar (g₁ g₂ : CSG T) : CSG T :=
-  CSG.mk (Nnn T g₁.nt g₂.nt) (Sum.inl none)
-    (CSR.mk [] (Sum.inl none) []
-        [Symbol.nonterminal (Sum.inl (some (Sum.inl g₁.initial))),
+  CSG.mk (Nnn T g₁.nt g₂.nt) ◩none)
+    (CSR.mk [] ◩none) []
+        [Symbol.nonterminal ◩(some ◩g₁.initial))),
           Symbol.nonterminal
             (Sum.inl
               (some

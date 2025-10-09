@@ -7,7 +7,7 @@ variable {T : Type}
 private def combined_grammar (gₗ gᵣ : CFG T) : CFG T :=
   CFG.mk (Option (Sum gₗ.nt gᵣ.nt)) none
     ((none,
-        [Symbol.nonterminal (some (Sum.inl gₗ.initial)),
+        [Symbol.nonterminal (some ◩gₗ.initial)),
           Symbol.nonterminal
             (some
               (Sum.inr
@@ -16,14 +16,14 @@ private def combined_grammar (gₗ gᵣ : CFG T) : CFG T :=
 /-- similar to `sink_symbol` -/
 private def oN₁_of_N {g₁ g₂ : CFG T} : (combinedGrammar g₁ g₂).nt → Option g₁.nt
   | none => none
-  | some (Sum.inl nt) => some nt
-  | some (Sum.inr _) => none
+  | some ◩n => some n
+  | some ◪_ => none
 
 /-- similar to `sink_symbol` -/
 private def oN₂_of_N {g₁ g₂ : CFG T} : (combinedGrammar g₁ g₂).nt → Option g₂.nt
   | none => none
-  | some (Sum.inl _) => none
-  | some (Sum.inr nt) => some nt
+  | some ◩_ => none
+  | some ◪n => some n
 
 /- ./././Mathport/Syntax/Translate/Tactic/Builtin.lean:69:18: unsupported non-interactive tactic five_steps -/
 /- ./././Mathport/Syntax/Translate/Tactic/Builtin.lean:69:18: unsupported non-interactive tactic five_steps -/
@@ -425,8 +425,8 @@ private lemma in_concatenated_of_in_combined {g₁ g₂ : CFG T} {w : List T}
   clear hyp
   have only_option :
     y =
-      [Symbol.nonterminal (some (Sum.inl g₁.initial)),
-        Symbol.nonterminal (some (Sum.inr g₂.initial))] :=
+      [Symbol.nonterminal (some ◩g₁.initial)),
+        Symbol.nonterminal (some ◪g₂.initial))] :=
     by
     rcases first_step with ⟨first_rule, first_rule_in, p, q, bef, aft⟩
     have len_bef := congr_arg List.length bef
@@ -451,13 +451,13 @@ private lemma in_concatenated_of_in_combined {g₁ g₂ : CFG T} {w : List T}
     have only_rule :
       first_rule =
         (none,
-          [Symbol.nonterminal (some (Sum.inl g₁.initial)),
-            Symbol.nonterminal (some (Sum.inr g₂.initial))]) :=
+          [Symbol.nonterminal (some ◩g₁.initial)),
+            Symbol.nonterminal (some ◪g₂.initial))]) :=
       by
       change
         first_rule ∈
           (none,
-              [Symbol.nonterminal (some (Sum.inl g₁.initial)),
+              [Symbol.nonterminal (some ◩g₁.initial)),
                 Symbol.nonterminal
                   (some
                     (Sum.inr
@@ -476,7 +476,7 @@ private lemma in_concatenated_of_in_combined {g₁ g₂ : CFG T} {w : List T}
           first_rule.fst ∈
             List.map Prod.fst
               (List.map
-                (fun r : g₁.nt × List (Symbol T g₁.nt) => (some (Sum.inl r.fst), lsTNOfLsTN₁ r.snd))
+                (fun r : g₁.nt × List (Symbol T g₁.nt) => (some ◩r.fst), lsTNOfLsTN₁ r.snd))
                 g₁.rules) :=
           List.mem_map_of_mem Prod.fst first_rule_in
         rw [initial] at rfst
@@ -487,7 +487,7 @@ private lemma in_concatenated_of_in_combined {g₁ g₂ : CFG T} {w : List T}
           first_rule.fst ∈
             List.map Prod.fst
               (List.map
-                (fun r : g₂.nt × List (Symbol T g₂.nt) => (some (Sum.inr r.fst), lsTNOfLsTN₂ r.snd))
+                (fun r : g₂.nt × List (Symbol T g₂.nt) => (some ◪r.fst), lsTNOfLsTN₂ r.snd))
                 g₂.rules) :=
           List.mem_map_of_mem Prod.fst first_rule_in
         rw [initial] at rfst
@@ -503,8 +503,8 @@ private lemma in_concatenated_of_in_combined {g₁ g₂ : CFG T} {w : List T}
   have complicated_induction :
     ∀ x : List (Symbol T (combined_grammar g₁ g₂).nt),
       CFDerives (combined_grammar g₁ g₂)
-          [Symbol.nonterminal (some (Sum.inl g₁.initial)),
-            Symbol.nonterminal (some (Sum.inr g₂.initial))]
+          [Symbol.nonterminal (some ◩g₁.initial)),
+            Symbol.nonterminal (some ◪g₂.initial))]
           x →
         ∃ u : List (Symbol T g₁.nt),
           ∃ v : List (Symbol T g₂.nt),
@@ -1189,13 +1189,13 @@ private lemma in_combined_of_in_concatenated {g₁ g₂ : CFG T} {w : List T}
       (List.map Symbol.terminal w)
   apply
     @CF_deri_of_tran_deri T (combined_grammar g₁ g₂) _
-      [Symbol.nonterminal (some (Sum.inl g₁.initial)),
-        Symbol.nonterminal (some (Sum.inr g₂.initial))]
+      [Symbol.nonterminal (some ◩g₁.initial)),
+        Symbol.nonterminal (some ◪g₂.initial))]
       _
   · use
       (none,
-        [Symbol.nonterminal (some (Sum.inl g₁.initial)),
-          Symbol.nonterminal (some (Sum.inr g₂.initial))])
+        [Symbol.nonterminal (some ◩g₁.initial)),
+          Symbol.nonterminal (some ◪g₂.initial))])
     constructor
     · apply List.mem_cons_self
     use [], []
@@ -1204,19 +1204,19 @@ private lemma in_combined_of_in_concatenated {g₁ g₂ : CFG T} {w : List T}
   rw [List.map_append]
   apply
     @CF_deri_of_deri_deri T (combined_grammar g₁ g₂) _
-      (List.map Symbol.terminal u ++ [Symbol.nonterminal (some (Sum.inr g₂.initial))]) _
+      (List.map Symbol.terminal u ++ [Symbol.nonterminal (some ◪g₂.initial))]) _
   · change
       CFDerives (combined_grammar g₁ g₂)
-        ([Symbol.nonterminal (some (Sum.inl g₁.initial))] ++
-          [Symbol.nonterminal (some (Sum.inr g₂.initial))])
-        (List.map Symbol.terminal u ++ [Symbol.nonterminal (some (Sum.inr g₂.initial))])
+        ([Symbol.nonterminal (some ◩g₁.initial))] ++
+          [Symbol.nonterminal (some ◪g₂.initial))])
+        (List.map Symbol.terminal u ++ [Symbol.nonterminal (some ◪g₂.initial))])
     apply CF_deri_append
     change CFDerives g₁ [Symbol.nonterminal g₁.initial] (List.map Symbol.terminal u) at hu
     let gg₁ := g₁g g₁ g₂
     change
-      CFDerives gg₁.g [Symbol.nonterminal (some (Sum.inl g₁.initial))] (List.map Symbol.terminal u)
+      CFDerives gg₁.g [Symbol.nonterminal (some ◩g₁.initial))] (List.map Symbol.terminal u)
     have ini_equ :
-      [Symbol.nonterminal (some (Sum.inl g₁.initial))] =
+      [Symbol.nonterminal (some ◩g₁.initial))] =
         List.map (liftSymbol gg₁.lift_nt) [Symbol.nonterminal g₁.initial] :=
       by apply List.singleton_eq
     rw [ini_equ]
@@ -1233,9 +1233,9 @@ private lemma in_combined_of_in_concatenated {g₁ g₂ : CFG T} {w : List T}
     change CFDerives g₂ [Symbol.nonterminal g₂.initial] (List.map Symbol.terminal v) at hv
     let gg₂ := g₂g g₁ g₂
     change
-      CFDerives gg₂.g [Symbol.nonterminal (some (Sum.inr g₂.initial))] (List.map Symbol.terminal v)
+      CFDerives gg₂.g [Symbol.nonterminal (some ◪g₂.initial))] (List.map Symbol.terminal v)
     have ini_equ :
-      [Symbol.nonterminal (some (Sum.inr g₂.initial))] =
+      [Symbol.nonterminal (some ◪g₂.initial))] =
         List.map (liftSymbol gg₂.lift_nt) [Symbol.nonterminal g₂.initial] :=
       by apply List.singleton_eq
     rw [ini_equ]

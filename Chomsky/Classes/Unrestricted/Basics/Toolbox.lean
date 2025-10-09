@@ -15,19 +15,19 @@ Relation.ReflTransGen.single hgvw
 
 /-- The relation `Grammar.derives` is transitive. -/
 lemma Grammar.deri_of_deri_deri {u v w : List (Symbol T g.nt)}
-    (huv : g.Derives u v) (hvw : g.Derives v w) :
+    (hguv : g.Derives u v) (hgvw : g.Derives v w) :
   g.Derives u w :=
-Relation.ReflTransGen.trans huv hvw
+Relation.ReflTransGen.trans hguv hgvw
 
 lemma Grammar.deri_of_deri_tran {u v w : List (Symbol T g.nt)}
-    (huv : g.Derives u v) (hvw : g.Transforms v w) :
+    (hguv : g.Derives u v) (hgvw : g.Transforms v w) :
   g.Derives u w :=
-Grammar.deri_of_deri_deri huv (Grammar.deri_of_tran hvw)
+Grammar.deri_of_deri_deri hguv (Grammar.deri_of_tran hgvw)
 
 lemma Grammar.deri_of_tran_deri {u v w : List (Symbol T g.nt)}
-    (huv : g.Transforms u v) (hvw : g.Derives v w) :
+    (hguv : g.Transforms u v) (hgvw : g.Derives v w) :
   g.Derives u w :=
-Grammar.deri_of_deri_deri (Grammar.deri_of_tran huv) hvw
+Grammar.deri_of_deri_deri (Grammar.deri_of_tran hguv) hgvw
 
 lemma Grammar.eq_or_tran_deri_of_deri {u w : List (Symbol T g.nt)} (hguw : g.Derives u w) :
   u = w  ∨  ∃ v : List (Symbol T g.nt), g.Transforms u v ∧ g.Derives v w  :=
@@ -42,11 +42,11 @@ lemma Grammar.append_deri {w₁ w₂ : List (Symbol T g.nt)}
     (pᵣ : List (Symbol T g.nt)) (hgww : g.Derives w₁ w₂) :
   g.Derives (pᵣ ++ w₁) (pᵣ ++ w₂) :=
 by
-  induction' hgww with x y _ hyp ih
+  induction' hgww with x y _ hgxy ih
   · apply Grammar.deri_self
   apply Grammar.deri_of_deri_tran
   · exact ih
-  rcases hyp with ⟨r, rin, u, v, h_bef, h_aft⟩
+  rcases hgxy with ⟨r, rin, u, v, h_bef, h_aft⟩
   use r
   constructor
   · exact rin
@@ -58,11 +58,11 @@ lemma Grammar.deri_append {w₁ w₂ : List (Symbol T g.nt)}
     (pₒ : List (Symbol T g.nt)) (hgww : g.Derives w₁ w₂) :
   g.Derives (w₁ ++ pₒ) (w₂ ++ pₒ) :=
 by
-  induction' hgww with x y _ hyp ih
+  induction' hgww with x y _ hgxy ih
   · apply Grammar.deri_self
   apply Grammar.deri_of_deri_tran
   · exact ih
-  rcases hyp with ⟨r, rin, u, v, h_bef, h_aft⟩
+  rcases hgxy with ⟨r, rin, u, v, h_bef, h_aft⟩
   use r
   constructor
   · exact rin
@@ -76,4 +76,4 @@ def asTerminal {N : Type} : Symbol T N → Option T
   | Symbol.nonterminal _ => none
 
 def allUsedTerminals (g : Grammar T) : List T :=
-  List.filterMap asTerminal (List.flatten (List.map Grule.output g.rules))
+  ((g.rules.map Grule.output).flatten).filterMap asTerminal

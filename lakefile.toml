@@ -1,0 +1,15 @@
+name = "chomsky"
+defaultTargets = ["Chomsky"]
+
+[leanOptions]
+autoImplicit = false
+relaxedAutoImplicit = false
+pp.structureInstances = false
+
+[[require]]
+name = "linters"
+git = "https://github.com/madvorak/leanters"
+rev = "main"
+
+[[lean_lib]]
+name = "Chomsky"

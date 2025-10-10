@@ -83,14 +83,14 @@ def wrapSymbol₂ {N₂ : Type} (N₁ : Type) : Symbol T N₂ → nst T N₁ N�
   | Symbol.terminal t => Symbol.nonterminal ◪◪t
   | Symbol.nonterminal n => Symbol.nonterminal ◩(some ◪n)
 
-private def wrapGrule₁ {N₁ : Type} (N₂ : Type) (r : Grule T N₁) : Grule T (nnn T N₁ N₂) :=
+def wrapGrule₁ {N₁ : Type} (N₂ : Type) (r : Grule T N₁) : Grule T (nnn T N₁ N₂) :=
   Grule.mk
     (List.map (wrapSymbol₁ N₂) r.inputL)
     ◩(some ◩r.inputN)
     (List.map (wrapSymbol₁ N₂) r.inputR)
     (List.map (wrapSymbol₁ N₂) r.output)
 
-private def wrapGrule₂ {N₂ : Type} (N₁ : Type) (r : Grule T N₂) : Grule T (nnn T N₁ N₂) :=
+def wrapGrule₂ {N₂ : Type} (N₁ : Type) (r : Grule T N₂) : Grule T (nnn T N₁ N₂) :=
   Grule.mk
     (List.map (wrapSymbol₂ N₁) r.inputL)
     ◩(some ◪r.inputN)
@@ -653,58 +653,14 @@ by
 
 private lemma correspondingStrings_after_wrap_unwrap_self₁ {N₁ N₂ : Type} {w : List (nst T N₁ N₂)}
     (hNw : ∃ z : List (Symbol T N₁), correspondingStrings (z.map (wrapSymbol₁ N₂)) w) :
-  correspondingStrings (List.map (wrapSymbol₁ N₂) (List.filterMap unwrapSymbol₁ w)) w :=
-by
-  induction' w with d l ih
-  · exact correspondingStrings_nil
-  specialize ih (by
-    cases' hNw with z hyp
-    cases' z with z₀ z'
-    · exfalso
-      simp [correspondingStrings, wrapSymbol₁] at hyp
-    · use z'
-      rw [List.map_cons, correspondingStrings_cons] at hyp
-      exact hyp.right
-  )
-  cases' d with t n
-  · have unwrap_first_t :
-      List.filterMap unwrapSymbol₁ (Symbol.terminal t :: l) =
-      Symbol.terminal t :: List.filterMap unwrapSymbol₁ l
-    · rfl
-    rw [unwrap_first_t]
-    unfold List.map
-    rw [correspondingStrings_cons]
-    constructor
-    · simp [wrapSymbol₁, correspondingSymbols]
-    · exact ih
-  -- probably throw away from here down
-  cases' n with o t'
-  · cases' o with n'
-    · sorry
-    · sorry
-  rw [List.map_filterMap]
-  convert_to
-    correspondingStrings
-      (List.filterMap Option.some (Symbol.nonterminal ◪t' :: l))
-      (Symbol.nonterminal ◪t' :: l)
-  · congr
-    ext1 a
-    cases' a with t n
-    · sorry
-    · sorry
-  rw [List.filterMap_some]
-  apply correspondingStrings_self
-
-private lemma correspondingStrings_after_wrap_unwrap_self₂ {N₁ N₂ : Type} {w : List (nst T N₁ N₂)}
-    (hNw : ∃ z : List (Symbol T N₂), correspondingStrings (z.map (wrapSymbol₂ N₁)) w) :
-  correspondingStrings ((w.filterMap unwrapSymbol₂).map (wrapSymbol₂ N₁)) w := -- TODO update the above
+  correspondingStrings ((w.filterMap unwrapSymbol₁).map (wrapSymbol₁ N₂)) w :=
 by
   induction w with
   | nil =>
     exact correspondingStrings_nil
   | cons d l ih =>
+    obtain ⟨z, hz⟩ := hNw
     specialize ih (by
-        obtain ⟨z, hz⟩ := hNw
         unfold correspondingStrings at *
         cases z <;> aesop)
     cases d with
@@ -715,93 +671,73 @@ by
       | inl n₀ =>
         cases n₀ with
         | none =>
-          sorry
+          cases z with
+          | nil => tauto
+          | cons a => cases a <;> tauto
         | some n =>
           cases n with
           | inl n₁ =>
-            sorry
+            cases z with
+            | nil => tauto
+            | cons a => cases a <;> tauto
           | inr n₂ =>
-            sorry
+            cases z with
+            | nil => tauto
+            | cons a => cases a <;> tauto
       | inr t =>
         cases t with
         | inl t₁ =>
-          sorry
+          cases z with
+            | nil => tauto
+            | cons a => cases a <;> tauto
         | inr t₂ =>
-          sorry
-/-induction' w with d l ih
-  · unfold corresponding_strings
-    unfold List.filterMap
-    unfold List.map
+          cases z with
+            | nil => tauto
+            | cons a => cases a <;> tauto
+
+private lemma correspondingStrings_after_wrap_unwrap_self₂ {N₁ N₂ : Type} {w : List (nst T N₁ N₂)}
+    (hNw : ∃ z : List (Symbol T N₂), correspondingStrings (z.map (wrapSymbol₂ N₁)) w) :
+  correspondingStrings ((w.filterMap unwrapSymbol₂).map (wrapSymbol₂ N₁)) w :=
+by
+  induction w with
+  | nil =>
     exact correspondingStrings_nil
-  specialize
-    ih
-      (by
-        cases' hNw with z hyp
-        unfold corresponding_strings at *
-        cases' z with z₀ z'
-        · exfalso
-          finish
-        · use z'
-          finish)
-  unfold corresponding_strings
-  cases d
-  · have unwrap_first_t :
-      List.filterMap unwrap_symbol₂ (Symbol.terminal d::l) =
-        Symbol.terminal d::List.filterMap unwrap_symbol₂ l :=
-      by rfl
-    rw [unwrap_first_t]
-    unfold List.map
-    unfold wrapSymbol₂
-    rw [List.forall₂_cons] -- correspondingStrings_cons
-    constructor
-    · unfold corresponding_symbols
-    · exact ih
-  cases d
-  cases d; swap
-  cases d; swap
-  · have unwrap_first_nlsr :
-      List.filterMap unwrap_symbol₂ (Symbol.nonterminal ◩(some ◪d) :: l) =
-        Symbol.nonterminal d :: List.filterMap unwrap_symbol₂ l :=
-      by rfl
-    rw [unwrap_first_nlsr]
-    unfold List.map
-    unfold wrapSymbol₂
-    rw [List.forall₂_cons] -- correspondingStrings_cons
-    constructor
-    · unfold corresponding_symbols
-    · exact ih
-  pick_goal 3
-  cases d; swap
-  · have unwrap_first_nrr :
-      List.filterMap unwrap_symbol₂ (Symbol.nonterminal ◪◪d :: l) =
-        Symbol.terminal d :: List.filterMap unwrap_symbol₂ l :=
-      by rfl
-    rw [unwrap_first_nrr]
-    unfold List.map
-    unfold wrapSymbol₂
-    rw [List.forall₂_cons] -- correspondingStrings_cons
-    constructor
-    · unfold corresponding_symbols
-    · exact ih
-  any_goals
-    exfalso
-    cases' hNw with z hyp
-    cases' z with z₀ z'
-    · have imposs := corresponding_strings_length hyp
-      clear * - imposs
-      rw [List.length] at imposs
-      rw [List.length_map] at imposs
-      rw [List.length] at imposs
-      linarith
-    · rw [List.map_cons] at hyp
-      unfold corresponding_strings at hyp
-      rw [List.forall₂_cons] at hyp  -- correspondingStrings_cons
-      have impos := hyp.left
-      clear * - impos
-      cases z₀ <;>
-        · unfold wrapSymbol₂ at impos
-          unfold corresponding_symbols at impos
-          exact impos-/
+  | cons d l ih =>
+    obtain ⟨z, hz⟩ := hNw
+    specialize ih (by
+        unfold correspondingStrings at *
+        cases z <;> aesop)
+    cases d with
+    | terminal t =>
+      exact List.Forall₂.cons rfl ih
+    | nonterminal n =>
+      cases n with
+      | inl n₀ =>
+        cases n₀ with
+        | none =>
+          cases z with
+          | nil => tauto
+          | cons a => cases a <;> tauto
+        | some n =>
+          cases n with
+          | inl n₁ =>
+            cases z with
+            | nil => tauto
+            | cons a => cases a <;> tauto
+          | inr n₂ =>
+            cases z with
+            | nil => tauto
+            | cons a => cases a <;> tauto
+      | inr t =>
+        cases t with
+        | inl t₁ =>
+          cases z with
+            | nil => tauto
+            | cons a => cases a <;> tauto
+        | inr t₂ =>
+          cases z with
+            | nil => tauto
+            | cons a => cases a <;> tauto
 
 end unwrapping_nst
 

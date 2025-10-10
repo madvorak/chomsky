@@ -159,31 +159,31 @@ by
             rw [wrap_eq_lift])
           (by
             rintro r ⟨rin, n, nrn⟩
-            sorry /-iterate 4
+            cases rin with
+            | head => exact Sum.noConfusion nrn
+            | tail _ rin =>
               cases rin with
-              · exfalso
-                rw [rin] at nrn
-                exact Sum.noConfusion nrn
-            change r ∈ List.map wrap_gr g.rules ++ rules_that_scan_terminals g at rin
-            rw [List.mem_append] at rin
-            cases rin
-            · clear * - rin wrap_eq_lift
-              rw [List.mem_map] at rin
-              rcases rin with ⟨r₀, rin₀, r_of_r₀⟩
-              use r₀
-              constructor
-              · exact rin₀
-              convert r_of_r₀
-              unfold liftRule_
-              unfold wrap_gr
-              unfold liftString_
-              rw [wrap_eq_lift]
-            · exfalso
-              unfold rules_that_scan_terminals at rin
-              rw [List.mem_map] at rin
-              rcases rin with ⟨t, tin, r_of_tg⟩
-              rw [← r_of_tg] at nrn
-              exact Sum.noConfusion nrn-/)
+              | head => exact Sum.noConfusion nrn
+              | tail _ rin =>
+                cases rin with
+                | head => exact Sum.noConfusion nrn
+                | tail _ rin =>
+                  cases rin with
+                  | head => exact Sum.noConfusion nrn
+                  | tail _ rin =>
+                    change r ∈ List.map wrapGr g.rules ++ rulesThatScanTerminals g at rin
+                    rw [List.mem_append] at rin
+                    cases rin with
+                    | inl rin =>
+                      rw [List.mem_map] at rin
+                      exact rin
+                    | inr rin =>
+                      exfalso
+                      unfold rulesThatScanTerminals at rin
+                      rw [List.mem_map] at rin
+                      rcases rin with ⟨t, tin, r_of_tg⟩
+                      rw [← r_of_tg] at nrn
+                      exact Sum.noConfusion nrn)
       convert_to
         G.g.Derives [Symbol.nonterminal ◩g.initial]
           (liftString G.liftNt (List.map Symbol.terminal v))
@@ -439,7 +439,7 @@ private lemma map_wrap_never_contains_Z {N : Type} {l : List (Symbol T N)} :
   map_wrap_never_contains_nt_inr 0
 
 private lemma map_wrap_never_contains_H {N : Type} {l : List (Symbol T N)} :
-    h ∉ List.map wrapSym l :=
+    H ∉ List.map wrapSym l :=
   map_wrap_never_contains_nt_inr 1
 
 private lemma map_wrap_never_contains_R {N : Type} {l : List (Symbol T N)} :
@@ -484,7 +484,7 @@ private lemma wrap_str_inj {N : Type} {x y : List (Symbol T N)}
       exact Option.some.inj eqnth
 
 private lemma H_not_in_rule_input {g : Grammar T} {r : Grule T g.nt} :
-    h ∉
+    H ∉
       List.map wrapSym r.inputL ++ [Symbol.nonterminal ◩r.inputN)] ++
         List.map wrapSym r.inputR :=
   by

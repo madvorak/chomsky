@@ -157,7 +157,7 @@ by
   unfold Grammar.language at hwgg ⊢
   rw [Set.mem_setOf_eq] at hwgg ⊢
   rw [Set.mem_setOf_eq]
-  have hggw := Grammar.eq_or_tran_deri_of_deri hwgg
+  have hggw := gr_eq_or_tran_deri_of_deri hwgg
   clear hwgg
   cases' hggw with hggw₁ hggw₂
   · exfalso
@@ -262,7 +262,7 @@ lemma in_union_of_in_L₁ {w : List T} (hwg : w ∈ g₁.language) :
 by
   unfold Grammar.language at hwg ⊢
   rw [Set.mem_setOf_eq] at hwg ⊢
-  apply Grammar.deri_of_tran_deri
+  apply gr_deri_of_tran_deri
   · use ⟨[], none, [], [Symbol.nonterminal (some ◩g₁.initial)]⟩
     constructor
     · apply List.mem_cons_self
@@ -282,7 +282,7 @@ lemma in_union_of_in_L₂ {w : List T} (hwg : w ∈ g₂.language) :
 by
   unfold Grammar.language at hwg ⊢
   rw [Set.mem_setOf_eq] at hwg ⊢
-  apply Grammar.deri_of_tran_deri
+  apply gr_deri_of_tran_deri
   · use ⟨[], none, [], [Symbol.nonterminal (some ◪g₂.initial)]⟩
     constructor
     · apply List.mem_cons_of_mem

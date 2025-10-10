@@ -89,7 +89,7 @@ private lemma short_induction {g : Grammar T} {w : List (List T)}
 by
   induction' w with v x ih
   · constructor
-    · apply Grammar.deri_self
+    · apply gr_deri_self
     · intro p pin
       exfalso
       exact List.not_mem_nil p pin
@@ -105,7 +105,7 @@ by
       apply List.mem_append_right
       apply List.mem_singleton_self)
   constructor
-  · apply Grammar.deri_of_tran_deri
+  · apply gr_deri_of_tran_deri
     · use g.star.rules.get ⟨0, Nat.zero_lt_succ _⟩
       constructor
       · apply List.get_mem
@@ -113,8 +113,8 @@ by
       constructor <;> rfl
     rw [List.nil_append, List.append_nil]
     show g.star.Derives [Z, S, H] _
-    have ih_plus := Grammar.deri_append ([S, H] : List (Symbol T g.star.nt)) ih.left
-    apply Grammar.deri_of_deri_deri ih_plus
+    have ih_plus := gr_deri_append ([S, H] : List (Symbol T g.star.nt)) ih.left
+    apply gr_deri_of_deri_deri ih_plus
     have hgSv : g.star.Derives [S] (List.map Symbol.terminal v) :=
       by
       clear * - hwg
@@ -191,7 +191,7 @@ by
         rw [List.map_map]
         congr
       exact lift_deri G hwg
-    have ass_postf := Grammar.deri_append [H] hgSv
+    have ass_postf := gr_deri_append [H] hgSv
     sorry/-rw [List.flatten_append]
     rw [← List.cons_append]
     apply grammar_append_deri

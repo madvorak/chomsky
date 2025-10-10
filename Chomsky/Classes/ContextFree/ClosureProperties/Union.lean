@@ -159,7 +159,7 @@ private lemma in_union_of_in_left (hw : w ∈ g₁.language) :
   have deri_start :
     (CFG.union g₁ g₂).Derives [Symbol.nonterminal none]
       [Symbol.nonterminal (some ◩g₁.initial)] := by
-    refine CFG.deri_of_tran
+    refine cf_deri_of_tran
       ⟨⟨none, [Symbol.nonterminal (some ◩g₁.initial)]⟩, List.mem_cons_self .., ?_⟩
     use [], []
     simp
@@ -170,7 +170,7 @@ private lemma in_union_of_in_right (hw : w ∈ g₂.language) :
   have deri_start :
     (CFG.union g₁ g₂).Derives [Symbol.nonterminal none]
       [Symbol.nonterminal (some ◪g₂.initial)] := by
-    refine CFG.deri_of_tran
+    refine cf_deri_of_tran
       ⟨⟨none, [Symbol.nonterminal (some ◪g₂.initial)]⟩,
         List.mem_cons_of_mem _ (List.mem_cons_self ..), ?_⟩
     use [], []
@@ -219,7 +219,7 @@ private lemma impossible_rule {r : Option (g₁.nt ⊕ g₂.nt) × List (Symbol 
 
 private lemma in_language_of_in_union (hw : w ∈ (CFG.union g₁ g₂).language) :
     w ∈ g₁.language ∨ w ∈ g₂.language := by
-  cases CFG.eq_or_tran_deri_of_deri hw with
+  cases cf_eq_or_tran_deri_of_deri hw with
   | inl impossible =>
     exfalso
     sorry/-have h0 := congr_arg (List.get? · 0) impossible

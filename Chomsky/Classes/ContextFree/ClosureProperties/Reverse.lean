@@ -27,8 +27,8 @@ by
   intro hv
   induction' hv with u w _ orig ih
   · rw [List.reverse_singleton]
-    apply CFG.deri_self
-  apply CFG.deri_of_deri_tran ih
+    apply cf_deri_self
+  apply cf_deri_of_deri_tran ih
   rcases orig with ⟨r, rin, x, y, bef, aft⟩
   change r ∈ List.map (fun r : g.nt × List (Symbol T g.nt) => (r.fst, List.reverse r.snd)) g.rules at rin
   rw [List.mem_map] at rin

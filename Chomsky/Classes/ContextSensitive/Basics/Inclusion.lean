@@ -21,7 +21,7 @@ private lemma CSderi_of_general {g : CSG T} {w : List (Symbol T g.nt)}
   (grammar_of_csg g).Derives [Symbol.nonterminal none] (List.map woption w) :=
 by
   induction' hgw with a b _ step ih
-  · apply Grammar.deri_of_tran
+  · apply gr_deri_of_tran
     use Grule.mk [] none [] [Symbol.nonterminal (some g.initial)]
     constructor
     · dsimp only [grammar_of_csg]
@@ -30,7 +30,7 @@ by
       · simp
     use [], []
     simp [woption]
-  apply Grammar.deri_of_deri_tran ih
+  apply gr_deri_of_deri_tran ih
   rcases step with ⟨r, rin, u, v, bef, aft⟩
   use grule_of_CSR r
   constructor
@@ -61,7 +61,7 @@ private lemma missingTODO {g : CSG T} {w : List T}
     (wnn : w ≠ []) :
   g.Derives [Symbol.nonterminal g.initial] (List.map Symbol.terminal w) :=
 by -- maybe useless
-  /-cases' Grammar.eq_or_tran_deri_of_deri hgw with imposs possib
+  /-cases' gr_eq_or_tran_deri_of_deri hgw with imposs possib
   · exfalso
     have contra := congr_fun (congr_arg (List.get?) imposs) 0
     simp [List.get?, forall_true_left, List.get?_map] at contra
@@ -83,7 +83,7 @@ by
         left
         tauto
       · rw [iff_true, Set.mem_setOf_eq, emptyStr]
-        apply Grammar.deri_of_tran
+        apply gr_deri_of_tran
         rw [List.map_nil]
         use Grule.mk [] none [] []
         constructor
@@ -106,7 +106,7 @@ by
         linarith
       · rw [iff_false, Set.mem_setOf_eq, emptyStr]
         intro imposs
-        cases' Grammar.eq_or_deri_tran_of_deri imposs with case_id case_tr
+        cases' gr_eq_or_deri_tran_of_deri imposs with case_id case_tr
         · cases' w with d l <;> simp at case_id
         rcases case_tr with ⟨x, -, r, rin, u, v, bef, aft⟩
         have routlen : r.output.length > 0

@@ -173,7 +173,7 @@ private lemma substitute_terminals {g₁ g₂ : Grammar T} {s : T → Sum T T} {
     (List.map Symbol.terminal w) :=
 by
   induction' w with d l ih
-  · apply Grammar.deri_self
+  · apply gr_deri_self
   rw [List.map_cons, List.map_cons, ← List.singleton_append, ← List.singleton_append]
   have step_head :
     (bigGrammar g₁ g₂).Transforms
@@ -189,8 +189,8 @@ by
       apply List.mem_cons_self
     use [], List.map (Symbol.nonterminal ∘ Sum.inr ∘ s) l
     constructor <;> rfl
-  apply Grammar.deri_of_tran_deri step_head
-  apply Grammar.append_deri
+  apply gr_deri_of_tran_deri step_head
+  apply gr_append_deri
   apply ih
   · intro t tin
     apply rule_for_each_terminal t
@@ -204,17 +204,19 @@ by
   rcases hwgg with ⟨u, hu, v, hv, hw⟩
   unfold Grammar.language at *
   rw [Set.mem_setOf_eq] at *
-  apply Grammar.deri_of_tran_deri first_transformation
+  apply gr_deri_of_tran_deri first_transformation
   rw [← hw]
   rw [List.map_append]
   apply
-    (bigGrammar g₁ g₂).deri_of_deri_deri
+    gr_deri_of_deri_deri
+      (g := bigGrammar g₁ g₂)
       (v := List.map Symbol.terminal u ++ [Symbol.nonterminal ◩(some ◪g₂.initial)])
   · clear * - hu
     rw [← List.singleton_append]
-    apply Grammar.deri_append
+    apply gr_deri_append
     apply
-      (bigGrammar g₁ g₂).deri_of_deri_deri
+      gr_deri_of_deri_deri
+        (g := bigGrammar g₁ g₂)
         (v := List.map (@Symbol.nonterminal T (bigGrammar g₁ g₂).nt ∘ Sum.inr ∘ Sum.inl) u)
     · have upgrade_deri₁ :
         ∀ w : List (Symbol T g₁.nt),
@@ -225,8 +227,8 @@ by
       · clear * -
         intro w deri₁
         induction' deri₁ with x y _ orig ih
-        · apply Grammar.deri_self
-        apply Grammar.deri_of_deri_tran ih
+        · apply gr_deri_self
+        apply gr_deri_of_deri_tran ih
         clear * - orig
         rcases orig with ⟨r, rin, u, v, bef, aft⟩
         use wrapGrule₁ g₂.nt r
@@ -283,9 +285,9 @@ by
           · rfl
         · rfl
   · clear * - hv
-    apply Grammar.append_deri
+    apply gr_append_deri
     apply
-      @Grammar.deri_of_deri_deri _ _ _
+      @gr_deri_of_deri_deri _ _ _
         (List.map (@Symbol.nonterminal T (bigGrammar g₁ g₂).nt ∘ Sum.inr ∘ Sum.inr) v) _
     · have upgrade_deri₂ :
         ∀ w : List (Symbol T g₂.nt),
@@ -296,8 +298,8 @@ by
       · clear * -
         intro w deri₁
         induction' deri₁ with x y _ orig ih
-        · apply Grammar.deri_self
-        apply Grammar.deri_of_deri_tran ih
+        · apply gr_deri_self
+        apply gr_deri_of_deri_tran ih
         clear * - orig
         rcases orig with ⟨r, rin, u, v, bef, aft⟩
         use wrapGrule₂ g₁.nt r
@@ -907,7 +909,7 @@ by
     omega
   constructor
   · constructor
-    · apply Grammar.deri_of_deri_tran ih_x
+    · apply gr_deri_of_deri_tran ih_x
       use r₁
       constructor
       · exact rin₁
@@ -1415,7 +1417,7 @@ by sorry
   constructor
   · constructor
     · exact ih_x
-    · apply Grammar.deri_of_deri_tran ih_y
+    · apply gr_deri_of_deri_tran ih_y
       use r₂
       constructor
       · exact rin₂
@@ -1587,9 +1589,9 @@ by
   induction' hggw with a b _ orig ih
   · use [Symbol.nonterminal g₁.initial], [Symbol.nonterminal g₂.initial]
     constructor
-    · apply Grammar.deri_self
+    · apply gr_deri_self
     constructor
-    · apply Grammar.deri_self
+    · apply gr_deri_self
     simp only [wrapSymbol₁, wrapSymbol₂, List.map_singleton, List.singleton_append]
     rw [correspondingStrings_cons]
     constructor
@@ -1881,7 +1883,7 @@ lemma in_concatenated_of_in_big {g₁ g₂ : Grammar T} {w : List T}
   w ∈ g₁.language * g₂.language :=
 by
   rw [Language.mem_mul]
-  cases' Grammar.eq_or_tran_deri_of_deri hwgg with case_id case_step
+  cases' gr_eq_or_tran_deri_of_deri hwgg with case_id case_step
   · exfalso
     have nonmatch := congr_fun (congr_arg List.get? case_id) 0
     clear * - nonmatch

@@ -80,8 +80,8 @@ lemma LiftedCFG.lift_derives {G : LiftedCFG T}
     {w₁ w₂ : List (Symbol T G.g₀.nt)} (hG : G.g₀.Derives w₁ w₂) :
     G.g.Derives (liftString G.liftNT w₁) (liftString G.liftNT w₂) := by
   induction hG with
-  | refl => exact CFG.deri_self
-  | tail _ orig ih => exact CFG.deri_of_deri_tran ih (lift_produces orig)
+  | refl => exact cf_deri_self
+  | tail _ orig ih => exact cf_deri_of_deri_tran ih (lift_produces orig)
 
 /-- A `Symbol` is good iff it is one of those nonterminals that result from sinking or it is any
 terminal. -/
@@ -153,10 +153,10 @@ private lemma LiftedCFG.sink_derives_aux {G : LiftedCFG T}
     G.g₀.Derives (sinkString G.sinkNT w₁) (sinkString G.sinkNT w₂) ∧
       GoodString w₂ := by
   induction hG with
-  | refl => exact ⟨CFG.deri_self, hw₁⟩
+  | refl => exact ⟨cf_deri_self, hw₁⟩
   | tail _ orig ih =>
     have both := sink_produces orig ih.right
-    exact ⟨CFG.deri_of_deri_tran ih.left both.left, both.right⟩
+    exact ⟨cf_deri_of_deri_tran ih.left both.left, both.right⟩
 
 /-- Derivation by `G.g` can be mirrored by `G.g₀` derivation if that the starting word does not
 contain any nonterminals that `G.g₀` lacks. -/

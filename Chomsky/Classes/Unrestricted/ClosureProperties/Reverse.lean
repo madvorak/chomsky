@@ -41,8 +41,8 @@ by
   intro hv
   induction' hv with u w _ orig ih
   · rw [List.reverse_singleton]
-    apply Grammar.deri_self
-  apply Grammar.deri_of_deri_tran ih
+    apply gr_deri_self
+  apply gr_deri_of_deri_tran ih
   rcases orig with ⟨r, rin, x, y, bef, aft⟩
   change r ∈ List.map _ g.rules at rin
   rw [List.mem_map] at rin

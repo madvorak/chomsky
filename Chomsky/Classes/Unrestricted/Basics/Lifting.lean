@@ -94,8 +94,8 @@ lemma lift_deri (G : LiftedGrammar T) {w₁ w₂ : List (Symbol T G.g₀.nt)}
   G.g.Derives (liftString G.liftNt w₁) (liftString G.liftNt w₂) :=
 by
   induction' hGww with u v _ orig ih
-  · apply Grammar.deri_self
-  apply Grammar.deri_of_deri_tran
+  · apply gr_deri_self
+  apply gr_deri_of_deri_tran
   · exact ih
   exact lift_tran orig
 
@@ -206,12 +206,12 @@ private lemma sink_deri_aux {G : LiftedGrammar T} {w₁ w₂ : List (Symbol T G.
 by
   induction' hGww with u v _ orig ih
   · constructor
-    · apply Grammar.deri_self
+    · apply gr_deri_self
     · exact ok_input
   have both := sink_tran orig ih.right
   constructor; swap
   · exact both.right
-  apply Grammar.deri_of_deri_tran
+  apply gr_deri_of_deri_tran
   · exact ih.left
   · exact both.left
 

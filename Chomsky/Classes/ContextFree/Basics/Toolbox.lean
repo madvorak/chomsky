@@ -45,14 +45,14 @@ by
   · apply CFG.deri_self
   apply CFG.deri_of_deri_tran
   · exact ih
-  rcases hgab with ⟨r, r_in, v, w, h_bef, h_aft⟩
+  rcases hgab with ⟨r, r_in, v, w, bef, aft⟩
   use r
   constructor
   · exact r_in
   use pᵣ ++ v
   use w
-  rw [h_bef]
-  rw [h_aft]
+  rw [bef]
+  rw [aft]
   constructor <;> simp only [List.append_assoc]
 
 lemma CFG.deri_append {w₁ w₂ : List (Symbol T g.nt)}
@@ -63,12 +63,12 @@ by
   · apply CFG.deri_self
   apply CFG.deri_of_deri_tran
   · exact ih
-  rcases hgab with ⟨r, r_in, v, w, h_bef, h_aft⟩
+  rcases hgab with ⟨r, r_in, v, w, bef, aft⟩
   use r
   constructor
   · exact r_in
   use v
   use w ++ pₒ
-  rw [h_bef]
-  rw [h_aft]
+  rw [bef]
+  rw [aft]
   constructor <;> simp only [List.append_assoc]

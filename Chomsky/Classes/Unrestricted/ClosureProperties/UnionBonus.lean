@@ -25,10 +25,8 @@ private lemma unionCFG_same_language (g₁ g₂ : CFG T) :
 by
   rw [cfLanguage_eq_grammarLanguage]
   unfold unionCFG grammar_of_cfg unionGrammar
-  dsimp only [List.map]
-  repeat' rw [List.map_append]
   simp
-  sorry
+  rfl
 
 private theorem bonus_CF_of_CF_u_CF (L₁ : Language T) (L₂ : Language T) :
   L₁.IsCF ∧ L₂.IsCF → (L₁ + L₂).IsCF :=

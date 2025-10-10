@@ -131,8 +131,7 @@ lemma countIn_cons (a b : α) :
   countIn (b::x) a = (if b = a then 1 else 0) + countIn x a :=
 by
   unfold countIn
-  rw [List.map_cons]
-  rw [List.sum_cons]
+  rw [List.map_cons, List.sum_cons]
 
 lemma countIn_append (a : α) :
   countIn (x ++ y) a = countIn x a + countIn y a :=
@@ -180,8 +179,7 @@ by
   rw [not_lt] at contr
   rw [Nat.le_zero] at contr
   rw [mem_cons] at hax
-  unfold countIn at contr
-  unfold List.map at contr
+  unfold countIn List.map at contr
   simp at contr
   cases' hax with a_eq_d a_in_l
   · exact contr.left a_eq_d.symm

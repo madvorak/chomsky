@@ -2,7 +2,7 @@ import Chomsky.Classes.Unrestricted.Basics.Toolbox
 import Chomsky.Utilities.ListUtils
 
 
-section FunctionsLiftSink
+section functions_lift_sink
 
 variable {T N₀ N : Type}
 
@@ -27,10 +27,10 @@ def liftRule (liftN : N₀ → N) : Grule T N₀ → Grule T N :=
     (liftString liftN r.inputR)
     (liftString liftN r.output)
 
-end FunctionsLiftSink
+end functions_lift_sink
 
 
-section LiftingConditions
+section lifting_conditions
 
 structure LiftedGrammar (T : Type) where
   g₀: Grammar T
@@ -62,10 +62,10 @@ by
   rw [ass] at case_none
   exact Option.noConfusion case_none
 
-end LiftingConditions
+end lifting_conditions
 
 
-section TranslatingDerivations
+section translating_derivations
 
 variable {T : Type}
 
@@ -140,9 +140,9 @@ by
     rw [List.forall_mem_append_append] at ok_input ⊢
     rw [List.forall_mem_append_append] at ok_input
     constructor
-    · exact ok_input.1.1
+    · exact ok_input.left.left
     constructor; swap
-    · exact ok_input.2.2
+    · exact ok_input.right.right
     intro a a_in_ros
     cases a
     · simp [GoodLetter]
@@ -208,16 +208,16 @@ by
   · constructor
     · apply Grammar.deri_self
     · exact ok_input
-  have both := sink_tran orig ih.2
+  have both := sink_tran orig ih.right
   constructor; swap
-  · exact both.2
+  · exact both.right
   apply Grammar.deri_of_deri_tran
-  · exact ih.1
-  · exact both.1
+  · exact ih.left
+  · exact both.left
 
 lemma sink_deri (G : LiftedGrammar T) {w₁ w₂ : List (Symbol T G.g.nt)}
     (hGww : G.g.Derives w₁ w₂) (ok_input : GoodString w₁) :
   G.g₀.Derives (sinkString G.sinkNt w₁) (sinkString G.sinkNt w₂) :=
-(sink_deri_aux hGww ok_input).1
+(sink_deri_aux hGww ok_input).left
 
-end TranslatingDerivations
+end translating_derivations

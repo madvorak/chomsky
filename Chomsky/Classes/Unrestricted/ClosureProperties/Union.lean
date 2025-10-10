@@ -177,7 +177,7 @@ by
     constructor <;>
     · rw [← List.length_eq_zero_iff]
       linarith
-  rw [uv_nil.1, List.nil_append, uv_nil.2, List.append_nil] at bef aft
+  rw [uv_nil.left, List.nil_append, uv_nil.right, List.append_nil] at bef aft
   have same_nt : (unionGrammar g₁ g₂).initial = r.inputN
   · clear * - bef
     have elemeq :

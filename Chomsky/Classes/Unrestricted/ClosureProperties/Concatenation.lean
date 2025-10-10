@@ -25,14 +25,13 @@ lemma list_forall₂_get {R : α → β → Prop} :
     ∀ i : ℕ, ∀ hix : i < x.length, ∀ hiy : i < y.length,
       R (x.get ⟨i, hix⟩) (y.get ⟨i, hiy⟩)
 | [], [] => by intro _ i hx; exfalso; apply Nat.not_lt_zero; exact hx
-| [], _::_ => by intro hyp; exfalso; cases hyp
-| _::_, [] => by intro hyp; exfalso; cases hyp
+| [], _::_ => by simp
+| _::_, [] => by simp
 | _::_, _::_ => by
     intro hR i _ _
     rw [List.forall₂_cons] at hR
     cases i
-    · unfold List.get
-      exact hR.left
+    · exact hR.left
     unfold List.get
     apply list_forall₂_get
     exact hR.right
@@ -42,8 +41,8 @@ lemma list_filterMap_eq_of_map_eq_map_some {f : α → Option β} :
     List.map f x = List.map Option.some y →
       List.filterMap f x = y
 | [], [] => fun _ => rfl
-| _::_, [] => by intro hyp; exfalso; apply List.cons_ne_nil; exact hyp
-| [], _::_ => by intro hyp; exfalso; apply List.cons_ne_nil; exact hyp.symm
+| _::_, [] => by simp
+| [], _::_ => by simp
 | a::_, _::_ => by
     intro hf
     rw [List.map_cons, List.map_cons] at hf
@@ -85,12 +84,18 @@ def wrapSymbol₂ {N₂ : Type} (N₁ : Type) : Symbol T N₂ → nst T N₁ N�
   | Symbol.nonterminal n => Symbol.nonterminal ◩(some ◪n)
 
 private def wrapGrule₁ {N₁ : Type} (N₂ : Type) (r : Grule T N₁) : Grule T (nnn T N₁ N₂) :=
-  Grule.mk (List.map (wrapSymbol₁ N₂) r.inputL) ◩(some ◩r.inputN)
-    (List.map (wrapSymbol₁ N₂) r.inputR) (List.map (wrapSymbol₁ N₂) r.output)
+  Grule.mk
+    (List.map (wrapSymbol₁ N₂) r.inputL)
+    ◩(some ◩r.inputN)
+    (List.map (wrapSymbol₁ N₂) r.inputR)
+    (List.map (wrapSymbol₁ N₂) r.output)
 
 private def wrapGrule₂ {N₂ : Type} (N₁ : Type) (r : Grule T N₂) : Grule T (nnn T N₁ N₂) :=
-  Grule.mk (List.map (wrapSymbol₂ N₁) r.inputL) ◩(some ◪r.inputN)
-    (List.map (wrapSymbol₂ N₁) r.inputR) (List.map (wrapSymbol₂ N₁) r.output)
+  Grule.mk
+    (List.map (wrapSymbol₂ N₁) r.inputL)
+    ◩(some ◪r.inputN)
+    (List.map (wrapSymbol₂ N₁) r.inputR)
+    (List.map (wrapSymbol₂ N₁) r.output)
 
 def rulesForTerminals₁ (N₂ : Type) (g : Grammar T) : List (Grule T (nnn T g.nt N₂)) :=
   List.map (fun t => Grule.mk [] ◪◩t [] [Symbol.terminal t]) (allUsedTerminals g)
@@ -119,18 +124,18 @@ section easy_direction
 
 lemma grammar_generates_only_legit_terminals {g : Grammar T} {w : List (Symbol T g.nt)}
     (hgw : g.Derives [Symbol.nonterminal g.initial] w)
-    (s : Symbol T g.nt) (symbol_derived : s ∈ w) :
+    (s : Symbol T g.nt) (hsw : s ∈ w) :
   (∃ r : Grule T g.nt, r ∈ g.rules ∧ s ∈ r.output) ∨ (s = Symbol.nonterminal g.initial) :=
 by
   induction' hgw with x y _ orig ih
-  · rw [List.mem_singleton] at symbol_derived
+  · rw [List.mem_singleton] at hsw
     right
-    exact symbol_derived
+    exact hsw
   rcases orig with ⟨r, rin, u, v, bef, aft⟩
-  rw [aft] at symbol_derived
-  rw [List.mem_append, List.mem_append] at symbol_derived
-  cases' symbol_derived with symbol_derived' s_in_v
-  cases' symbol_derived' with s_in_u s_in_out
+  rw [aft] at hsw
+  rw [List.mem_append, List.mem_append] at hsw
+  cases' hsw with hsw' s_in_v
+  cases' hsw' with s_in_u s_in_out
   · apply ih
     rw [bef]
     repeat'

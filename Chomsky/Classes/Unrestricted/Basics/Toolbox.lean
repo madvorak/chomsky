@@ -46,12 +46,12 @@ by
   · apply Grammar.deri_self
   apply Grammar.deri_of_deri_tran
   · exact ih
-  rcases hgxy with ⟨r, rin, u, v, h_bef, h_aft⟩
+  rcases hgxy with ⟨r, rin, u, v, bef, aft⟩
   use r
   constructor
   · exact rin
   use pᵣ ++ u, v
-  rw [h_bef, h_aft]
+  rw [bef, aft]
   constructor <;> simp only [List.append_assoc]
 
 lemma Grammar.deri_append {w₁ w₂ : List (Symbol T g.nt)}
@@ -62,12 +62,12 @@ by
   · apply Grammar.deri_self
   apply Grammar.deri_of_deri_tran
   · exact ih
-  rcases hgxy with ⟨r, rin, u, v, h_bef, h_aft⟩
+  rcases hgxy with ⟨r, rin, u, v, bef, aft⟩
   use r
   constructor
   · exact rin
   use u, v ++ pₒ
-  rw [h_bef, h_aft]
+  rw [bef, aft]
   constructor <;> simp only [List.append_assoc]
 
 

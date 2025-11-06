@@ -814,9 +814,7 @@ by
     clear * - contr
     rw [List.mem_append] at contr
     cases contr with
-    | inl hRZ =>
-      rw [List.mem_singleton] at hRZ
-      exact Z_neq_R.symm hRZ
+    | inl hRZ => exact Z_neq_R.symm (List.mem_singleton.→ hRZ)
     | inr hRH => exact R_not_in_join_mpHmmw hRH
   rcases orig with ⟨r, rin, u, v, bef, aft⟩
   cases rin with
@@ -834,7 +832,8 @@ by
       clear * - bef cat
       rw [← List.length_eq_zero_iff]
       by_contra
-      have ul_pos : 0 < u.length := by rwa [pos_iff_ne_zero]
+      have ul_pos : 0 < u.length
+      · rwa [pos_iff_ne_zero]
       have bef_tail := congr_arg List.tail bef
       cases' u with d l
       · rw [List.length] at ul_pos
@@ -859,8 +858,8 @@ by
       use x
       constructor
       · exact valid
-      have u_nil : u = [] := by
-        clear * - bef cat
+      have u_nil : u = []
+      · clear * - bef cat
         rw [← List.length_eq_zero_iff]
         by_contra
         have ul_pos : 0 < u.length
@@ -873,17 +872,19 @@ by
           · apply List.mem_append_left
             apply List.mem_append_right
             apply List.mem_singleton_self
-          rw [cat, List.singleton_append, List.tail_cons, List.cons_append, List.cons_append] at bef_tail
-          sorry /-rw [← bef_tail] at Z_in_tail
-          exact Z_not_in_join_mpHmmw Z_in_tail-/
-      have v_rest : v = List.flatten (List.map (· ++ [H]) (List.map (List.map wrapSym) x))
+          rw [cat, List.singleton_append, List.tail_cons,
+            List.cons_append, List.cons_append, List.append_nil, List.append_nil, List.cons_append, List.tail_cons
+          ] at bef_tail
+          rw [← bef_tail] at Z_in_tail
+          exact Z_not_in_join_mpHmmw Z_in_tail
+      have v_rest : v = ((x.map (List.map wrapSym)).map (· ++ [H])).flatten
       · rw [cat, u_nil] at bef
         convert congr_arg List.tail bef.symm
       rw [aft, u_nil, v_rest]
       rfl
     | tail _ rin =>
       cases rin with
-      | head as =>
+      | head =>
         exfalso
         apply no_R_in_alpha
         rw [bef]
@@ -926,7 +927,7 @@ by
             unfold wrapGr at wrap_orig
             rw [← wrap_orig] at *
             clear wrap_orig
-            sorry /-rcases case_1_match_rule bef with ⟨m, u₁, v₁, u_eq, xm_eq, v_eq⟩
+            sorry /-obtain ⟨m, u₁, v₁, u_eq, xm_eq, v_eq⟩ := case_1_match_rule bef
             clear bef
             rw [u_eq, v_eq] at aft
             use List.take m x ++ [u₁ ++ r₀.output_string ++ v₁] ++ List.drop m.succ x

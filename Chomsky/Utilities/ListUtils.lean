@@ -116,6 +116,18 @@ infixl:100 " ^^ " => nTimes
 
 end ListJoin
 
+section ListGet
+
+lemma get_map (f : α → β) (l : List α) (i : Fin (l.map f).length) :
+  (l.map f).get i = f (l.get (congr_arg Fin (l.length_map f) ▸ i)) :=
+by
+  simp
+  congr
+  · simp
+  · simp
+
+end ListGet
+
 variable [DecidableEq α]
 
 section ListCountIn

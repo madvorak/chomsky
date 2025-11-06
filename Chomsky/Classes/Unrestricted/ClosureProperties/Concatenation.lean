@@ -1009,7 +1009,7 @@ by
           simp
         have segment_2_equ := (filterMap_unwrap_of_correspondingStrings₁ segment_2_eqi).symm
         rw [unwrap_wrap₁_string] at segment_2_equ
-        rw [← List.take_append_drop r₁.inputL.length (List.drop u.length x)]
+        rw [← List.take_append_drop r₁.inputL.length (x.drop u.length)]
         apply congr_arg₂
         · exact segment_2_equ
         clear segment_2_equ segment_2_eqi equiv_sgmnt_2
@@ -1023,15 +1023,14 @@ by
           simp
         have segment_3_equ := (filterMap_unwrap_of_correspondingStrings₁ segment_3_eqi).symm
         rw [unwrap_wrap₁_string] at segment_3_equ
-        sorry /-rw [← List.take_append_drop 1 (List.drop (r₁.inputL.length + u.length) x)]
+        sorry /-rw [← List.take_append_drop 1 (x.drop (r₁.inputL.length + u.length))]
         apply congr_arg₂
         · exact segment_3_equ
         clear segment_3_equ segment_3_eqi equiv_sgmnt_3
         rw [List.drop_drop]
         have segment_4_eqi :
           corresponding_strings
-            (List.map (wrapSymbol₁ g₂.nt)
-              (List.take r₁.input_R.length (List.drop (1 + (r₁.input_L.length + u.length)) x)))
+            (((x.drop (1 + (r₁.input_L.length + u.length))).take r₁.input_R.length).map (wrapSymbol₁ g₂.nt))
             (r₁.input_R.map (wrapSymbol₁ g₂.nt)) :=
           by
           convert equiv_sgmnt_4
@@ -1050,7 +1049,7 @@ by
         rw [unwrap_wrap₁_string] at segment_4_equ
         rw [←
           List.take_append_drop r₁.input_R.length
-            (List.drop (1 + (r₁.input_L.length + u.length)) x)]
+            (x.drop (1 + (r₁.input_L.length + u.length)))]
         apply congr_arg₂
         · exact segment_4_equ
         clear segment_4_equ segment_4_eqi equiv_sgmnt_4
@@ -1158,7 +1157,7 @@ by
     rw [List.length_map]
     rw [List.take_append_eq_append_take]
     rw [List.drop_append_eq_append_drop]
-    have tul_lt : (List.take x.length u).length ≤ u.length + m :=
+    have tul_lt : (u.take x.length).length ≤ u.length + m :=
       by
       rw [List.length_take]
       calc
@@ -1272,7 +1271,7 @@ by sorry
   simp [wrap_grule₂] at *
   rw [← List.singleton_append] at bef
   rw [bef] at ih_concat
-  let b' := List.drop x.length u ++ r₂.output_string.map (wrapSymbol₂ g₁.nt) ++ v
+  let b' := u.drop x.length ++ r₂.output_string.map (wrapSymbol₂ g₁.nt) ++ v
   use List.filterMap unwrap_symbol₂ b'
   have total_len := corresponding_strings_length ih_concat
   repeat' rw [List.length_append] at total_len
@@ -1331,7 +1330,7 @@ by sorry
       use r₂
       constructor
       · exact rin₂
-      use List.filterMap unwrap_symbol₂ (List.drop x.length u)
+      use List.filterMap unwrap_symbol₂ (u.drop x.length)
       use List.filterMap unwrap_symbol₂ v
       constructor
       · have corres_y :=
@@ -1348,7 +1347,7 @@ by sorry
         clear corres_y
         rw [List.take_left] at seg1
         rw [List.drop_left] at rest1
-        rw [← List.take_append_drop (List.filterMap unwrap_symbol₂ (List.drop x.length u)).length y]
+        rw [← List.take_append_drop (List.filterMap unwrap_symbol₂ (u.drop x.length)).length y]
         rw [← List.map_take] at seg1
         have min_uxy : min (u.length - x.length) y.length = u.length - x.length :=
           by
@@ -1356,16 +1355,16 @@ by sorry
           clear * - total_len
           omega
         have tuxy :
-          List.take (List.take (u.length - x.length) y).length y =
-            List.take (u.length - x.length) y :=
+          y.take (y.take (u.length - x.length)).length =
+            y.take (u.length - x.length) :=
           by
           rw [List.length_take]
           rw [min_uxy]
         have fmu1 := filter_map_unwrap_of_corresponding_strings₂ seg1
         rw [List.length_map] at fmu1
         have fml :
-          (List.filterMap unwrap_symbol₂ (List.drop x.length u)).length =
-            (List.drop x.length u).length :=
+          (List.filterMap unwrap_symbol₂ (u.drop x.length)).length =
+            (u.drop x.length).length :=
           by
           rw [congr_arg List.length fmu1]
           rw [List.length_take] at tuxy
@@ -1387,7 +1386,7 @@ by sorry
         rw [List.drop_left] at rest2
         rw [←
           List.take_append_drop (r₂.input_L.map (wrapSymbol₂ g₁.nt)).length
-            (List.drop (List.filterMap unwrap_symbol₂ (List.drop x.length u)).length y)]
+            (y.drop (List.filterMap unwrap_symbol₂ (u.drop x.length)).length)]
         apply congr_arg₂
         · clear * - seg2 fml
           rw [← List.map_drop] at seg2
@@ -1408,7 +1407,7 @@ by sorry
         rw [List.length_map]
         rw [fml]
         rw [←
-          List.take_append_drop 1 (List.drop (r₂.input_L.length + (List.drop x.length u).length) y)]
+          List.take_append_drop 1 (y.drop (r₂.input_L.length + (u.drop x.length).length))]
         apply congr_arg₂
         · rw [← List.map_drop] at seg3
           rw [← List.map_take] at seg3
@@ -1591,8 +1590,8 @@ by
       rw [List.append_nil] at ih_concat
       have xy_split_u :
         x.map (wrapSymbol₁ g₂.nt) ++ y.map (wrapSymbol₂ g₁.nt) =
-          List.take u.length (x.map (wrapSymbol₁ g₂.nt) ++ y.map (wrapSymbol₂ g₁.nt)) ++
-            List.drop u.length (x.map (wrapSymbol₁ g₂.nt) ++ y.map (wrapSymbol₂ g₁.nt)) :=
+          (x.map (wrapSymbol₁ g₂.nt) ++ y.map (wrapSymbol₂ g₁.nt)).take u.length ++
+            (x.map (wrapSymbol₁ g₂.nt) ++ y.map (wrapSymbol₂ g₁.nt)).drop u.length :=
         by rw [List.take_append_drop]
       rw [xy_split_u]
       have part_for_u := corresponding_strings_take u.length ih_concat
@@ -1630,7 +1629,7 @@ by
         convert middle_nt
         sorry
       have xy_split_nt :
-        List.drop u.length (x.map (wrapSymbol₁ g₂.nt) ++ y.map (wrapSymbol₂ g₁.nt)) =
+        (x.map (wrapSymbol₁ g₂.nt) ++ y.map (wrapSymbol₂ g₁.nt)).drop u.length =
           List.take 1
               (List.drop u.length
                 (x.map (wrapSymbol₁ g₂.nt) ++ y.map (wrapSymbol₂ g₁.nt))) ++
@@ -1880,15 +1879,13 @@ by
     intros i iltwl iltxl
     rw [List.get_map]
     have i_lt_lenl : i < (x.map (wrapSymbol₁ g₂.nt) ++ y.map (wrapSymbol₂ g₁.nt)).length
-    · rw [List.length_append]
-      sorry
+    · rw [List.length_append, List.length_map]
+      exact Nat.lt_add_right (y.map (wrapSymbol₂ g₁.nt)).length iltxl
     have i_lt_lenr : i < (w.map Symbol.terminal).length
-    · sorry
+    · simp_all
     have equivalent_ith := correspondingStrings_get i_lt_lenl i_lt_lenr concat_xy
-    have asdf :
-      (x.map (wrapSymbol₁ g₂.nt) ++ y.map (wrapSymbol₂ g₁.nt)).get ⟨i, i_lt_lenl⟩ =
-      wrapSymbol₁ g₂.nt (x.get ⟨i, iltxl⟩)
-    · sorry
+    have asdf : (x.map (wrapSymbol₁ g₂.nt) ++ y.map (wrapSymbol₂ g₁.nt)).get ⟨i, i_lt_lenl⟩ = wrapSymbol₁ g₂.nt (x.get ⟨i, iltxl⟩)
+    · simp_all
     rw [asdf, List.get_map] at equivalent_ith
     set I : Fin x.length := ⟨i, iltxl⟩
     cases' x.get I with t n₁
@@ -1922,8 +1919,7 @@ by
       apply lt_of_lt_of_le i_lt_len_lwx
       apply le_self_add
     sorry /-have i_lt_len₂ : i < (w.map Symbol.terminal).length
-    · rw [List.length_map]
-      exact i_lt_len_w
+    · exact List.length_map _ _ ▸ i_lt_len_w -- TODO inline
     rw [List.get?_map]
     rw [List.get?_take hix]
     have equivalent_ith :
@@ -1980,17 +1976,15 @@ by
       rfl
     push_neg at h
     rename' h => hiy
-    rw [←
-      List.take_append_drop (x.map (wrapSymbol₁ g₂.nt)).length (w.map Symbol.terminal)] at
-      concat_xy
+    rw [←List.take_append_drop (x.map (wrapSymbol₁ g₂.nt)).length (w.map Symbol.terminal)] at concat_xy
     rw [List.get?_map]
     have equivalent_second_parts :
       corresponding_strings (y.map (wrapSymbol₂ g₁.nt))
-        (List.drop (x.map (wrapSymbol₁ g₂.nt)).length (w.map Symbol.terminal)) :=
+        ((w.map Symbol.terminal).drop (x.map (wrapSymbol₁ g₂.nt)).length) :=
       by
       have llen_eq_llen :
         (x.map (wrapSymbol₁ g₂.nt)).length =
-          (List.take (x.map (wrapSymbol₁ g₂.nt)).length (w.map Symbol.terminal)).length :=
+          ((w.map Symbol.terminal).take (x.map (wrapSymbol₁ g₂.nt)).length).length :=
         by
         rw [List.length_take]
         symm
@@ -2008,7 +2002,7 @@ by
       by
       rw [List.length_map]
       exact hiy
-    have i_lt_len_dxw : i < (List.drop x.length (w.map Symbol.terminal)).length :=
+    have i_lt_len_dxw : i < ((w.map Symbol.terminal).drop x.length).length :=
       by
       rw [List.length_drop]
       rw [List.length_map]

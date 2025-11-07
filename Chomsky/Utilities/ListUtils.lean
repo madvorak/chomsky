@@ -76,11 +76,12 @@ by
   rw [drop, drop, get]
   apply ih
 
-lemma take_join_of_lt {L : List (List α)} {n : ℕ} (notall : n < L.flatten.length) :
+lemma take_join_of_lt {L : List (List α)} {n : ℕ} (hnL : n < L.flatten.length) :
   ∃ m k : ℕ, ∃ mlt : m < L.length,
     k < (L.get ⟨m, mlt⟩).length ∧
     L.flatten.take n = (L.take m).flatten ++ (L.get ⟨m, mlt⟩).take k :=
-sorry
+by
+  sorry
 
 lemma drop_join_of_lt {L : List (List α)} {n : ℕ} (notall : n < L.flatten.length) :
   ∃ m k : ℕ, ∃ mlt : m < L.length,

@@ -1,7 +1,7 @@
 import Mathlib.Data.List.Flatten
 import Mathlib.Data.List.Lemmas
---import Mathlib.Algebra.Order.WithZero
-import Mathlib.Tactic.Have
+import Mathlib.Data.Nat.Find
+import Mathlib.Tactic
 
 namespace List
 
@@ -76,12 +76,61 @@ by
   rw [drop, drop, get]
   apply ih
 
+-- proof copied from https://github.com/leanprover/lean4/blob/master/src/Init/Data/List/Nat/TakeDrop.lean
+lemma take_append' (l₁ l₂ : List α) (n : ℕ) :
+  (l₁ ++ l₂).take n = l₁.take n ++ l₂.take (n - l₁.length) :=
+by
+  induction l₁ generalizing n
+  · simp
+  · cases n
+    · simp [*]
+    · simp only [cons_append, take_succ_cons, length_cons, cons.injEq,
+        append_cancel_left_eq, true_and, *]
+      congr 1
+      omega
+
+-- proof copied from https://github.com/leanprover/lean4/blob/master/src/Init/Data/List/Nat/TakeDrop.lean
+lemma drop_append' (l₁ l₂ : List α) (n : ℕ) :
+  (l₁ ++ l₂).drop n = l₁.drop n ++ l₂.drop (n - l₁.length) :=
+by
+  induction l₁ generalizing n
+  · simp
+  · cases n
+    · simp [*]
+    · simp only [cons_append, drop_succ_cons, length_cons, append_cancel_left_eq, *]
+      congr 1
+      omega
+
+-- proved by Patrick Johnson; ported to Lean 4 by Vlad
 lemma take_join_of_lt {L : List (List α)} {n : ℕ} (hnL : n < L.flatten.length) :
   ∃ m k : ℕ, ∃ mlt : m < L.length,
     k < (L.get ⟨m, mlt⟩).length ∧
     L.flatten.take n = (L.take m).flatten ++ (L.get ⟨m, mlt⟩).take k :=
 by
-  sorry
+  simp at hnL; have h₂ : ∃ m, n < (L.take m |>.map length).sum; use L.length; simpa
+  generalize hm : Nat.find h₂ = m; have h₃ := Nat.find_spec h₂
+  have h₅ := @Nat.find_min' (H := h₂) _ _; rw [hm] at h₃ h₅
+  have h₄ := @h₅ L.length $ by simp at hnL ⊢; exact hnL
+  cases m; simp at h₃; rename_i m; rw [Nat.succ_le_iff] at h₄
+  specialize @h₅ m; simp at h₅; use m; simp [h₄]
+  generalize hr : (L.map length |>.take m).sum = r at h₅
+  obtain ⟨n, rfl⟩ := Nat.exists_eq_add_of_le h₅; use n
+  simp [take_add, ←take_sum_flatten, hr]
+  have h₂ : L = L.take m ++ L.drop m; simp
+  rw [h₂] at h₃; simp [-take_append_drop] at h₃; rw [take_append'] at h₃; simp at h₃
+  rw [take_take] at h₃; simp [hr] at h₃; rw [min_eq_left_of_lt h₄] at h₃; simp at h₃
+  rw [take_one] at h₃; simp [getElem?_eq_getElem h₄] at h₃; use h₃
+  rw [←drop_take_succ_flatten_eq_getElem, hr, take_sum_flatten, take_add,
+    flatten_append, drop_append']; simp [hr]
+  simp [show L.flatten.drop r = (L.drop m).flatten by subst hr; apply drop_sum_flatten,
+    ←show L.flatten.take r = (L.take m).flatten by subst hr; apply take_sum_flatten]
+  generalize hM : L.drop m = M
+  have h₇ : 0 < M.length; simpa [←hM]
+  have h₈ : M.take 1 = [M[0]]
+  · simp [←hM, take_one, head?_drop]
+    aesop
+  simp [h₈]; rw [show L[m] = M[0] by simp [←hM]] at h₃
+  cases M; simp at h₈; simp at h₃; simp [le_of_lt h₃]
 
 lemma drop_join_of_lt {L : List (List α)} {n : ℕ} (notall : n < L.flatten.length) :
   ∃ m k : ℕ, ∃ mlt : m < L.length,

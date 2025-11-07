@@ -84,8 +84,7 @@ by
   · simp
   · cases n
     · simp [*]
-    · simp only [cons_append, take_succ_cons, length_cons, cons.injEq,
-        append_cancel_left_eq, true_and, *]
+    · simp only [cons_append, take_succ_cons, length_cons, cons.injEq, append_cancel_left_eq, true_and, *]
       congr 1
       omega
 
@@ -107,10 +106,10 @@ lemma take_join_of_lt {L : List (List α)} {n : ℕ} (hnL : n < L.flatten.length
     k < (L.get ⟨m, mlt⟩).length ∧
     L.flatten.take n = (L.take m).flatten ++ (L.get ⟨m, mlt⟩).take k :=
 by
-  simp at hnL; have h₂ : ∃ m, n < (L.take m |>.map length).sum; use L.length; simpa
+  simp at hnL; have h₂ : ∃ m, n < ((L.take m).map length).sum; use L.length; simpa
   generalize hm : Nat.find h₂ = m; have h₃ := Nat.find_spec h₂
   have h₅ := @Nat.find_min' (H := h₂) _ _; rw [hm] at h₃ h₅
-  have h₄ := @h₅ L.length $ by simp at hnL ⊢; exact hnL
+  have h₄ := @h₅ L.length (by simp at hnL ⊢; exact hnL)
   cases m; simp at h₃; rename_i m; rw [Nat.succ_le_iff] at h₄
   specialize @h₅ m; simp at h₅; use m; simp [h₄]
   generalize hr : (L.map length |>.take m).sum = r at h₅

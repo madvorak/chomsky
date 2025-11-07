@@ -509,8 +509,8 @@ by
   · clear * - lens
     linarith
   rcases List.take_join_of_lt ul_lt with ⟨m, k, mlt, klt, init_ul⟩
-  have vnn : v ≠ [] := by
-    by_contra v_nil
+  have vnn : v ≠ []
+  · by_contra v_nil
     rw [v_nil, List.append_nil] at hypp
     clear * - hypp xnn
     have hlast := congr_arg (fun l : List (ns T g.nt) => l.reverse[0]?) hypp
@@ -530,8 +530,8 @@ by
         some H =
         (x.map (fun l : List (Symbol T g.nt) => [H].reverse ++ (l.map wrapSym).reverse)).reverse.flatten[0]?
       rw [← List.map_reverse]
-      have xrnn : x.reverse ≠ [] := by
-        intro xr_nil
+      have xrnn : x.reverse ≠ []
+      · intro xr_nil
         rw [List.reverse_eq_iff] at xr_nil
         exact xnn xr_nil
       cases' hx : x.reverse with d l
@@ -557,12 +557,12 @@ by
     rw [List.length_singleton]
     linarith
   rcases List.drop_join_of_lt urrrl_lt with ⟨m', k', mlt', klt', last_vl⟩
-  have mxl : m < x.length := by
-    rw [List.length_map] at mlt
+  have mxl : m < x.length
+  · rw [List.length_map] at mlt
     rw [List.length_map] at mlt
     exact mlt
-  have mxl' : m' < x.length := by
-    rw [List.length_map] at mlt'
+  have mxl' : m' < x.length
+  · rw [List.length_map] at mlt'
     rw [List.length_map] at mlt'
     exact mlt'
   have mxlmm : m < (x.map (List.map wrapSym)).length
@@ -664,8 +664,8 @@ by
     · rw [List.map_drop]
       rw [mm]
   rw [← hyp_u, ← hyp_v] at hypp
-  have mltx : m < x.length := by
-    rw [List.length_map] at mlt
+  have mltx : m < x.length
+  · rw [List.length_map] at mlt
     rw [List.length_map] at mlt
     exact mlt
   have xxx : x = x.take m ++ [x.nth_le m mltx] ++ x.drop m.succ :=
@@ -739,8 +739,8 @@ by
     have imposs := List.head_eq_of_cons_eq hyp
     unfold Z at imposs
     simp_all
-  have unn : u ≠ [] := by
-    by_contra u_nil
+  have unn : u ≠ []
+  · by_contra u_nil
     rw [u_nil, List.nil_append] at hyp
     cases' hr₀ : r₀.inputL with d l
     · rw [hr₀, List.map_nil, List.nil_append] at hyp
@@ -766,8 +766,8 @@ by
   · cases' u with d l
     · exfalso
       exact unn rfl
-    have headZ : d = Z := by
-      repeat' rw [List.cons_append] at hyp
+    have headZ : d = Z
+    · repeat' rw [List.cons_append] at hyp
       exact List.head_eq_of_cons_eq hyp.symm
     rw [headZ]
     rw [List.tail] at u_eq
@@ -791,8 +791,8 @@ private lemma star_case_1 {g : Grammar T} {α α' : List (ns T g.nt)}
         α' = [R, H] ++ ((x.map (List.map wrapSym)).map (· ++ [H])).flatten) :=
 by
   rcases hyp with ⟨x, valid, cat⟩
-  have no_R_in_alpha : R ∉ α := by
-    intro contr
+  have no_R_in_alpha : R ∉ α
+  · intro contr
     rw [cat] at contr
     clear * - contr
     rw [List.mem_append] at contr
@@ -811,8 +811,8 @@ by
       cases xin with
       | head => apply gr_deri_self
       | tail _ xin => exact valid xᵢ xin
-    have u_nil : u = [] := by
-      clear * - bef cat
+    have u_nil : u = []
+    · clear * - bef cat
       rw [← List.length_eq_zero_iff]
       by_contra
       have ul_pos : 0 < u.length
@@ -1031,8 +1031,8 @@ by
   rw [List.tail] at hypt
   repeat' rw [List.append_assoc] at hypt
   sorry /-rw [List.tail_append_of_ne_nil _ _ unn] at hypt
-  have utnn : u.tail ≠ [] := by
-    by_contra ut_nil
+  have utnn : u.tail ≠ []
+  · by_contra ut_nil
     rw [ut_nil, List.nil_append] at hypt
     cases' r₀.inputL with d l
     · rw [List.map_nil, List.nil_append] at hypt
@@ -1057,16 +1057,16 @@ by
   · cases' u with d l
     · exfalso
       exact unn rfl
-    have headR : d = R := by
-      repeat' rw [List.cons_append] at hyp
+    have headR : d = R
+    · repeat' rw [List.cons_append] at hyp
       exact List.head_eq_of_cons_eq hyp.symm
     rw [List.tail] at u_eq
     rw [List.tail] at hypt
     cases' l with d' l'
     · exfalso
       exact utnn rfl
-    have tailHead : d' = H := by
-      repeat' rw [List.cons_append] at hypt
+    have tailHead : d' = H
+    · repeat' rw [List.cons_append] at hypt
       exact List.head_eq_of_cons_eq hypt.symm
     rw [List.tail] at u_eq
     rw [headR, tailHead, u_eq, List.cons_append, List.cons_append]
@@ -1333,8 +1333,8 @@ private lemma case_3_ni_u {g : Grammar T} {w : List (List T)} {β : List T}
   have count_R := congr_arg (fun l => List.countIn l R) ass
   dsimp only at count_R
   repeat' rw [List.countIn_append] at count_R
-  have R_ni_wb : R ∉ w.flatten.map Symbol.terminal ++ β.map Symbol.terminal := by
-    apply @case_3_ni_wb T g
+  have R_ni_wb : R ∉ w.flatten.map Symbol.terminal ++ β.map Symbol.terminal
+  · apply @case_3_ni_wb T g
   rw [List.countIn_singleton_eq] at count_R
   rw [List.countIn_singleton_neq H_neq_R, add_zero] at count_R
   rw [← List.countIn_append] at count_R
@@ -1402,8 +1402,8 @@ private lemma case_3_gamma_nil {g : Grammar T} {w : List (List T)} {β : List T}
     · rw [List.mem_singleton] at contra
       exact H_neq_R contra
   have R_ni_u : @Symbol.nonterminal T (nn g.nt) ◪2) ∉ u := case_3_ni_u ass
-  have H_ni_u : H ∉ u := by
-    rw [case_3_u_eq_left_side ass]
+  have H_ni_u : H ∉ u
+  · rw [case_3_u_eq_left_side ass]
     exact H_ni_wb
   classical
   have first_R := congr_arg (List.indexOf R) ass
@@ -2031,8 +2031,8 @@ private lemma case_3_match_rule {g : Grammar T} {r₀ : Grule T g.nt}
     have lh_len := congr_arg List.length left_half
     repeat' rw [List.length_append] at lh_len
     repeat' rw [List.length_singleton] at lh_len
-    have cut_off_end : z.length = (List.map wrapSym v₁).length + 1 := by
-      simpa using congr_arg List.length z_eq
+    have cut_off_end : z.length = (List.map wrapSym v₁).length + 1
+    · simpa using congr_arg List.length z_eq
     rw [cut_off_end] at lh_len
     repeat' rw [List.length_append]
     rw [List.length_singleton]
@@ -2060,8 +2060,8 @@ private lemma star_case_3 {g : Grammar T} {α α' : List (ns T g.nt)}
     (∃ ω : List (ns T g.nt), α' = ω ++ [H]) ∧ Z ∉ α' ∧ R ∉ α' :=
   by
   sorry /-rcases hyp with ⟨w, β, γ, x, valid_w, valid_middle, valid_x, cat⟩
-  have no_Z_in_alpha : Z ∉ α := by
-    intro contr
+  have no_Z_in_alpha : Z ∉ α
+  · intro contr
     rw [cat] at contr
     clear * - contr
     repeat' rw [List.mem_append] at contr
@@ -2177,14 +2177,11 @@ private lemma star_case_3 {g : Grammar T} {α α' : List (ns T g.nt)}
     · right; right; right
       rw [List.reverse_cons] at bef
       rw [aft]
-      have Z_ni_wb :
-        Z ∉ w.flatten.map (@Symbol.terminal T (nn g.nt)) ++ β.map Symbol.terminal := by
-        apply case_3_ni_wb
-      have R_ni_wb :
-        R ∉ w.flatten.map (@Symbol.terminal T (nn g.nt)) ++ β.map Symbol.terminal := by
-        apply case_3_ni_wb
-      have u_eq :
-        u = w.flatten.map (@Symbol.terminal T (nn g.nt)) ++ β.map Symbol.terminal :=
+      have Z_ni_wb : Z ∉ w.flatten.map (@Symbol.terminal T (nn g.nt)) ++ β.map Symbol.terminal
+      · apply case_3_ni_wb
+      have R_ni_wb : R ∉ w.flatten.map (@Symbol.terminal T (nn g.nt)) ++ β.map Symbol.terminal
+      · apply case_3_ni_wb
+      have u_eq : u = w.flatten.map (@Symbol.terminal T (nn g.nt)) ++ β.map Symbol.terminal :=
         case_3_u_eq_left_side bef
       have v_eq :
         v = List.flatten (List.map (· ++ [H]) (List.map (List.map wrapSym) (L.reverse ++ [xₘ]))) :=

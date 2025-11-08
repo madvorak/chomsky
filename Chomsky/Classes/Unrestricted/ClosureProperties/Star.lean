@@ -566,6 +566,40 @@ by
         (u ++ (r₀.inputL.map wrapSym ++ [Symbol.nonterminal ◩r₀.inputN] ++ r₀.inputR.map wrapSym)).length)
       hypp
   rw [List.drop_left, last_vl] at hyp_v
+  have hmm : m = m'
+  · rw [←hyp_v] at count_Hs
+    clear * - count_Hs mxl mxl' klt klt'
+    simp [List.countIn_append] at count_Hs
+    have inside_wrap : ∀ y : List (Symbol T g.nt), (List.map wrapSym y).countIn H = 0
+    · intro
+      rw [List.countIn_zero_of_notin]
+      apply map_wrap_never_contains_H
+    have inside_one :
+      ∀ z : List (Symbol T g.nt),
+        (z.map wrapSym).countIn (@H T g.nt) + [@H T g.nt].countIn (@H T g.nt) = 1
+    · intro
+      rw [List.countIn_singleton_eq H, inside_wrap]
+    have inside_take : (((x[m]'mxl).map wrapSym).take k).countIn H = 0
+    · rw [← List.map_take, inside_wrap]
+    have inside_drop : (((x[m']'mxl').map wrapSym).drop k').countIn H + [@H T g.nt].countIn H = 1
+    · rw [← List.map_drop, inside_wrap, List.countIn_singleton_eq (@H T g.nt)]
+    sorry/-rw [List.countIn_append, List.countIn_append, List.map_map, List.countIn_join, ← List.map_take,
+      List.map_map, List.countIn_join, ← List.map_drop, List.map_map] at count_Hs
+    change
+      (List.map (fun w => List.countIn (w.map wrapSym ++ [H]) H) x).Sum =
+        (List.map (fun w => List.countIn (w.map wrapSym ++ [H]) H) (x.take m)).Sum + _ +
+          (_ +
+            (List.map (fun w => List.countIn (w.map wrapSym ++ [H]) H)
+                (List.drop m'.succ x)).Sum) at
+      count_Hs
+    simp_rw [inside_one] at count_Hs
+    repeat' rw [List.map_const, List.sum_const_nat, mul_one] at count_Hs
+    rw [List.length_take, List.length_drop, List.nthLe_map', List.nthLe_map'] at count_Hs
+    rw [min_eq_left (le_of_lt mxl)] at count_Hs
+    rw [inside_take, inside_drop] at count_Hs
+    rw [add_zero, ← add_assoc, ← Nat.add_sub_assoc] at count_Hs
+    swap; · rwa [Nat.succ_le_iff]
+    exact nat_eq_tech mxl' count_Hs-/
   constructor
   · convert hyp_u.symm using 1
     simp_all
@@ -574,7 +608,8 @@ by
   · sorry
   · convert hyp_v.symm using 1
     simp
-    sorry
+    rw [←List.singleton_append, ←List.append_assoc, List.drop_append_of_le_length, hmm]
+    simpa using Nat.le_of_lt_succ (by simpa using klt')
   /-rw [List.take_append_of_le_length] at hyp_u
   · rw [List.nthLe_map] at klt
     swap; · exact mxlmm
@@ -600,44 +635,6 @@ by
     rw [Nat.lt_succ_iff] at klt'
     exact klt'
   rw [← hyp_v] at count_Hs
-  have mm : m = m'
-  · clear * - count_Hs mxl mxl' klt klt'
-    rw [List.countIn_append, List.countIn_append, List.map_map, List.countIn_join, ← List.map_take,
-      List.map_map, List.countIn_join, ← List.map_drop, List.map_map] at count_Hs
-    change
-      (List.map (fun w => List.countIn (w.map wrapSym ++ [H]) H) x).Sum =
-        (List.map (fun w => List.countIn (w.map wrapSym ++ [H]) H) (x.take m)).Sum + _ +
-          (_ +
-            (List.map (fun w => List.countIn (w.map wrapSym ++ [H]) H)
-                (List.drop m'.succ x)).Sum) at
-      count_Hs
-    simp_rw [List.countIn_append] at count_Hs
-    have inside_wrap : ∀ y : List (Symbol T g.nt), (List.map wrapSym y).countIn H = 0
-    · intro
-      rw [List.countIn_zero_of_notin]
-      apply map_wrap_never_contains_H
-    have inside_one :
-      ∀ z : List (Symbol T g.nt),
-        (List.map wrapSym z).countIn (@H T g.nt) + [@H T g.nt].countIn (@H T g.nt) = 1
-        · intro
-      rw [List.countIn_singleton_eq H]
-      rw [inside_wrap]
-    simp_rw [inside_one] at count_Hs
-    repeat' rw [List.map_const, List.sum_const_nat, mul_one] at count_Hs
-    rw [List.length_take, List.length_drop, List.nthLe_map', List.nthLe_map'] at count_Hs
-    rw [min_eq_left (le_of_lt mxl)] at count_Hs
-    have inside_take : ((List.map wrapSym (x.nth_le m mxl)).take k).countIn H = 0
-    · rw [← List.map_take]
-      rw [inside_wrap]
-    have inside_drop :
-      (List.drop k' (List.map wrapSym (x.nth_le m' mxl'))).countIn H + [H].countIn H = 1
-      · rw [← List.map_drop]
-      rw [inside_wrap]
-      rw [List.countIn_singleton_eq (@H T g.nt)]
-    rw [inside_take, inside_drop] at count_Hs
-    rw [add_zero, ← add_assoc, ← Nat.add_sub_assoc] at count_Hs
-    swap; · rwa [Nat.succ_le_iff]
-    exact nat_eq_tech mxl' count_Hs
   rw [← mm] at *
   constructor
   · symm

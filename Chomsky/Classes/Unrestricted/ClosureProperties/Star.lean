@@ -605,55 +605,43 @@ by
     simp_all
     exact Nat.le_of_lt_succ klt
   constructor
-  · sorry
+  · have x_eq : x = x.take m ++ [x[m]'mxl] ++ x.drop m.succ
+    · simp
+    have hyppp :
+      (((x.take m ++ [x[m]'mxl] ++ x.drop m.succ).map (List.map wrapSym)).map (· ++ [H])).flatten =
+      (((x.map (List.map wrapSym)).map (· ++ [H])).take m).flatten ++
+        ((x.map (List.map wrapSym))[m]'mxlmm).take k ++
+        (r₀.inputL.map wrapSym ++ [Symbol.nonterminal ◩r₀.inputN] ++ r₀.inputR.map wrapSym) ++
+        (((x.map (List.map wrapSym))[m]'mxlmm).drop k' ++ [H] ++
+          (((x.map (List.map wrapSym)).map (· ++ [H])).drop m.succ).flatten)
+    · convert hypp
+      · exact x_eq.symm
+      · convert hyp_u using 1
+        simp
+        apply Nat.le_of_lt_succ
+        simpa using klt
+      · convert hyp_v using 1
+        simp
+        rw [←List.singleton_append, ←List.append_assoc, List.drop_append_of_le_length]
+        simp [hmm]
+        apply Nat.le_of_lt_succ
+        simpa using klt'
+    rw [List.map_append_append, List.map_append_append, List.flatten_append_append, List.append_assoc,
+        List.append_assoc, List.append_assoc, List.append_assoc, List.append_assoc, List.append_assoc,
+        List.map_take, List.map_take, List.append_right_inj, ←List.append_assoc, ←List.append_assoc,
+        ←List.append_assoc, ←List.append_assoc, ←List.append_assoc, List.map_drop, List.map_drop,
+        List.append_left_inj, List.map_singleton, List.map_singleton, List.flatten_singleton,
+        List.append_left_inj] at hyppp
+    rw [List.get?_eq_some]
+    use mxl
+    apply map_wrapSym_inj
+    rw [hyppp]
+    simp [hmm]
+    rfl
   · convert hyp_v.symm using 1
     simp
     rw [←List.singleton_append, ←List.append_assoc, List.drop_append_of_le_length, hmm]
     simpa using Nat.le_of_lt_succ (by simpa using klt')
-  /-
-  have xxx : x = x.take m ++ [x.nth_le m mltx] ++ x.drop m.succ :=
-    by
-    rw [List.append_assoc]
-    rw [List.singleton_append]
-    rw [List.cons_nthLe_drop_succ]
-    rw [List.take_append_drop]
-  have hyppp :
-    (List.map (· ++ [H])
-          (List.map (List.map wrapSym) (x.take m ++ [x.nth_le m mltx] ++ x.drop m.succ))).join =
-      (List.take m (List.map (· ++ [H]) (List.map (List.map wrapSym) x))).flatten ++
-            List.take k ((List.map (List.map wrapSym) x).nthLe m mxlmm) ++
-          (r₀.inputL.map wrapSym ++ [Symbol.nonterminal ◩r₀.inputN] ++
-            r₀.inputR.map wrapSym) ++
-        (((x.map (List.map wrapSym)).nthLe m mxlmm).drop k' ++ [H] ++
-          (List.drop m.succ (List.map (· ++ [H]) (x.map (List.map wrapSym)))).flatten) :=
-    by
-    convert hypp
-    exact xxx.symm
-  clear * - hyppp mm
-  rw [List.map_append_append, List.map_append_append, List.flatten_append_append, List.append_assoc,
-    List.append_assoc, List.append_assoc, List.append_assoc, List.append_assoc, List.append_assoc,
-    List.map_take, List.map_take, List.append_right_inj, ← List.append_assoc, ← List.append_assoc, ←
-    List.append_assoc, ← List.append_assoc, ← List.append_assoc, List.map_drop, List.map_drop,
-    List.append_left_inj, List.map_singleton, List.map_singleton, List.flatten_singleton,
-    List.append_left_inj] at hyppp
-  rw [List.nthLe_get? mltx]
-  apply congr_arg
-  apply map_wrapSym_inj
-  rw [hyppp]
-  rw [List.map_append_append]
-  rw [List.map_take]
-  rw [List.nthLe_map]
-  swap
-  · exact mltx
-  rw [List.map_drop]
-  rw [List.map_append_append]
-  rw [List.map_singleton]
-  rw [← List.append_assoc]
-  rw [← List.append_assoc]
-  apply congr_arg₂
-  · rfl
-  congr
-  exact mm-/
 
 private lemma case_1_match_rule {g : Grammar T} {r₀ : Grule T g.nt}
     {x : List (List (Symbol T g.nt))} {u v : List (ns T g.nt)}
@@ -2480,39 +2468,63 @@ by
       · rw [eq_iff_iff, false_iff_iff]
         intro hyp_R_in
         exact map_wrap_never_contains_R hyp_R_in
-
 -/
+
 private lemma star_case_6 {g : Grammar T} {α α' : List (ns T g.nt)}
     (orig : g.star.Transforms α α')
     (hyp : (∃ ω : List (ns T g.nt), α = ω ++ [H]) ∧ Z ∉ α ∧ R ∉ α) :
   (∃ ω : List (ns T g.nt), α' = ω ++ [H]) ∧ Z ∉ α' ∧ R ∉ α' :=
 by
-  sorry /-rcases hyp with ⟨⟨w, ends_with_H⟩, no_Z, no_R⟩
+  rcases hyp with ⟨⟨w, ends_with_H⟩, no_Z, no_R⟩
   rcases orig with ⟨r, rin, u, v, bef, aft⟩
-  iterate 2
-    cases rin
-    · exfalso
-      rw [rin] at bef
+  cases rin with
+  | head =>
+    exfalso
+    simp only [List.append_nil] at bef
+    rw [bef] at no_Z
+    apply no_Z
+    apply List.mem_append_left
+    apply List.mem_append_right
+    apply List.mem_singleton_self
+  | tail _ rin =>
+    cases rin with
+    | head =>
+      exfalso
       simp only [List.append_nil] at bef
       rw [bef] at no_Z
       apply no_Z
       apply List.mem_append_left
       apply List.mem_append_right
       apply List.mem_singleton_self
-  iterate 2
-    cases rin
-    · exfalso
-      rw [rin] at bef
-      dsimp only at bef
-      rw [List.append_nil] at bef
-      rw [bef] at no_R
-      apply no_R
-      apply List.mem_append_left
-      apply List.mem_append_left
-      apply List.mem_append_right
-      apply List.mem_singleton_self
-  change r ∈ g.rules.map wrap_gr ++ rules_that_scan_terminals g at rin
-  rw [List.mem_append] at rin
+    | tail _ rin =>
+      cases rin with
+      | head as =>
+        exfalso
+        dsimp only at bef
+        rw [List.append_nil] at bef
+        rw [bef] at no_R
+        apply no_R
+        apply List.mem_append_left
+        apply List.mem_append_left
+        apply List.mem_append_right
+        apply List.mem_singleton_self
+      | tail _ rin =>
+        cases rin with
+        | head as =>
+          exfalso
+          dsimp only at bef
+          rw [List.append_nil] at bef
+          rw [bef] at no_R
+          apply no_R
+          apply List.mem_append_left
+          apply List.mem_append_left
+          apply List.mem_append_right
+          apply List.mem_singleton_self
+        | tail _ rin =>
+          change r ∈ g.rules.map wrapGr ++ rulesThatScanTerminals g at rin
+          rw [List.mem_append] at rin
+          sorry
+  /-
   cases rin
   · rw [ends_with_H] at bef
     rw [List.mem_map] at rin
@@ -2647,6 +2659,7 @@ by
     apply List.mem_append_right
     apply List.mem_singleton_self
 -/
+
 private lemma star_induction {g : Grammar T} {α : List (ns T g.nt)}
     (ass : g.star.Derives [Z] α) :
   (∃ x : List (List (Symbol T g.nt)),

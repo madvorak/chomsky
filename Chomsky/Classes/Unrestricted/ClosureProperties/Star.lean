@@ -473,9 +473,8 @@ private lemma cases_1_and_2_and_3a_match_aux {g : Grammar T} {r₀ : Grule T g.n
       x[m]? = some (u₁ ++ r₀.inputL ++ [Symbol.nonterminal r₀.inputN] ++ r₀.inputR ++ v₁) ∧
       v = v₁.map wrapSym ++ [H] ++ (((x.map (List.map wrapSym)).drop m.succ).map (· ++ [H])).flatten :=
 by
-  have hypp :
-    ((x.map (List.map wrapSym)).map (· ++ [H])).flatten =
-    u ++ (r₀.inputL.map wrapSym ++ [Symbol.nonterminal ◩r₀.inputN] ++ r₀.inputR.map wrapSym) ++ v
+  have hypp : ((x.map (List.map wrapSym)).map (· ++ [H])).flatten =
+      u ++ (r₀.inputL.map wrapSym ++ [Symbol.nonterminal ◩r₀.inputN] ++ r₀.inputR.map wrapSym) ++ v
   · simpa [List.append_assoc] using hyp
   have mid_brack :
     ∀ u' v' : List (Symbol T g.nt),
@@ -486,7 +485,7 @@ by
   simp_rw [mid_brack]
   clear hyp mid_brack
   classical
-  have count_Hs := congr_arg (fun l => l.countIn H) hypp
+  have count_Hs := congr_arg (·.countIn H) hypp
   dsimp only at count_Hs
   rw [List.countIn_append, List.countIn_append, List.countIn_zero_of_notin H_not_in_rule_input,
       add_zero, List.countIn_join, List.map_map, List.map_map] at count_Hs
@@ -502,8 +501,7 @@ by
     clear * - hypp xnn
     have hlast := congr_arg (fun l : List (ns T g.nt) => l.reverse[0]?) hypp
     dsimp only at hlast
-    rw [List.reverse_flatten, List.reverse_append, List.reverse_append_append,
-      List.reverse_singleton] at hlast
+    rw [List.reverse_flatten, List.reverse_append, List.reverse_append_append, List.reverse_singleton] at hlast
     have hhh : some H =
         ((r₀.inputR.map wrapSym).reverse ++ [Symbol.nonterminal ◩r₀.inputN] ++ (r₀.inputL.map wrapSym).reverse ++ u.reverse)[0]?
     · convert hlast
@@ -568,7 +566,16 @@ by
         (u ++ (r₀.inputL.map wrapSym ++ [Symbol.nonterminal ◩r₀.inputN] ++ r₀.inputR.map wrapSym)).length)
       hypp
   rw [List.drop_left, last_vl] at hyp_v
-  sorry /-rw [List.take_append_of_le_length] at hyp_u
+  constructor
+  · convert hyp_u.symm using 1
+    simp_all
+    exact Nat.le_of_lt_succ klt
+  constructor
+  · sorry
+  · convert hyp_v.symm using 1
+    simp
+    sorry
+  /-rw [List.take_append_of_le_length] at hyp_u
   · rw [List.nthLe_map] at klt
     swap; · exact mxlmm
     rw [List.length_append] at klt

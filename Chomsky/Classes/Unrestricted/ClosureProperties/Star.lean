@@ -572,7 +572,7 @@ by
   have hmm : m = m'
   · clear * - count_Hs mxl mxl' klt klt'
     simp [List.countIn_append, List.countIn_flatten] at count_Hs
-    have inside_wrap : ∀ y : List (Symbol T g.nt), (List.map wrapSym y).countIn H = 0
+    have inside_wrap : ∀ y : List (Symbol T g.nt), (y.map wrapSym).countIn H = 0
     · intro
       rw [List.countIn_zero_of_notin]
       apply map_wrap_never_contains_H
@@ -585,31 +585,21 @@ by
     · rw [← List.map_take, inside_wrap]
     have inside_drop : (((x[m']'mxl').map wrapSym).drop k').countIn H + [@H T g.nt].countIn H = 1
     · rw [← List.map_drop, inside_wrap, List.countIn_singleton_eq (@H T g.nt)]
-    have counted_Hs : x.length = (m + 0) + (1 + (x.length - (m' + 1)))
+    have counted_Hs : x.length = (m + 0) + (1 + (x.length - m'.succ))
     · convert count_Hs using 3
-      · sorry
-      · sorry
-      · sorry
-      · sorry
-      · sorry
+      · show x.length = (x.map (fun l : List (Symbol T g.nt) => (l.map wrapSym ++ [H]).countIn H)).sum
+        simp [List.countIn_append, inside_one]
+      · show m = ((x.map (fun l : List (Symbol T g.nt) => (l.map wrapSym ++ [H]).countIn H)).take m).sum
+        simp [List.countIn_append, inside_one, Nat.le_of_succ_le mxl]
+      · rw [List.take_append_of_le_length, inside_take]
+        apply Nat.le_of_lt_succ
+        simpa using klt
+      · rw [List.drop_append_of_le_length, List.countIn_append, inside_drop]
+        apply Nat.le_of_lt_succ
+        simpa using klt'
+      · show x.length - m'.succ = ((x.map (fun l : List (Symbol T g.nt) => (l.map wrapSym ++ [H]).countIn H)).drop m'.succ).sum
+        simp [List.countIn_append, inside_one]
     omega
-    /-rw [List.countIn_append, List.countIn_append, List.map_map, List.countIn_flatten, ← List.map_take,
-      List.map_map, List.countIn_flatten, ← List.map_drop, List.map_map] at count_Hs
-    change
-      (List.map (fun w => List.countIn (w.map wrapSym ++ [H]) H) x).Sum =
-        (List.map (fun w => List.countIn (w.map wrapSym ++ [H]) H) (x.take m)).Sum + _ +
-          (_ +
-            (List.map (fun w => List.countIn (w.map wrapSym ++ [H]) H)
-                (List.drop m'.succ x)).Sum) at
-      count_Hs
-    simp_rw [inside_one] at count_Hs
-    repeat' rw [List.map_const, List.sum_const_nat, mul_one] at count_Hs
-    rw [List.length_take, List.length_drop, List.nthLe_map', List.nthLe_map'] at count_Hs
-    rw [min_eq_left (le_of_lt mxl)] at count_Hs
-    rw [inside_take, inside_drop] at count_Hs
-    rw [add_zero, ← add_assoc, ← Nat.add_sub_assoc] at count_Hs
-    swap; · rwa [Nat.succ_le_iff]
-    exact nat_eq_tech mxl' count_Hs-/
   constructor
   · convert hyp_u.symm using 1
     simp_all
@@ -620,51 +610,7 @@ by
     simp
     rw [←List.singleton_append, ←List.append_assoc, List.drop_append_of_le_length, hmm]
     simpa using Nat.le_of_lt_succ (by simpa using klt')
-  /-rw [List.take_append_of_le_length] at hyp_u
-  · rw [List.nthLe_map] at klt
-    swap; · exact mxlmm
-    rw [List.length_append] at klt
-    rw [List.length_singleton] at klt
-    rw [List.nthLe_map] at klt ⊢
-    iterate 2 swap; · exact mxl
-    rw [List.length_map] at klt ⊢
-    rw [Nat.lt_succ_iff] at klt
-    exact klt
-  rw [List.nthLe_map] at hyp_v
-  swap
-  · exact mxlmm'
-  rw [List.drop_append_of_le_length] at hyp_v
-  swap
-  · rw [List.nthLe_map] at klt'
-    swap; · exact mxlmm'
-    rw [List.length_append] at klt'
-    rw [List.length_singleton] at klt'
-    rw [List.nthLe_map] at klt' ⊢
-    iterate 2 swap; · exact mxl'
-    rw [List.length_map] at klt' ⊢
-    rw [Nat.lt_succ_iff] at klt'
-    exact klt'
-  rw [← hyp_v] at count_Hs
-  rw [← mm] at *
-  constructor
-  · symm
-    convert hyp_u
-    · rw [List.map_take]
-    · rw [List.map_take]
-      rw [List.nthLe_map]
-  constructor
-  swap
-  · symm
-    convert hyp_v
-    · rw [List.map_drop]
-      rw [List.nthLe_map]
-    · rw [List.map_drop]
-      rw [mm]
-  rw [← hyp_u, ← hyp_v] at hypp
-  have mltx : m < x.length
-  · rw [List.length_map] at mlt
-    rw [List.length_map] at mlt
-    exact mlt
+  /-
   have xxx : x = x.take m ++ [x.nth_le m mltx] ++ x.drop m.succ :=
     by
     rw [List.append_assoc]

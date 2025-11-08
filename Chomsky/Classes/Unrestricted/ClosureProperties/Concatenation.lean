@@ -1493,7 +1493,7 @@ private lemma big_induction {g₁ g₂ : Grammar T} {w : List (nst T g₁.nt g�
     g₂.Derives [Symbol.nonterminal g₂.initial] y  ∧
     correspondingStrings
       (x.map (wrapSymbol₁ g₂.nt) ++ y.map (wrapSymbol₂ g₁.nt))
-      w   :=
+      w  :=
 by
   induction' hggw with a b _ orig ih
   · use [Symbol.nonterminal g₁.initial], [Symbol.nonterminal g₂.initial]

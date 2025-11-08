@@ -302,32 +302,19 @@ by
         · rfl
       use ((w[w.length - k.succ]'lt_wl).take n).map Symbol.terminal
       use ((w[w.length - k.succ]'lt_wl).drop n.succ).map Symbol.terminal
-      sorry
-    /-
-    dsimp only
-    constructor
-    · trace
-        "./././Mathport/Syntax/Translate/Tactic/Builtin.lean:73:14: unsupported tactic `trim #[]"
-      rw [List.nil_append]
-      rw [List.append_assoc]
-      apply congr_arg₂
-      · rfl
-      rw [←
-        List.take_append_drop 1
-          (List.map Symbol.terminal (List.drop n (w.nth_le (w.length - k.succ) lt_wl)))]
-      apply congr_arg₂
-      · rw [← List.map_take]
-        rw [list_take_one_drop]
-        rw [List.map_singleton]
-      · rw [← List.map_drop]
-        rw [List.drop_drop]
-        rw [add_comm]
-    · rw [List.take_succ]
-      rw [List.map_append]
-      trace
-        "./././Mathport/Syntax/Translate/Tactic/Builtin.lean:73:14: unsupported tactic `trim #[]"
-      rw [List.nthLe_get? Small]
-      rfl-/
+      constructor
+      · simp
+        constructor
+        · rfl
+        · rw [←List.map_drop]
+          rw [←(((w[w.length - k.succ]'lt_wl).drop n).map Symbol.terminal).take_append_drop 1]
+          rw [←List.singleton_append]
+          apply congr_arg₂
+          · rewrite [←List.map_take, list_take_one_drop small]
+            rfl
+          · simp
+      · rw [List.take_succ, List.map_append]
+        simp [*]
   convert scan_segment (w[w.length - k.succ]'lt_wl).length (by rfl) using 2
   · rw [List.take_length]
   · rewrite [List.drop_length, List.map_nil]
@@ -618,30 +605,26 @@ by
                 (List.drop m'.succ x)).Sum) at
       count_Hs
     simp_rw [List.countIn_append] at count_Hs
-    have inside_wrap : ∀ y : List (Symbol T g.nt), (List.map wrapSym y).countIn H = 0 :=
-      by
-      intro
+    have inside_wrap : ∀ y : List (Symbol T g.nt), (List.map wrapSym y).countIn H = 0
+    · intro
       rw [List.countIn_zero_of_notin]
       apply map_wrap_never_contains_H
     have inside_one :
       ∀ z : List (Symbol T g.nt),
-        (List.map wrapSym z).countIn (@H T g.nt) + [@H T g.nt].countIn (@H T g.nt) = 1 :=
-      by
-      intro
+        (List.map wrapSym z).countIn (@H T g.nt) + [@H T g.nt].countIn (@H T g.nt) = 1
+        · intro
       rw [List.countIn_singleton_eq H]
       rw [inside_wrap]
     simp_rw [inside_one] at count_Hs
     repeat' rw [List.map_const, List.sum_const_nat, mul_one] at count_Hs
     rw [List.length_take, List.length_drop, List.nthLe_map', List.nthLe_map'] at count_Hs
     rw [min_eq_left (le_of_lt mxl)] at count_Hs
-    have inside_take : ((List.map wrapSym (x.nth_le m mxl)).take k).countIn H = 0 :=
-      by
-      rw [← List.map_take]
+    have inside_take : ((List.map wrapSym (x.nth_le m mxl)).take k).countIn H = 0
+    · rw [← List.map_take]
       rw [inside_wrap]
     have inside_drop :
-      (List.drop k' (List.map wrapSym (x.nth_le m' mxl'))).countIn H + [H].countIn H = 1 :=
-      by
-      rw [← List.map_drop]
+      (List.drop k' (List.map wrapSym (x.nth_le m' mxl'))).countIn H + [H].countIn H = 1
+      · rw [← List.map_drop]
       rw [inside_wrap]
       rw [List.countIn_singleton_eq (@H T g.nt)]
     rw [inside_take, inside_drop] at count_Hs
@@ -1590,9 +1573,8 @@ private lemma case_3_match_rule {g : Grammar T} {r₀ : Grule T g.nt}
   · rcases hyp with ⟨v', left_half, right_half⟩
     have very_middle :
       [Symbol.nonterminal ◩r₀.inputN)] =
-        List.map wrapSym [Symbol.nonterminal r₀.inputN] :=
-      by
-      rw [List.map_singleton]
+        List.map wrapSym [Symbol.nonterminal r₀.inputN]
+        · rw [List.map_singleton]
       rfl
     cases' x with x₀ xₗ
     · rw [List.map_nil, List.map_nil, List.flatten, List.append_nil] at right_half
@@ -1794,9 +1776,8 @@ private lemma case_3_match_rule {g : Grammar T} {r₀ : Grule T g.nt}
         v' =
           List.map wrapSym r₀.inputL ++ [Symbol.nonterminal ◩r₀.inputN)] ++
               List.map wrapSym r₀.inputR ++
-            z :=
-      by
-      obtain ⟨v'', without_final_H⟩ : ∃ v'', v' = v'' ++ [H] :=
+            z
+            · obtain ⟨v'', without_final_H⟩ : ∃ v'', v' = v'' ++ [H] :=
         by
         rw [List.append_eq_append_iff] at left_half
         cases left_half
@@ -1871,9 +1852,8 @@ private lemma case_3_match_rule {g : Grammar T} {r₀ : Grule T g.nt}
                   (List.map wrapSym r₀.inputL ++ [Symbol.nonterminal ◩r₀.inputN)] ++
                     List.map wrapSym r₀.inputR) ++
                 List.map wrapSym v₁ ∧
-            z = List.map wrapSym v₁ ++ [H] :=
-      by
-      repeat' rw [← List.append_assoc] at left_half
+            z = List.map wrapSym v₁ ++ [H]
+            · repeat' rw [← List.append_assoc] at left_half
       rw [List.append_assoc _ (List.map wrapSym γ)] at left_half
       rw [List.append_assoc _ _ z] at left_half
       rw [List.append_eq_append_iff] at left_half
@@ -2227,9 +2207,8 @@ private lemma star_case_3 {g : Grammar T} {α α' : List (ns T g.nt)}
       case_3_u_eq_left_side bef
     have tv_matches :
       [Symbol.terminal t] ++ v =
-        γ.map wrapSym ++ [H] ++ List.flatten (List.map (· ++ [H]) (x.map (List.map wrapSym))) :=
-      by
-      rw [u_matches] at bef
+        γ.map wrapSym ++ [H] ++ List.flatten (List.map (· ++ [H]) (x.map (List.map wrapSym)))
+        · rw [u_matches] at bef
       repeat' rw [List.append_assoc] at bef
       have almost := List.append_left_cancel (List.append_left_cancel (List.append_left_cancel bef))
       rw [← List.append_assoc] at almost

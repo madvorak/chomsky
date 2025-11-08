@@ -39,7 +39,7 @@ lemma forall_mem_append_append {p : α → Prop} :
 by
   rw [List.forall_mem_append, List.forall_mem_append, and_assoc]
 
-lemma join_append_append {X Y Z : List (List α)} :
+lemma flatten_append_append {X Y Z : List (List α)} :
   (X ++ Y ++ Z).flatten = X.flatten ++ Y.flatten ++ Z.flatten :=
 by
   rw [List.flatten_append, List.flatten_append]
@@ -61,7 +61,7 @@ by
 
 end ListReplicate
 
-section ListJoin
+section ListFlatten
 
 private lemma cons_drop_succ {m : ℕ} (mlt : m < x.length) :
   x.drop m = x.get ⟨m, mlt⟩ :: x.drop m.succ :=
@@ -101,7 +101,7 @@ by
       omega
 
 -- proved by Patrick Johnson; ported to Lean 4 by Vlad
-lemma take_join_of_lt {L : List (List α)} {n : ℕ} (hnL : n < L.flatten.length) :
+lemma take_flatten_of_lt {L : List (List α)} {n : ℕ} (hnL : n < L.flatten.length) :
   ∃ m k : ℕ, ∃ mlt : m < L.length,
     k < (L.get ⟨m, mlt⟩).length ∧
     L.flatten.take n = (L.take m).flatten ++ (L.get ⟨m, mlt⟩).take k :=
@@ -131,12 +131,12 @@ by
   simp [h₈]; rw [show L[m] = M[0] by simp [←hM]] at h₃
   cases M; simp at h₈; simp at h₃; simp [le_of_lt h₃]
 
-lemma drop_join_of_lt {L : List (List α)} {n : ℕ} (notall : n < L.flatten.length) :
+lemma drop_flatten_of_lt {L : List (List α)} {n : ℕ} (notall : n < L.flatten.length) :
   ∃ m k : ℕ, ∃ mlt : m < L.length,
     k < (L.get ⟨m, mlt⟩).length ∧
     L.flatten.drop n = (L.get ⟨m, mlt⟩).drop k ++ (L.drop m.succ).flatten :=
 by
-  obtain ⟨m, k, mlt, klt, left_half⟩ := take_join_of_lt notall
+  obtain ⟨m, k, mlt, klt, left_half⟩ := take_flatten_of_lt notall
   use m, k, mlt, klt
   have L_two_parts := congr_arg List.flatten (List.take_append_drop m L)
   rw [List.flatten_append] at L_two_parts
@@ -163,7 +163,7 @@ def nTimes (l : List α) (n : ℕ) : List α :=
 
 infixl:100 " ^^ " => nTimes
 
-end ListJoin
+end ListFlatten
 
 section ListGet
 
@@ -263,7 +263,7 @@ by
     exact (List.ne_of_not_mem_cons hax).symm
   · exact ih (List.not_mem_of_not_mem_cons hax)
 
-lemma countIn_join (L : List (List α)) (a : α) :
+lemma countIn_flatten (L : List (List α)) (a : α) :
   countIn L.flatten a = List.sum (List.map (fun w => countIn w a) L) :=
 by
   induction' L with d l ih

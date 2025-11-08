@@ -400,7 +400,7 @@ private lemma wrapSym_inj {N : Type} {a b : Symbol T N} (wrap_eq : wrapSym a = w
       unfold wrapSym at wrap_eq
       exact Sum.inl.inj (Symbol.nonterminal.inj wrap_eq)
 
-private lemma wrap_str_inj {N : Type} {x y : List (Symbol T N)}
+private lemma map_wrapSym_inj {N : Type} {x y : List (Symbol T N)}
     (wrap_eqs : x.map wrapSym = y.map wrapSym) :
     x = y :=
   by
@@ -488,13 +488,13 @@ by
   have count_Hs := congr_arg (·.countIn H) hypp
   dsimp only at count_Hs
   rw [List.countIn_append, List.countIn_append, List.countIn_zero_of_notin H_not_in_rule_input,
-      add_zero, List.countIn_join, List.map_map, List.map_map] at count_Hs
+      add_zero, List.countIn_flatten, List.map_map, List.map_map] at count_Hs
   have lens := congr_arg List.length hypp
   rw [List.length_append_append, List.length_append_append, List.length_singleton] at lens
   have ul_lt : u.length < ((x.map (List.map wrapSym)).map (· ++ [H])).flatten.length
   · clear * - lens
     linarith
-  rcases List.take_join_of_lt ul_lt with ⟨m, k, mlt, klt, init_ul⟩
+  rcases List.take_flatten_of_lt ul_lt with ⟨m, k, mlt, klt, init_ul⟩
   have vnn : v ≠ []
   · by_contra v_nil
     rw [v_nil, List.append_nil] at hypp
@@ -532,16 +532,15 @@ by
     · rw [hr₀] at hhh
       simp at hhh
       exact wrap_never_outputs_H hhh.symm
-  have urrrl_lt :
-    (u ++ (r₀.inputL.map wrapSym ++ [Symbol.nonterminal ◩r₀.inputN] ++ r₀.inputR.map wrapSym)).length <
-    ((x.map (List.map wrapSym)).map (· ++ [H])).flatten.length
+  have urrrl_lt : (u ++ (r₀.inputL.map wrapSym ++ [Symbol.nonterminal ◩r₀.inputN] ++ r₀.inputR.map wrapSym)).length <
+      ((x.map (List.map wrapSym)).map (· ++ [H])).flatten.length
   · have vl_pos : v.length > 0 := List.length_pos_of_ne_nil vnn
     clear * - lens vl_pos
     rw [List.length_append]
     rw [List.length_append_append]
     rw [List.length_singleton]
     linarith
-  rcases List.drop_join_of_lt urrrl_lt with ⟨m', k', mlt', klt', last_vl⟩
+  rcases List.drop_flatten_of_lt urrrl_lt with ⟨m', k', mlt', klt', last_vl⟩
   have mxl : m < x.length
   · rw [List.length_map] at mlt
     rw [List.length_map] at mlt
@@ -557,19 +556,18 @@ by
   use m, (x.get ⟨m, mxl⟩).take k, (x.get ⟨m', mxl'⟩).drop k'
   have hyp_u := congr_arg (List.take u.length) hypp
   rw [List.append_assoc, List.take_left, init_ul] at hyp_u
-  simp only [List.map_map, List.get_eq_getElem, Function.comp_apply] at hyp_u -- ??
-  rw [List.getElem_map] at hyp_u -- ??
-  rw [← hyp_u] at count_Hs
+  simp only [List.map_map, List.get_eq_getElem, Function.comp_apply] at hyp_u
+  rw [List.getElem_map] at hyp_u
   have hyp_v :=
     congr_arg
       (List.drop
         (u ++ (r₀.inputL.map wrapSym ++ [Symbol.nonterminal ◩r₀.inputN] ++ r₀.inputR.map wrapSym)).length)
       hypp
   rw [List.drop_left, last_vl] at hyp_v
+  rw [←hyp_u, ←hyp_v] at count_Hs
   have hmm : m = m'
-  · rw [←hyp_v] at count_Hs
-    clear * - count_Hs mxl mxl' klt klt'
-    simp [List.countIn_append] at count_Hs
+  · clear * - count_Hs mxl mxl' klt klt'
+    simp [List.countIn_append, List.countIn_flatten] at count_Hs
     have inside_wrap : ∀ y : List (Symbol T g.nt), (List.map wrapSym y).countIn H = 0
     · intro
       rw [List.countIn_zero_of_notin]
@@ -583,8 +581,16 @@ by
     · rw [← List.map_take, inside_wrap]
     have inside_drop : (((x[m']'mxl').map wrapSym).drop k').countIn H + [@H T g.nt].countIn H = 1
     · rw [← List.map_drop, inside_wrap, List.countIn_singleton_eq (@H T g.nt)]
-    sorry/-rw [List.countIn_append, List.countIn_append, List.map_map, List.countIn_join, ← List.map_take,
-      List.map_map, List.countIn_join, ← List.map_drop, List.map_map] at count_Hs
+    have counted_Hs : x.length = (m + 0) + (1 + (x.length - (m' + 1)))
+    · convert count_Hs using 3
+      · sorry
+      · sorry
+      · sorry
+      · sorry
+      · sorry
+    omega
+    /-rw [List.countIn_append, List.countIn_append, List.map_map, List.countIn_flatten, ← List.map_take,
+      List.map_map, List.countIn_flatten, ← List.map_drop, List.map_map] at count_Hs
     change
       (List.map (fun w => List.countIn (w.map wrapSym ++ [H]) H) x).Sum =
         (List.map (fun w => List.countIn (w.map wrapSym ++ [H]) H) (x.take m)).Sum + _ +
@@ -682,7 +688,7 @@ by
     List.append_left_inj] at hyppp
   rw [List.nthLe_get? mltx]
   apply congr_arg
-  apply wrap_str_inj
+  apply map_wrapSym_inj
   rw [hyppp]
   rw [List.map_append_append]
   rw [List.map_take]
@@ -1701,7 +1707,7 @@ private lemma case_3_match_rule {g : Grammar T} {r₀ : Grule T g.nt}
         have gamma_minus_initial_l := congr_arg (List.drop l.length) gamma_is
         rw [List.drop_left, very_middle, ← List.map_drop, ← List.map_drop] at gamma_minus_initial_l
         repeat' rw [← List.map_append] at gamma_minus_initial_l
-        rw [wrap_str_inj gamma_minus_initial_l]
+        rw [map_wrapSym_inj gamma_minus_initial_l]
         trace
           "./././Mathport/Syntax/Translate/Tactic/Builtin.lean:73:14: unsupported tactic `trim #[]"
         repeat' rw [List.length_append]
@@ -1751,7 +1757,7 @@ private lemma case_3_match_rule {g : Grammar T} {r₀ : Grule T g.nt}
               x₀.drop (r₀.inputL ++ [Symbol.nonterminal r₀.inputN] ++ r₀.inputR).length
         · trace
             "./././Mathport/Syntax/Translate/Tactic/Builtin.lean:73:14: unsupported tactic `trim #[]"
-          apply wrap_str_inj
+          apply map_wrapSym_inj
           rw [List.map_append_append]
           have right_left :=
             congr_arg
@@ -2000,7 +2006,7 @@ private lemma case_3_match_rule {g : Grammar T} {r₀ : Grule T g.nt}
       exact almost
     use u₁, v₁
     constructor; swap; constructor
-    · apply wrap_str_inj
+    · apply map_wrapSym_inj
       rwa [very_middle, ← List.map_append_append, ← List.map_append_append, ← List.append_assoc, ←
         List.append_assoc] at gamma_parts
     · rwa [z_eq] at right_half

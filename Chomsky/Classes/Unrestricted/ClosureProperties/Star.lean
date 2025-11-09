@@ -1173,44 +1173,39 @@ by
     have second_symbol := (congr_arg (·[1]?) bef)
     simp [H] at second_symbol
 
-/-
 private lemma case_3_ni_wb {g : Grammar T} {w : List (List T)} {β : List T} {i : Fin 3} :
-    @Symbol.nonterminal T (Nn g.nt) ◪i) ∉
-      w.flatten.map (@Symbol.terminal T (Nn g.nt)) ++ β.map (@Symbol.terminal T (Nn g.nt)) :=
-  by
+  @Symbol.nonterminal T (nn g.nt) ◪i ∉
+    w.flatten.map (@Symbol.terminal T (nn g.nt)) ++ β.map (@Symbol.terminal T (nn g.nt)) :=
+by
   intro contra
   rw [List.mem_append] at contra
-  cases contra <;>
-    · rw [List.mem_map] at contra
-      rcases contra with ⟨t, -, imposs⟩
-      exact Symbol.noConfusion imposs
+  cases' contra with contra contra <;> rw [List.mem_map] at contra <;> rcases contra with ⟨t, -, imposs⟩ <;> exact Symbol.noConfusion imposs
 
 private lemma case_3_ni_u {g : Grammar T} {w : List (List T)} {β : List T}
-    {γ : List (Symbol T g.nt)} {x : List (List (Symbol T g.nt))} {u v : List (ns T g.nt)}
-    {s : ns T g.nt}
+    {γ : List (Symbol T g.nt)} {x : List (List (Symbol T g.nt))} {u v : List (ns T g.nt)} {s : ns T g.nt}
     (ass :
-      w.flatten.map Symbol.terminal ++ β.map Symbol.terminal ++ [R] ++ γ.map wrapSym ++
-            [H] ++
-          (List.map (· ++ [H]) (x.map (List.map wrapSym))).flatten =
-        u ++ [R] ++ [s] ++ v) :
-    R ∉ u := by
+      w.flatten.map Symbol.terminal ++ β.map Symbol.terminal ++ [R] ++ γ.map wrapSym ++ [H] ++
+        (List.map (· ++ [H]) (x.map (List.map wrapSym))).flatten =
+      u ++ [R] ++ [s] ++ v) :
+  R ∉ u :=
+by
   intro R_in_u
   classical
-  have count_R := congr_arg (fun l => List.countIn l R) ass
+  have count_R := congr_arg (·.countIn R) ass
   dsimp only at count_R
   repeat' rw [List.countIn_append] at count_R
-  have R_ni_wb : R ∉ w.flatten.map Symbol.terminal ++ β.map Symbol.terminal
-  · apply @case_3_ni_wb T g
-  rw [List.countIn_singleton_eq] at count_R
-  rw [List.countIn_singleton_neq H_neq_R, add_zero] at count_R
-  rw [← List.countIn_append] at count_R
-  rw [List.countIn_zero_of_notin R_ni_wb, zero_add] at count_R
-  rw [List.countIn_zero_of_notin map_wrap_never_contains_R, add_zero] at count_R
-  rw [zero_Rs_in_the_long_part, add_zero] at count_R
+  have R_ni_wb : @R T g.nt ∉ w.flatten.map Symbol.terminal ++ β.map Symbol.terminal
+  · apply case_3_ni_wb
+  rw [List.countIn_singleton_eq, List.countIn_singleton_neq H_neq_R, add_zero,
+      ←List.countIn_append, List.countIn_zero_of_notin R_ni_wb, zero_add,
+      List.countIn_zero_of_notin map_wrap_never_contains_R, add_zero,
+      zero_Rs_in_the_long_part, add_zero
+  ] at count_R
   have ucR_pos := List.countIn_pos_of_in R_in_u
   clear * - count_R ucR_pos
   linarith
 
+/-
 private lemma case_3_u_eq_left_side {g : Grammar T} {w : List (List T)} {β : List T}
     {γ : List (Symbol T g.nt)} {x : List (List (Symbol T g.nt))} {u v : List (ns T g.nt)}
     {s : ns T g.nt}

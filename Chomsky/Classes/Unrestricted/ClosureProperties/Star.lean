@@ -736,7 +736,7 @@ by
     dsimp only at *
     rw [List.append_nil, List.append_nil] at bef
     left
-    use ([Symbol.nonterminal g.initial] :: x)
+    use [Symbol.nonterminal g.initial] :: x
     constructor
     · intro xᵢ xin
       cases xin with
@@ -838,51 +838,36 @@ by
           · left
             rw [List.mem_map] at rin'
             rcases rin' with ⟨r₀, orig_in, wrap_orig⟩
-            unfold wrapGr at wrap_orig
-            rw [← wrap_orig] at *
-            clear wrap_orig
-            sorry /-obtain ⟨m, u₁, v₁, u_eq, xm_eq, v_eq⟩ := case_1_match_rule bef
+            rw [cat, ←wrap_orig] at bef
+            obtain ⟨m, u₁, v₁, u_eq, xm_eq, v_eq⟩ := case_1_match_rule bef
             clear bef
             rw [u_eq, v_eq] at aft
-            use x.take m ++ [u₁ ++ r₀.output_string ++ v₁] ++ x.drop m.succ
+            use x.take m ++ [u₁ ++ r₀.output ++ v₁] ++ x.drop m.succ
             constructor
             · intro xᵢ xiin
               rw [List.mem_append_append] at xiin
-              cases xiin
-              · apply valid
+              cases xiin with
+              | inl xiin =>
+                apply valid
                 exact List.mem_of_mem_take xiin
-              cases xiin
-              swap;
-              · apply valid
-                exact List.mem_of_mem_drop xiin
-              rw [List.mem_singleton] at xiin
-              rw [xiin]
-              have last_step :
-                g.Transforms
-                  (u₁ ++ r₀.inputL ++ [Symbol.nonterminal r₀.inputN] ++ r₀.inputR ++ v₁)
-                  (u₁ ++ r₀.output_string ++ v₁)
-              · use r₀
-                constructor
-                · exact orig_in
-                use u₁, v₁
-                constructor <;> rfl
-              apply grammar_deri_of_deri_tran _ last_step
-              apply valid (u₁ ++ r₀.inputL ++ [Symbol.nonterminal r₀.inputN] ++ r₀.inputR ++ v₁)
-              exact List.get?_mem xm_eq
-          rw [List.singleton_append]
-          rw [aft]
-          repeat' rw [List.cons_append]
-          apply congr_arg₂
-          · rfl
-          repeat' rw [List.map_append]
-          rw [List.flatten_append_append]
-          repeat' rw [List.append_assoc]
-          apply congr_arg₂
-          · rw [← List.map_take]
-          repeat' rw [← List.append_assoc]
-          apply congr_arg₂
-          swap; · rw [← List.map_drop]
-          rw [List.map_singleton, List.map_singleton, List.flatten_singleton, List.map_append, List.map_append]-/
+              | inr xiin =>
+                cases xiin with
+                | inl xiin =>
+                  rw [List.mem_singleton] at xiin
+                  rw [xiin]
+                  have last_step :
+                    g.Transforms
+                      (u₁ ++ r₀.inputL ++ [Symbol.nonterminal r₀.inputN] ++ r₀.inputR ++ v₁)
+                      (u₁ ++ r₀.output ++ v₁)
+                  · use r₀, orig_in, u₁, v₁
+                  apply gr_deri_of_deri_tran _ last_step
+                  apply valid (u₁ ++ r₀.inputL ++ [Symbol.nonterminal r₀.inputN] ++ r₀.inputR ++ v₁)
+                  exact List.mem_of_getElem? xm_eq
+                | inr xiin =>
+                  apply valid
+                  exact List.mem_of_mem_drop xiin
+            rw [List.singleton_append, aft]
+            simp [←wrap_orig, wrapGr]
 
 private lemma uv_nil_of_RH_eq {g : Grammar T} {u v : List (ns T g.nt)}
     (ass : [R, H] = u ++ [] ++ [Symbol.nonterminal ◪2] ++ [H] ++ v) :

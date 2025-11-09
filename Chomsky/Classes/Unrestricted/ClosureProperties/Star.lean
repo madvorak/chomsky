@@ -927,32 +927,34 @@ by
   have unn : u ≠ [] := by
     by_contra u_nil
     rw [u_nil, List.nil_append] at hyp
-    sorry /-cases' r₀.inputL with d l
-    · rw [List.map_nil, List.nil_append] at hyp
+    cases hrL : r₀.inputL with
+    | nil =>
+      rw [hrL] at hyp
       have imposs := List.head_eq_of_cons_eq hyp
       have inr_eq_inl := Symbol.nonterminal.inj imposs
       exact Sum.noConfusion inr_eq_inl
-    · rw [List.map_cons] at hyp
+    | cons d l =>
+      rw [hrL, List.map_cons] at hyp
       have imposs := List.head_eq_of_cons_eq hyp
       cases d
-      · unfold wrapSym at imposs
-        exact Symbol.noConfusion imposs
-      · unfold wrapSym at imposs
-        have inr_eq_inl := Symbol.nonterminal.inj imposs
-        exact Sum.noConfusion inr_eq_inl-/
+      · exact Symbol.noConfusion imposs
+      · have inr_eq_inl := Symbol.nonterminal.inj imposs
+        exact Sum.noConfusion inr_eq_inl
   have hypt := congr_arg List.tail hyp
   rw [List.tail] at hypt
   repeat' rw [List.append_assoc] at hypt
-  sorry /-rw [List.tail_append_of_ne_nil _ _ unn] at hypt
+  rw [List.tail_append_of_ne_nil unn] at hypt
   have utnn : u.tail ≠ []
   · by_contra ut_nil
     rw [ut_nil, List.nil_append] at hypt
-    cases' r₀.inputL with d l
-    · rw [List.map_nil, List.nil_append] at hypt
+    cases hrL : r₀.inputL with
+    | nil =>
+      rw [hrL, List.map_nil, List.nil_append] at hypt
       have imposs := List.head_eq_of_cons_eq hypt
       have inr_eq_inl := Symbol.nonterminal.inj imposs
       exact Sum.noConfusion inr_eq_inl
-    · rw [List.map_cons] at hypt
+    | cons d l =>
+      rw [hrL, List.map_cons] at hypt
       have imposs := List.head_eq_of_cons_eq hypt
       cases d
       · unfold wrapSym at imposs
@@ -961,8 +963,7 @@ by
         have inr_eq_inl := Symbol.nonterminal.inj imposs
         exact Sum.noConfusion inr_eq_inl
   have hyptt := congr_arg List.tail hypt
-  rw [List.tail] at hyptt
-  rw [List.tail_append_of_ne_nil _ _ utnn] at hyptt
+  rw [List.tail, List.tail_append_of_ne_nil utnn] at hyptt
   repeat' rw [← List.append_assoc] at hyptt
   rcases cases_1_and_2_and_3a_match_aux is_x_nil hyptt with ⟨m, u₁, v₁, u_eq, xm_eq, v_eq⟩
   use m, u₁, v₁
@@ -973,8 +974,7 @@ by
     have headR : d = R
     · repeat' rw [List.cons_append] at hyp
       exact List.head_eq_of_cons_eq hyp.symm
-    rw [List.tail] at u_eq
-    rw [List.tail] at hypt
+    rw [List.tail] at u_eq hypt
     cases' l with d' l'
     · exfalso
       exact utnn rfl
@@ -985,7 +985,7 @@ by
     rw [headR, tailHead, u_eq, List.cons_append, List.cons_append]
   constructor
   · exact xm_eq
-  · exact v_eq-/
+  · exact v_eq
 
 private lemma star_case_2 {g : Grammar T} {α α' : List (Symbol T g.star.nt)}
     (hαα : g.star.Transforms α α')

@@ -890,28 +890,23 @@ by
   · rfl
   rw [List.append_nil] at ass
   exfalso
-  by_cases d = R
+  by_cases hdR : d = R
   · rw [H] at ass
     classical
     have imposs := congr_arg (fun c : List (ns T g.nt) => c.countIn R) ass
-    /- dsimp at imposs
-    repeat' rw [List.countIn_append] at imposs
-    repeat' rw [List.countIn_cons] at imposs
-    repeat' rw [List.countIn_nil] at imposs-/
+    simp only [List.countIn_append, List.countIn_cons, List.countIn_nil, hdR, ite_true] at imposs
+    have h0 : 0 = if Symbol.nonterminal ◪1 = @R T g.nt then 1 else 0
+    · rfl
     have one_imposs : 1 + (0 + 0) + 0 = 1 + l.countIn R + (1 + 0) + (0 + 0) + v.countIn R
-    · sorry /-convert imposs
-      · norm_num
-      · simp [H_neq_R]
+    · convert imposs
+      · convert h0
       · symm
         apply zero_Rs_in_the_long_part
-      · norm_num
       · simp [R]
-      · simp [H_neq_R]-/
+      · convert h0
     clear * - one_imposs
-    repeat' rw [add_zero] at one_imposs
     linarith
-  · -- have impos := (congr_arg (·[0]?) ass)
-    simp_all
+  · simp_all
 
 private lemma case_2_match_rule {g : Grammar T} {r₀ : Grule T g.nt}
     {x : List (List (Symbol T g.nt))} {u v : List (ns T g.nt)}

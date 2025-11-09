@@ -1205,34 +1205,28 @@ by
   clear * - count_R ucR_pos
   linarith
 
-/-
 private lemma case_3_u_eq_left_side {g : Grammar T} {w : List (List T)} {β : List T}
-    {γ : List (Symbol T g.nt)} {x : List (List (Symbol T g.nt))} {u v : List (ns T g.nt)}
-    {s : ns T g.nt}
+    {γ : List (Symbol T g.nt)} {x : List (List (Symbol T g.nt))} {u v : List (ns T g.nt)} {s : ns T g.nt}
     (ass :
-      w.flatten.map Symbol.terminal ++ β.map Symbol.terminal ++ [R] ++ γ.map wrapSym ++
-            [H] ++
-          ((x.map (List.map wrapSym)).map (· ++ [H])).flatten =
-        u ++ [Symbol.nonterminal ◪2)] ++ [s] ++ v) :
-    u = List.map Symbol.terminal w.flatten ++ List.map (@Symbol.terminal T (Nn g.nt)) β :=
-  by
+      w.flatten.map Symbol.terminal ++ β.map Symbol.terminal ++ [R] ++ γ.map wrapSym ++ [H] ++
+        ((x.map (List.map wrapSym)).map (· ++ [H])).flatten =
+      u ++ [Symbol.nonterminal ◪2] ++ [s] ++ v) :
+  u = w.flatten.map Symbol.terminal ++ β.map (@Symbol.terminal T (nn g.nt)) :=
+by
   have R_ni_u : R ∉ u := case_3_ni_u ass
-  have R_ni_wb : R ∉ List.map Symbol.terminal w.flatten ++ β.map Symbol.terminal
+  have R_ni_wb : R ∉ w.flatten.map Symbol.terminal ++ β.map Symbol.terminal
   · apply @case_3_ni_wb T g
   repeat' rw [List.append_assoc] at ass
-  convert congr_arg (List.take u.length) ass.symm
+  convert congr_arg (List.take u.length) ass.symm using 1
   · rw [List.take_left]
-  rw [← List.append_assoc]
-  rw [List.take_left']
-  · classical
-    have index_of_first_R := congr_arg (List.indexOf R) ass
-    rw [List.indexOf_append_of_not_mem R_ni_u] at index_of_first_R
-    rw [@List.singleton_append _ _ ([s] ++ v)] at index_of_first_R
-    rw [← R, List.indexOf_cons_self, add_zero] at index_of_first_R
-    rw [← List.append_assoc, List.indexOf_append_of_not_mem R_ni_wb] at index_of_first_R
-    rw [List.singleton_append, List.indexOf_cons_self, add_zero] at index_of_first_R
-    exact index_of_first_R
+  rw [←List.append_assoc, List.take_left']
+  classical
+  have index_of_first_R := congr_arg (List.idxOf R) ass
+  rwa [List.idxOf_append_of_not_mem R_ni_u, @List.singleton_append _ _ ([s] ++ v), ←R, List.idxOf_cons_self, add_zero,
+      ←List.append_assoc, List.idxOf_append_of_not_mem R_ni_wb, List.singleton_append, List.idxOf_cons_self, add_zero
+  ] at index_of_first_R
 
+/-
 private lemma case_3_gamma_nil {g : Grammar T} {w : List (List T)} {β : List T}
     {γ : List (Symbol T g.nt)} {x : List (List (Symbol T g.nt))} {u v : List (ns T g.nt)}
     (ass :

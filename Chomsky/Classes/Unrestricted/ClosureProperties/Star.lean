@@ -1269,90 +1269,83 @@ by
   ] at first_H
   simpa using first_H
 
-/-
-private lemma case_3_v_nil {g : Grammar T} {w : List (List T)} {β : List T}
-    {u v : List (ns T g.nt)}
-    (ass :
-      List.map Symbol.terminal w.flatten ++ β.map Symbol.terminal ++ [R] ++ [H] =
-        u ++ [Symbol.nonterminal ◪2)] ++ [H] ++ v) :
-    v = [] := by
+private lemma case_3_v_nil {g : Grammar T} {w : List (List T)} {β : List T} {u v : List (ns T g.nt)}
+    (ass : w.flatten.map Symbol.terminal ++ β.map Symbol.terminal ++ [R] ++ [H] = u ++ [R] ++ [H] ++ v) :
+  v = [] :=
+by
   have rev := congr_arg List.reverse ass
-  repeat' rw [List.reverse_append] at rev
-  repeat' rw [List.reverse_singleton] at rev
-  rw [← List.reverse_eq_nil]
-  cases' v.reverse with d l
-  · rfl
-  exfalso
-  rw [List.singleton_append] at rev
-  have brt := List.tail_eq_of_cons_eq rev
-  have brtt := congr_arg List.tail brt
-  rw [List.singleton_append] at brtt
-  rw [List.tail_cons] at brtt
-  cases' l with e l'
-  · change
-      (β.map Symbol.terminal).reverse ++ (List.map Symbol.terminal w.flatten).reverse =
-        [Symbol.nonterminal ◪2)] ++ u.reverse at
-      brtt
-    have imposs := congr_arg (fun a => R ∈ a) brtt
-    dsimp only at imposs
-    apply false_of_true_eq_false
-    convert imposs.symm
-    · rw [eq_iff_iff, true_iff_iff]
-      apply List.mem_append_left
-      apply List.mem_singleton_self
-    · rw [eq_iff_iff, false_iff_iff]
-      rw [List.mem_append]
-      push_neg
-      constructor <;>
-        · rw [List.mem_reverse']
-          rw [List.mem_map]
-          push_neg
-          intro t trash
-          apply Symbol.noConfusion
-  · change _ = _ ++ _ at brtt
-    have imposs := congr_arg (fun a => H ∈ a) brtt
-    dsimp only at imposs
-    apply false_of_true_eq_false
-    convert imposs.symm
-    · rw [eq_iff_iff, true_iff_iff]
-      apply List.mem_append_right
-      apply List.mem_append_left
-      apply List.mem_singleton_self
-    · rw [eq_iff_iff, false_iff_iff]
-      rw [List.mem_append]
-      push_neg
-      constructor <;>
-        · rw [List.mem_reverse']
-          rw [List.mem_map]
-          push_neg
-          intro t trash
-          apply Symbol.noConfusion
+  simp only [List.reverse_append, List.reverse_singleton] at rev
+  rw [← List.reverse_nil]
+  cases hv : v.reverse with
+  | nil => exact List.reverse_eq_iff.→ hv
+  | cons d l =>
+    exfalso
+    rw [hv, List.singleton_append] at rev
+    have brt := List.tail_eq_of_cons_eq rev
+    have brtt := congr_arg List.tail brt
+    rw [List.singleton_append] at brtt
+    rw [List.tail_cons] at brtt
+    cases hl : l with
+    | nil =>
+      rw [hl] at brtt
+      change (β.map Symbol.terminal).reverse ++ (w.flatten.map Symbol.terminal).reverse = [R] ++ u.reverse at brtt
+      have imposs := congr_arg (R ∈ ·) brtt
+      dsimp only at imposs
+      apply false_of_true_eq_false
+      convert imposs.symm
+      · rw [true_iff]
+        apply List.mem_append_left
+        apply List.mem_singleton_self
+      · rw [false_iff, List.mem_append]
+        push_neg
+        constructor <;> unfold H at * <;> aesop
+    | cons e l' =>
+      rw [hl] at brtt
+      have imposs := congr_arg (H ∈ ·) brtt
+      dsimp only at imposs
+      apply false_of_true_eq_false
+      convert imposs.symm
+      · rw [true_iff]
+        apply List.mem_append_right
+        apply List.mem_append_left
+        apply List.mem_singleton_self
+      · rw [false_iff]
+        rw [List.mem_append]
+        push_neg
+        constructor <;> unfold H at * <;> aesop
 
 private lemma case_3_false_of_wbr_eq_urz {g : Grammar T} {r₀ : Grule T g.nt} {w : List (List T)}
     {β : List T} {u z : List (ns T g.nt)}
     (contradictory_equality :
-      List.map Symbol.terminal w.flatten ++ β.map Symbol.terminal ++ [R] =
-        u ++ List.map wrapSym r₀.inputL ++ [Symbol.nonterminal ◩r₀.inputN)] ++ z) :
-    False := by
+      w.flatten.map Symbol.terminal ++ β.map Symbol.terminal ++ [R] =
+      u ++ r₀.inputL.map wrapSym ++ [Symbol.nonterminal ◩r₀.inputN] ++ z) :
+  False :=
+by
   apply false_of_true_eq_false
-  convert congr_arg ((· ∈ ·) (Symbol.nonterminal ◩r₀.inputN))) contradictory_equality.symm
-  · rw [eq_iff_iff, true_iff_iff]
+  convert congr_arg ((Symbol.nonterminal ◩r₀.inputN ∈ ·)) contradictory_equality.symm
+  · rw [true_iff]
     apply List.mem_append_left
     apply List.mem_append_right
     apply List.mem_singleton_self
-  · rw [eq_iff_iff, false_iff_iff]
+  · rw [false_iff]
     intro hyp_N_in
     rw [List.mem_append] at hyp_N_in
-    cases hyp_N_in
-    swap;
-    · rw [List.mem_singleton] at hyp_N_in
-      exact Sum.noConfusion (Symbol.nonterminal.inj hyp_N_in)
-    rw [List.mem_append] at hyp_N_in
-    cases hyp_N_in <;>
-      · rw [List.mem_map] at hyp_N_in
-        rcases hyp_N_in with ⟨t, -, impos⟩
+    cases hyp_N_in with
+    | inl hr₀ =>
+      rw [List.mem_append] at hr₀
+      cases hr₀ with
+      | inl hw =>
+        rw [List.mem_map] at hw
+        rcases hw with ⟨t, -, impos⟩
         exact Symbol.noConfusion impos
-
+      | inr hβ =>
+        rw [List.mem_map] at hβ
+        rcases hβ with ⟨t, -, impos⟩
+        exact Symbol.noConfusion impos
+    | inr hR =>
+      rw [List.mem_singleton] at hR
+      exact Sum.noConfusion (Symbol.nonterminal.inj hR)
+/-
 /- ./././Mathport/Syntax/Translate/Tactic/Builtin.lean:73:14: unsupported tactic `trim #[] -/
 /- ./././Mathport/Syntax/Translate/Tactic/Builtin.lean:73:14: unsupported tactic `trim #[] -/
 /- ./././Mathport/Syntax/Translate/Tactic/Builtin.lean:73:14: unsupported tactic `trim #[] -/

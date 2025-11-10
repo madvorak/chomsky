@@ -198,8 +198,7 @@ lemma countIn_append (a : α) :
   countIn (x ++ y) a = countIn x a + countIn y a :=
 by
   unfold countIn
-  rw [List.map_append]
-  sorry--rw [List.sum_append]
+  rw [List.map_append, List.sum_append]
 
 lemma countIn_replicate_eq (a : α) (n : ℕ) :
   countIn (List.replicate n a) a = n :=

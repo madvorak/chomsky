@@ -131,21 +131,19 @@ by
     right
     exact hsw
   rcases orig with ⟨r, rin, u, v, bef, aft⟩
-  rw [aft] at hsw
-  rw [List.mem_append, List.mem_append] at hsw
+  rw [aft, List.mem_append, List.mem_append] at hsw
   cases' hsw with hsw' s_in_v
   cases' hsw' with s_in_u s_in_out
   · apply ih
     rw [bef]
-    repeat'
+    repeat
       rw [List.mem_append]
       left
     exact s_in_u
   · left
     use r
   · apply ih
-    rw [bef]
-    rw [List.mem_append]
+    rw [bef, List.mem_append]
     right
     exact s_in_v
 
@@ -159,9 +157,7 @@ by
   constructor
   · simp [bigGrammar]
   use [], []
-  constructor
-  · rfl
-  · rfl
+  constructor <;> rfl
 
 private lemma substitute_terminals {g₁ g₂ : Grammar T} {s : T → Sum T T} {w : List T}
   (rule_for_each_terminal : ∀ t ∈ w,
@@ -203,8 +199,7 @@ by
   unfold Grammar.language at *
   rw [Set.mem_setOf_eq] at *
   apply gr_deri_of_tran_deri first_transformation
-  rw [← hw]
-  rw [List.map_append]
+  rw [←hw, List.map_append]
   apply
     gr_deri_of_deri_deri
       (g := bigGrammar g₁ g₂)

@@ -2,6 +2,7 @@ import Chomsky.Classes.Unrestricted.Basics.Lifting
 import Chomsky.Utilities.ListUtils
 import Mathlib.Tactic.Linarith
 
+
 variable {T : Type}
 
 def unionGrammar (g₁ g₂ : Grammar T) : Grammar T :=
@@ -161,12 +162,10 @@ by
   clear hwgg
   cases' hggw with hggw₁ hggw₂
   · exfalso
-    have zeroth := congr_fun (congr_arg List.get? hggw₁) 0
+    have zeroth := congr_arg (·[0]?) hggw₁
     cases w
     · exact Option.noConfusion zeroth
-    · rw [List.get?, List.map_cons, List.get?] at zeroth
-      have nt_eq_ter := Option.some.inj zeroth
-      exact Symbol.noConfusion nt_eq_ter
+    · simp at zeroth
   rcases hggw₂ with ⟨i, ⟨r, rin, u, v, bef, aft⟩, deri⟩
   have uv_nil : u = [] ∧ v = []
   · have bef_len := congr_arg List.length bef
@@ -180,8 +179,7 @@ by
   rw [uv_nil.left, List.nil_append, uv_nil.right, List.append_nil] at bef aft
   have same_nt : (unionGrammar g₁ g₂).initial = r.inputN
   · clear * - bef
-    have elemeq :
-      [Symbol.nonterminal (unionGrammar g₁ g₂).initial] = [Symbol.nonterminal r.inputN]
+    have elemeq : [Symbol.nonterminal (unionGrammar g₁ g₂).initial] = [Symbol.nonterminal r.inputN]
     · have bef_len := congr_arg List.length bef
       rw [List.length_append_append, List.length_singleton, List.length_singleton] at bef_len
       have rl_first : r.inputL.length = 0
@@ -206,14 +204,12 @@ by
         unfold GoodString
         simp only [List.mem_singleton, forall_eq]
         use g₁.initial
-        rfl
-      )
+        rfl)
     convert sinked
     unfold sinkString
     rw [List.filterMap_map]
-    convert_to List.map Symbol.terminal w = List.filterMap (Option.some ∘ Symbol.terminal) w
-    rw [← List.filterMap_map]
-    rw [List.filterMap_some]
+    convert_to w.map Symbol.terminal = w.filterMap (Option.some ∘ Symbol.terminal)
+    rw [← List.filterMap_map, List.filterMap_some]
   · rw [req₂] at aft
     dsimp only at aft
     rw [aft] at deri
@@ -224,19 +220,17 @@ by
         unfold GoodString
         simp only [List.mem_singleton, forall_eq]
         use g₂.initial
-        rfl
-      )
+        rfl)
     convert sinked
     unfold sinkString
     rw [List.filterMap_map]
     convert_to List.map Symbol.terminal w = List.filterMap (Option.some ∘ Symbol.terminal) w
-    rw [← List.filterMap_map]
-    rw [List.filterMap_some]
-  · suffices True = False
-      by contradiction
+    rw [←List.filterMap_map, List.filterMap_some]
+  · suffices True = False by contradiction
     rcases rin₁ with ⟨r₁, -, r_of_r₁⟩
-    convert congr_arg
-        (fun z => Symbol.nonterminal (liftRule (Option.some ∘ Sum.inl) r₁).inputN ∈ z)
+    convert
+      congr_arg
+        (Symbol.nonterminal (liftRule (Option.some ∘ Sum.inl) r₁).inputN ∈ ·)
         bef.symm
     · rw [true_iff]
       apply List.mem_append_left
@@ -244,11 +238,11 @@ by
       rw [List.mem_singleton, r_of_r₁]
     · rw [List.mem_singleton, Symbol.nonterminal.injEq]
       simp [liftRule, unionGrammar]
-  · suffices True = False
-      by contradiction
+  · suffices True = False by contradiction
     rcases rin₂ with ⟨r₂, -, r_of_r₂⟩
-    convert congr_arg
-        (fun z => Symbol.nonterminal (liftRule (Option.some ∘ Sum.inr) r₂).inputN ∈ z)
+    convert
+      congr_arg
+        (Symbol.nonterminal (liftRule (Option.some ∘ Sum.inr) r₂).inputN ∈ ·)
         bef.symm
     · rw [true_iff]
       apply List.mem_append_left
@@ -269,12 +263,13 @@ by
     use [], []
     constructor <;> rfl
   rw [List.nil_append, List.append_nil]
-  change lg₁.g.Derives
+  show
+    lg₁.g.Derives
       (liftString lg₁.liftNt [Symbol.nonterminal g₁.initial])
       (List.map Symbol.terminal w)
   convert lift_deri (@lg₁ T g₁ g₂) hwg
   unfold liftString
-  rw [List.map_map]
+  rewrite [List.map_map]
   rfl
 
 lemma in_union_of_in_L₂ {w : List T} (hwg : w ∈ g₂.language) :
@@ -290,12 +285,13 @@ by
     use [], []
     constructor <;> rfl
   rw [List.nil_append, List.append_nil]
-  change lg₂.g.Derives
+  show
+    lg₂.g.Derives
       (liftString lg₂.liftNt [Symbol.nonterminal g₂.initial])
       (List.map Symbol.terminal w)
   convert lift_deri (@lg₂ T g₁ g₂) hwg
   unfold liftString
-  rw [List.map_map]
+  rewrite [List.map_map]
   rfl
 
 /-- The class of grammar-generated languages is closed under union. -/

@@ -2,9 +2,8 @@ import Chomsky.Classes.Unrestricted.Basics.Toolbox
 import Chomsky.Utilities.LanguageOperations
 import Chomsky.Utilities.ListUtils
 
-variable {T : Type}
 
-section Auxiliary
+variable {T : Type}
 
 private def reversalGrule {N : Type} (r : Grule T N) : Grule T N :=
   Grule.mk r.inputR.reverse r.inputN r.inputL.reverse r.output.reverse
@@ -12,7 +11,6 @@ private def reversalGrule {N : Type} (r : Grule T N) : Grule T N :=
 private lemma dual_of_reversalGrule {N : Type} (r : Grule T N) :
   reversalGrule (reversalGrule r) = r :=
 by
-  cases r
   simp [reversalGrule, List.reverse_reverse]
 
 private lemma reversal_grule_reversal_grule {N : Type} :
@@ -27,12 +25,7 @@ private def reversalGrammar (g : Grammar T) : Grammar T :=
 private lemma dual_of_reversalGrammar (g : Grammar T) :
   reversalGrammar (reversalGrammar g) = g :=
 by
-  cases g
-  unfold reversalGrammar
-  dsimp only
-  rw [List.map_map]
-  rw [reversal_grule_reversal_grule]
-  rw [List.map_id]
+  simp [reversalGrammar, reversal_grule_reversal_grule]
 
 private lemma derives_reversed (g : Grammar T) (v : List (Symbol T g.nt)) :
   (reversalGrammar g).Derives [Symbol.nonterminal (reversalGrammar g).initial] v →
@@ -47,11 +40,7 @@ by
   change r ∈ List.map _ g.rules at rin
   rw [List.mem_map] at rin
   rcases rin with ⟨r₀, rin₀, r_from_r₀⟩
-  use r₀
-  constructor
-  · exact rin₀
-  use y.reverse
-  use x.reverse
+  use r₀, rin₀, y.reverse, x.reverse
   constructor
   · have rid₁ : r₀.inputL = r.inputR.reverse
     · rw [← r_from_r₀]
@@ -73,8 +62,7 @@ by
     · rw [← r_from_r₀]
       unfold reversalGrule
       rw [List.reverse_reverse]
-    rw [snd_from_r]
-    rw [← List.reverse_append_append]
+    rw [snd_from_r, ←List.reverse_append_append]
     exact congr_arg List.reverse aft
 
 private lemma reversed_word_in_original_language {g : Grammar T} {w : List T}
@@ -86,14 +74,13 @@ by
   rw [← List.map_reverse] at almost_done
   exact almost_done
 
-end Auxiliary
 
 /-- The class of grammar-generated languages is closed under reversal. -/
 theorem GG_of_reverse_GG (L : Language T) :
   L.IsGG → L.reverse.IsGG :=
 by
   rintro ⟨g, hgL⟩
-  rw [← hgL]
+  rw [←hgL]
   use reversalGrammar g
   apply Set.eq_of_subset_of_subset
   · intro _
@@ -106,7 +93,6 @@ by
     rw [pre_reversal] at hwL ⊢
     have finished_up_to_reverses := reversed_word_in_original_language hwL
     rw [dual_of_reversalGrammar]
-    rw [List.reverse_reverse] at finished_up_to_reverses
-    exact finished_up_to_reverses
+    rwa [List.reverse_reverse] at finished_up_to_reverses
 
 #print axioms GG_of_reverse_GG

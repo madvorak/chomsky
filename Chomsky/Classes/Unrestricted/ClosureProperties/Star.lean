@@ -1226,76 +1226,50 @@ by
       ←List.append_assoc, List.idxOf_append_of_not_mem R_ni_wb, List.singleton_append, List.idxOf_cons_self, add_zero
   ] at index_of_first_R
 
-/-
 private lemma case_3_gamma_nil {g : Grammar T} {w : List (List T)} {β : List T}
     {γ : List (Symbol T g.nt)} {x : List (List (Symbol T g.nt))} {u v : List (ns T g.nt)}
     (ass :
-      List.map Symbol.terminal w.flatten ++ β.map Symbol.terminal ++
-                [Symbol.nonterminal ◪2)] ++
-              List.map wrapSym γ ++
-            [H] ++
-          ((x.map (List.map wrapSym)).map (· ++ [H])).flatten =
-        u ++ [Symbol.nonterminal ◪2)] ++ [H] ++ v) :
-    γ = [] :=
-  by
-  have R_ni_wb : R ∉ List.map Symbol.terminal w.flatten ++ β.map Symbol.terminal
-  · apply @case_3_ni_wb T g
-  have H_ni_wb : H ∉ List.map Symbol.terminal w.flatten ++ β.map Symbol.terminal
-  · apply @case_3_ni_wb T g
-  have H_ni_wbrg :
-    H ∉
-      List.map (@Symbol.terminal T (nn g.nt)) w.flatten ++ β.map Symbol.terminal ++
-          [Symbol.nonterminal ◪2)] ++
-        List.map wrapSym γ
+      w.flatten.map Symbol.terminal ++ β.map Symbol.terminal ++ [R] ++ γ.map wrapSym ++ [H] ++
+        ((x.map (List.map wrapSym)).map (· ++ [H])).flatten =
+      u ++ [Symbol.nonterminal ◪2] ++ [H] ++ v) :
+  γ = [] :=
+by
+  have R_ni_wb : @R T g.nt ∉ w.flatten.map Symbol.terminal ++ β.map Symbol.terminal
+  · apply case_3_ni_wb
+  have H_ni_wb : @H T g.nt ∉ w.flatten.map Symbol.terminal ++ β.map Symbol.terminal
+  · apply case_3_ni_wb
+  have H_ni_wbrg : H ∉ w.flatten.map (@Symbol.terminal T (nn g.nt)) ++ β.map Symbol.terminal ++ [R] ++ γ.map wrapSym
   · intro contra
     rw [List.mem_append] at contra
-    cases contra
-    swap; · exact map_wrap_never_contains_H contra
-    rw [List.mem_append] at contra
-    cases contra
-    · exact H_ni_wb contra
-    · rw [List.mem_singleton] at contra
-      exact H_neq_R contra
-  have R_ni_u : @Symbol.nonterminal T (nn g.nt) ◪2) ∉ u := case_3_ni_u ass
-  have H_ni_u : H ∉ u
-  · rw [case_3_u_eq_left_side ass]
-    exact H_ni_wb
+    refine contra.casesOn (fun hH => ?_) map_wrap_never_contains_H
+    rw [List.mem_append] at hH
+    refine hH.casesOn H_ni_wb (fun hHR => ?_)
+    rw [List.mem_singleton] at hHR
+    exact H_neq_R hHR
+  have R_ni_u : @Symbol.nonterminal T (nn g.nt) ◪2 ∉ u := case_3_ni_u ass
+  have H_ni_u : H ∉ u := case_3_u_eq_left_side ass ▸ H_ni_wb
   classical
-  have first_R := congr_arg (List.indexOf R) ass
-  have first_H := congr_arg (List.indexOf H) ass
-  repeat'
-    rw [List.append_assoc (List.map Symbol.terminal w.flatten ++ β.map Symbol.terminal)] at
-      first_R
-  rw [List.append_assoc
-      (List.map Symbol.terminal w.flatten ++ β.map Symbol.terminal ++
-          [Symbol.nonterminal ◪2)] ++
-        List.map wrapSym γ)] at
-    first_H
-  rw [List.indexOf_append_of_not_mem R_ni_wb] at first_R
-  rw [List.indexOf_append_of_not_mem H_ni_wbrg] at first_H
-  rw [List.cons_append, List.cons_append, List.cons_append, R, List.indexOf_cons_self, add_zero] at
-    first_R
-  rw [List.cons_append, List.indexOf_cons_self, add_zero] at first_H
+  have first_R := congr_arg (List.idxOf R) ass
+  have first_H := congr_arg (List.idxOf H) ass
+  simp only [List.append_assoc (w.flatten.map Symbol.terminal ++ β.map Symbol.terminal)] at first_R
+  simp only [List.append_assoc (w.flatten.map Symbol.terminal ++ β.map Symbol.terminal ++ [R] ++ γ.map wrapSym)] at first_H
+  rw [List.idxOf_append_of_not_mem R_ni_wb] at first_R
+  rw [List.idxOf_append_of_not_mem H_ni_wbrg] at first_H
+  rw [List.cons_append, List.cons_append, List.cons_append, R, List.idxOf_cons_self, add_zero] at first_R
+  rw [List.cons_append, List.idxOf_cons_self, add_zero] at first_H
   rw [List.append_assoc u, List.append_assoc u] at first_R first_H
-  rw [List.indexOf_append_of_not_mem R_ni_u] at first_R
-  rw [List.indexOf_append_of_not_mem H_ni_u] at first_H
-  rw [List.append_assoc _ [H], List.singleton_append, List.indexOf_cons_self, add_zero] at first_R
-  rw [List.append_assoc _ [H], List.singleton_append, ← R, List.indexOf_cons_ne _ H_neq_R] at
-    first_H
-  rw [List.singleton_append, H, List.indexOf_cons_self] at first_H
-  rw [← first_R] at first_H
-  clear * - first_H
-  repeat' rw [List.length_append] at first_H
-  rw [List.length_singleton] at first_H
-  rw [←
-    add_zero
-      ((List.map Symbol.terminal w.flatten).length + (β.map Symbol.terminal).length + 1)] at
-    first_H
-  rw [add_right_inj] at first_H
-  rw [List.length_map] at first_H
-  rw [List.length_eq_zero] at first_H
-  exact first_H
+  rw [List.idxOf_append_of_not_mem R_ni_u] at first_R
+  rw [List.idxOf_append_of_not_mem H_ni_u] at first_H
+  rw [List.append_assoc _ [H], List.singleton_append, List.idxOf_cons_self, add_zero] at first_R
+  rw [List.append_assoc _ [H], List.singleton_append, ← R, List.idxOf_cons_ne _ H_neq_R.symm,
+      List.singleton_append, H, List.idxOf_cons_self, ← first_R
+  ] at first_H
+  rw [List.length_append, List.length_append, List.length_append, List.length_singleton,
+      ←add_zero ((w.flatten.map Symbol.terminal).length + (β.map Symbol.terminal).length + 1)
+  ] at first_H
+  simpa using first_H
 
+/-
 private lemma case_3_v_nil {g : Grammar T} {w : List (List T)} {β : List T}
     {u v : List (ns T g.nt)}
     (ass :

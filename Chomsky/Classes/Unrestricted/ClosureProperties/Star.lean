@@ -2311,8 +2311,8 @@ by
     apply List.mem_append_left
     apply List.mem_append_right
     apply List.mem_singleton_self
-  | tail _ rin =>
-    cases rin with
+  | tail _ rin' =>
+    cases rin' with
     | head =>
       exfalso
       simp only [List.append_nil] at bef
@@ -2323,7 +2323,7 @@ by
       apply List.mem_singleton_self
     | tail _ rin =>
       cases rin with
-      | head as =>
+      | head =>
         exfalso
         dsimp only at bef
         rw [List.append_nil] at bef
@@ -2333,9 +2333,9 @@ by
         apply List.mem_append_left
         apply List.mem_append_right
         apply List.mem_singleton_self
-      | tail _ rin =>
-        cases rin with
-        | head as =>
+      | tail _ rin' =>
+        cases rin' with
+        | head =>
           exfalso
           dsimp only at bef
           rw [List.append_nil] at bef
@@ -2348,142 +2348,141 @@ by
         | tail _ rin =>
           change r ∈ g.rules.map wrapGr ++ rulesThatScanTerminals g at rin
           rw [List.mem_append] at rin
-          sorry
-  /-
-  cases rin
-  · rw [ends_with_H] at bef
-    rw [List.mem_map] at rin
-    rcases rin with ⟨r₀, -, r_of_r₀⟩
-    constructor
-    swap;
-    · constructor
-      · rw [aft]
-        intro contra
-        rw [List.mem_append] at contra
-        rw [List.mem_append] at contra
-        cases contra
-        swap;
-        · apply no_Z
-          rw [ends_with_H]
-          rw [bef]
-          rw [List.mem_append]
-          right
-          exact contra
-        cases contra
-        · apply no_Z
-          rw [ends_with_H]
-          rw [bef]
-          repeat' rw [List.append_assoc]
-          rw [List.mem_append]
-          left
-          exact contra
-        rw [← r_of_r₀] at contra
-        unfold wrap_gr at contra
-        rw [List.mem_map] at contra
-        rcases contra with ⟨s, -, imposs⟩
-        cases s
-        · unfold wrapSym at imposs
-          exact Symbol.noConfusion imposs
-        · unfold wrapSym at imposs
-          unfold Z at imposs
-          rw [Symbol.nonterminal.inj_eq] at imposs
-          exact Sum.noConfusion imposs
-      · rw [aft]
-        intro contra
-        rw [List.mem_append] at contra
-        rw [List.mem_append] at contra
-        cases contra
-        swap;
-        · apply no_R
-          rw [ends_with_H]
-          rw [bef]
-          rw [List.mem_append]
-          right
-          exact contra
-        cases contra
-        · apply no_R
-          rw [ends_with_H]
-          rw [bef]
-          repeat' rw [List.append_assoc]
-          rw [List.mem_append]
-          left
-          exact contra
-        rw [← r_of_r₀] at contra
-        unfold wrap_gr at contra
-        rw [List.mem_map] at contra
-        rcases contra with ⟨s, -, imposs⟩
-        cases s
-        · unfold wrapSym at imposs
-          exact Symbol.noConfusion imposs
-        · unfold wrapSym at imposs
-          unfold R at imposs
-          rw [Symbol.nonterminal.inj_eq] at imposs
-          exact Sum.noConfusion imposs
-    use u ++ r.output_string ++ v.take (v.length - 1)
-    rw [aft]
-    trace "./././Mathport/Syntax/Translate/Tactic/Builtin.lean:73:14: unsupported tactic `trim #[]"
-    have vlnn : v.length ≥ 1
-    · by_contra contra
-      have v_nil := zero_of_not_ge_one contra
-      rw [List.length_eq_zero] at v_nil
-      rw [v_nil] at bef
-      rw [← r_of_r₀] at bef
-      rw [List.append_nil] at bef
-      unfold wrap_gr at bef
-      have rev := congr_arg List.reverse bef
-      clear * - rev
-      repeat' rw [List.reverse_append] at rev
-      rw [← List.map_reverse _ r₀.inputR] at rev
-      rw [List.reverse_singleton] at rev
-      cases' r₀.inputR.reverse with d l
-      · have H_eq_N : H = Symbol.nonterminal ◩r₀.inputN)
-        · rw [List.map_nil, List.nil_append, List.reverse_singleton, List.singleton_append,
-            List.singleton_append, List.cons.inj_eq] at rev
-          exact rev.left
-        unfold H at H_eq_N
-        have inr_eq_inl := Symbol.nonterminal.inj H_eq_N
-        exact Sum.noConfusion inr_eq_inl
-      · rw [List.map_cons] at rev
-        have H_is : H = wrapSym d
-        · rw [List.singleton_append, List.cons_append, List.cons.inj_eq] at rev
-          exact rev.left
-        unfold H at H_is
-        cases d <;> unfold wrapSym at H_is
-        · exact Symbol.noConfusion H_is
-        · rw [Symbol.nonterminal.inj_eq] at H_is
-          exact Sum.noConfusion H_is
-    convert_to v.take (v.length - 1) ++ v.drop (v.length - 1) = v.take (v.length - 1) ++ [H]
-    · rw [List.take_append_drop]
-    trace "./././Mathport/Syntax/Translate/Tactic/Builtin.lean:73:14: unsupported tactic `trim #[]"
-    have bef_rev := congr_arg List.reverse bef
-    repeat' rw [List.reverse_append] at bef_rev
-    have bef_rev_tak := congr_arg (List.take 1) bef_rev
-    rw [List.take_left'] at bef_rev_tak
-    swap;
-    · rw [List.length_reverse]
-      apply List.length_singleton
-    rw [List.take_append_of_le_length] at bef_rev_tak
-    swap;
-    · rw [List.length_reverse]
-      exact vlnn
-    rw [List.reverse_take _ vlnn] at bef_rev_tak
-    rw [List.reverse_eq_iff] at bef_rev_tak
-    rw [List.reverse_reverse] at bef_rev_tak
-    exact bef_rev_tak.symm
-  · exfalso
-    unfold rules_that_scan_terminals at rin
-    rw [List.mem_map] at rin
-    rcases rin with ⟨t, -, eq_r⟩
-    rw [← eq_r] at bef
-    dsimp only at bef
-    rw [List.append_nil] at bef
-    rw [bef] at no_R
-    apply no_R
-    apply List.mem_append_left
-    apply List.mem_append_left
-    apply List.mem_append_right
-    apply List.mem_singleton_self
--/
+          cases rin with
+          | inl hrg =>
+            rw [ends_with_H] at bef
+            rw [List.mem_map] at hrg
+            rcases hrg with ⟨r₀, -, r_of_r₀⟩
+            constructor
+            · use u ++ r.output ++ v.take (v.length - 1)
+              rw [aft]
+              sorry/-
+              have vlnn : v.length ≥ 1
+              · by_contra contra
+                have v_nil := zero_of_not_ge_one contra
+                rw [List.length_eq_zero_iff] at v_nil
+                rw [v_nil] at bef
+                rw [← r_of_r₀] at bef
+                rw [List.append_nil] at bef
+                unfold wrapGr at bef
+                have rev := congr_arg List.reverse bef
+                clear * - rev
+                repeat' rw [List.reverse_append] at rev
+                rw [← List.map_reverse _ r₀.inputR] at rev
+                rw [List.reverse_singleton] at rev
+                cases' r₀.inputR.reverse with d l
+                · have H_eq_N : H = Symbol.nonterminal ◩r₀.inputN
+                  · rw [List.map_nil, List.nil_append, List.reverse_singleton, List.singleton_append,
+                      List.singleton_append, List.cons.inj_eq] at rev
+                    exact rev.left
+                  unfold H at H_eq_N
+                  have inr_eq_inl := Symbol.nonterminal.inj H_eq_N
+                  exact Sum.noConfusion inr_eq_inl
+                · rw [List.map_cons] at rev
+                  have H_is : H = wrapSym d
+                  · rw [List.singleton_append, List.cons_append, List.cons.inj_eq] at rev
+                    exact rev.left
+                  unfold H at H_is
+                  cases d <;> unfold wrapSym at H_is
+                  · exact Symbol.noConfusion H_is
+                  · rw [Symbol.nonterminal.inj_eq] at H_is
+                    exact Sum.noConfusion H_is
+              convert_to v.take (v.length - 1) ++ v.drop (v.length - 1) = v.take (v.length - 1) ++ [H]
+              · rw [List.take_append_drop]
+              have bef_rev := congr_arg List.reverse bef
+              repeat' rw [List.reverse_append] at bef_rev
+              have bef_rev_tak := congr_arg (List.take 1) bef_rev
+              rw [List.take_left'] at bef_rev_tak
+              swap;
+              · rw [List.length_reverse]
+                apply List.length_singleton
+              rw [List.take_append_of_le_length] at bef_rev_tak
+              swap;
+              · rw [List.length_reverse]
+                exact vlnn
+              rw [List.reverse_take _ vlnn] at bef_rev_tak
+              rw [List.reverse_eq_iff] at bef_rev_tak
+              rw [List.reverse_reverse] at bef_rev_tak
+              exact bef_rev_tak.symm-/
+            · constructor
+              · rw [aft]
+                intro contra
+                rw [List.mem_append, List.mem_append] at contra
+                cases contra with
+                | inl hZ =>
+                  cases hZ with
+                  | inl hZu =>
+                    apply no_Z
+                    rw [ends_with_H]
+                    rw [bef]
+                    repeat rw [List.append_assoc]
+                    rw [List.mem_append]
+                    left
+                    exact hZu
+                  | inr hZr =>
+                    rw [←r_of_r₀] at hZr
+                    unfold wrapGr at hZr
+                    rw [List.mem_map] at hZr
+                    rcases hZr with ⟨s, -, imposs⟩
+                    cases s
+                    · unfold wrapSym at imposs
+                      exact Symbol.noConfusion imposs
+                    · unfold wrapSym at imposs
+                      unfold Z at imposs
+                      simp at imposs
+                | inr hZv =>
+                  apply no_Z
+                  rw [ends_with_H]
+                  rw [bef]
+                  rw [List.mem_append]
+                  right
+                  exact hZv
+              · rw [aft]
+                intro contra
+                rw [List.mem_append] at contra
+                rw [List.mem_append] at contra
+                cases contra with
+                | inl hR =>
+                  cases hR with
+                  | inl hRu =>
+                    apply no_R
+                    rw [ends_with_H]
+                    rw [bef]
+                    repeat rw [List.append_assoc]
+                    rw [List.mem_append]
+                    left
+                    exact hRu
+                  | inr hRr =>
+                    rw [←r_of_r₀] at hRr
+                    unfold wrapGr at hRr
+                    rw [List.mem_map] at hRr
+                    rcases hRr with ⟨s, -, imposs⟩
+                    cases s
+                    · unfold wrapSym at imposs
+                      exact Symbol.noConfusion imposs
+                    · unfold wrapSym R at imposs
+                      simp at imposs
+                | inr hRv =>
+                  apply no_R
+                  rw [ends_with_H]
+                  rw [bef]
+                  rw [List.mem_append]
+                  right
+                  exact hRv
+          | inr hrg =>
+            exfalso
+            unfold rulesThatScanTerminals at hrg
+            rw [List.mem_map] at hrg
+            rcases hrg with ⟨t, -, eq_r⟩
+            rw [←eq_r] at bef
+            dsimp only at bef
+            rw [List.append_nil] at bef
+            rw [bef] at no_R
+            apply no_R
+            apply List.mem_append_left
+            apply List.mem_append_left
+            apply List.mem_append_right
+            apply List.mem_singleton_self
 
 private lemma star_induction {g : Grammar T} {α : List (ns T g.nt)}
     (ass : g.star.Derives [Z] α) :

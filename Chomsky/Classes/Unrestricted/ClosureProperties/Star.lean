@@ -1389,14 +1389,10 @@ by
     have very_middle : [@Symbol.nonterminal T _ ◩r₀.inputN] = List.map wrapSym [Symbol.nonterminal r₀.inputN]
     · apply List.map_singleton
     rw [List.append_assoc _ (γ.map wrapSym)] at left_half
-    obtain ⟨n, hnv'⟩ : ∃ n : ℕ, v' = (γ.map wrapSym ++ [H]).drop n
-    · have v'_from_left := congr_arg (List.drop u.length) left_half
-      simp only [List.drop_left'] at v'_from_left
-      use u.length - (w.flatten.map Symbol.terminal ++ β.map Symbol.terminal ++ [@R T g.nt]).length
-      rw [←v'_from_left, List.drop_append']
-      convert List.nil_append _
-      apply List.drop_of_length_le
-      by_contra! contr
+    have v'_from_left := congr_arg (List.drop u.length) left_half
+    simp only [List.drop_left'] at v'_from_left
+    have le_u_len : (w.flatten.map Symbol.terminal ++ β.map Symbol.terminal ++ [@R T g.nt]).length ≤ u.length
+    · by_contra! contr
       have contr' : u.length ≤ (w.flatten.map Symbol.terminal ++ β.map Symbol.terminal).length
       · simp only [List.length_append] at contr ⊢
         rw [List.length_singleton] at contr
@@ -1430,58 +1426,31 @@ by
           simp_all
         rw [very_middle, ←List.map_append_append] at Rin
         exact map_wrap_never_contains_R Rin
-    have hnγ : n ≤ (γ.map wrapSym).length
-    · sorry -- maybe extract explicit `n` above
-    obtain ⟨o, hor₀⟩ : ∃ o : ℕ, r₀.inputL.map wrapSym ++ [Symbol.nonterminal ◩r₀.inputN] ++ r₀.inputR.map wrapSym = ((γ.map wrapSym).drop n).take o
+    have v'_is_suffix : v' = (γ.map wrapSym ++ [H]).drop
+        (u.length - (w.flatten.map Symbol.terminal ++ β.map Symbol.terminal ++ [@R T g.nt]).length)
+    · rw [←v'_from_left, List.drop_append']
+      convert List.nil_append _
+      exact List.drop_of_length_le le_u_len
+    -- have hnγ : u.length - (w.flatten.map Symbol.terminal ++ β.map Symbol.terminal ++ [@R T g.nt]).length ≤ (γ.map wrapSym).length
+    -- · sorry -- maybe extract explicit `n` above
+    obtain ⟨o, hor₀⟩ :
+      ∃ o : ℕ,
+        r₀.inputL.map wrapSym ++ [Symbol.nonterminal ◩r₀.inputN] ++ r₀.inputR.map wrapSym =
+        ((γ.map wrapSym).drop (u.length - (w.flatten.map Symbol.terminal ++ β.map Symbol.terminal ++ [@R T g.nt]).length)).take o
     · have middle_part_r := congr_arg (List.take (r₀.inputL.map wrapSym ++ [Symbol.nonterminal ◩r₀.inputN] ++ r₀.inputR.map wrapSym).length) right_half
       rw [List.take_left] at middle_part_r
       use (r₀.inputL.map wrapSym ++ [Symbol.nonterminal ◩r₀.inputN] ++ r₀.inputR.map wrapSym).length
       have middle_part_l := congr_arg (List.drop u.length) left_half
       simp_rw [List.drop_left'] at middle_part_l
-      have u_len : u.length = (w.flatten.map Symbol.terminal ++ β.map Symbol.terminal ++ [@R T g.nt]).length + n
-      · sorry
+      have u_len : u.length = (w.flatten.map Symbol.terminal ++ β.map Symbol.terminal ++ [@R T g.nt]).length + (u.length - (w.flatten.map Symbol.terminal ++ β.map Symbol.terminal ++ [@R T g.nt]).length)
+      · omega
       rw [u_len, List.drop_append] at middle_part_l
       rw [middle_part_r, ←middle_part_l]
       sorry
     right
-    use γ.take n, (γ.drop n).drop o
-    constructor
-    · rw [hnv'] at left_half
-      have left_part := congr_arg (List.take u.length) left_half
-      simp_rw [List.take_left'] at left_part
-      rw [←left_part]
-      have u_len : u.length = (w.flatten.map Symbol.terminal ++ β.map Symbol.terminal ++ [@R T g.nt]).length + n
-      · have left_lengths := congr_arg List.length left_half
-        simp only [List.length_append, List.length_drop] at left_lengths ⊢
-        clear hor₀
-        omega
-      rw [u_len, List.take_append, List.take_append_of_le_length hnγ, List.map_take]
-    constructor
-    · convert_to γ = γ.take n ++ (r₀.inputL ++ [Symbol.nonterminal r₀.inputN] ++ r₀.inputR) ++ (γ.drop n).drop o
-      · simp
-      apply map_wrapSym_inj
-      rw [List.map_append_append, List.map_append_append, ←very_middle, hor₀]
-      simp
-    · have right_half_rev := congr_arg List.reverse right_half
-      simp only [List.reverse_append] at right_half_rev
-      have right_part_rev := congr_arg (List.take (v.reverse.length + 0)) right_half_rev
-      rw [List.take_append, List.take_zero, List.append_nil] at right_part_rev
-      have right_part := congr_arg List.reverse right_part_rev
-      rw [List.reverse_reverse, List.reverse_take, List.reverse_append, List.reverse_reverse, List.reverse_reverse, hnv'] at right_part
-      rw [right_part]
-      convert_to
-        ((γ.map wrapSym ++ [H]).drop n ++ ((x.map (List.map wrapSym)).map (· ++ [H])).flatten).drop o =
-        ((γ.drop n).drop o).map wrapSym ++ [H] ++ ((x.map (List.map wrapSym)).map (· ++ [H])).flatten
-      · congr
-        sorry
-      rw [List.drop_append', List.drop_append', List.drop_append']
-      congr
-      · simp
-      · rw [List.drop_drop]
-        convert List.drop_zero _
-        sorry
-      · convert List.drop_zero _
-        sorry
+    use  γ.take (u.length - (w.flatten.map Symbol.terminal ++ β.map Symbol.terminal ++ [@R T g.nt]).length)
+    use (γ.drop (u.length - (w.flatten.map Symbol.terminal ++ β.map Symbol.terminal ++ [@R T g.nt]).length)).drop o
+    sorry
 /-
   repeat rw [List.append_assoc u] at hyp
   rw [List.append_eq_append_iff] at hyp

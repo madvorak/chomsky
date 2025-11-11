@@ -2412,7 +2412,6 @@ by
             constructor
             · use u ++ r.output ++ v.take (v.length - 1)
               rw [aft]
-              sorry/-
               have vlnn : v.length ≥ 1
               · by_contra contra
                 have v_nil := zero_of_not_ge_one contra
@@ -2426,40 +2425,38 @@ by
                 repeat' rw [List.reverse_append] at rev
                 rw [← List.map_reverse _ r₀.inputR] at rev
                 rw [List.reverse_singleton] at rev
-                cases' r₀.inputR.reverse with d l
-                · have H_eq_N : H = Symbol.nonterminal ◩r₀.inputN
-                  · rw [List.map_nil, List.nil_append, List.reverse_singleton, List.singleton_append,
-                      List.singleton_append, List.cons.inj_eq] at rev
+                cases hr₀ : r₀.inputR.reverse with
+                | nil =>
+                  have H_eq_N : H = Symbol.nonterminal ◩r₀.inputN
+                  · rw [hr₀] at rev
+                    simp at rev
                     exact rev.left
                   unfold H at H_eq_N
                   have inr_eq_inl := Symbol.nonterminal.inj H_eq_N
                   exact Sum.noConfusion inr_eq_inl
-                · rw [List.map_cons] at rev
+                | cons d l =>
+                  rw [hr₀, List.map_cons] at rev
                   have H_is : H = wrapSym d
-                  · rw [List.singleton_append, List.cons_append, List.cons.inj_eq] at rev
+                  · simp at rev
                     exact rev.left
                   unfold H at H_is
                   cases d <;> unfold wrapSym at H_is
                   · exact Symbol.noConfusion H_is
-                  · rw [Symbol.nonterminal.inj_eq] at H_is
-                    exact Sum.noConfusion H_is
-              convert_to v.take (v.length - 1) ++ v.drop (v.length - 1) = v.take (v.length - 1) ++ [H]
-              · rw [List.take_append_drop]
+                  · simp at H_is
               have bef_rev := congr_arg List.reverse bef
               repeat' rw [List.reverse_append] at bef_rev
               have bef_rev_tak := congr_arg (List.take 1) bef_rev
-              rw [List.take_left'] at bef_rev_tak
-              swap;
-              · rw [List.length_reverse]
-                apply List.length_singleton
-              rw [List.take_append_of_le_length] at bef_rev_tak
-              swap;
-              · rw [List.length_reverse]
-                exact vlnn
-              rw [List.reverse_take _ vlnn] at bef_rev_tak
-              rw [List.reverse_eq_iff] at bef_rev_tak
-              rw [List.reverse_reverse] at bef_rev_tak
-              exact bef_rev_tak.symm-/
+              rw [List.take_left' (by rfl)] at bef_rev_tak
+              rw [List.take_append_of_le_length (by rwa [List.length_reverse])] at bef_rev_tak
+              convert_to u ++ r.output ++ v = u ++ r.output ++ (v.take (v.length - 1) ++ [H])
+              · simp
+              conv_lhs => rw [←v.take_append_drop (v.length - 1)]
+              congr
+              have h1 : 1 = v.length - (v.length - 1)
+              · omega
+              rw [h1, ←List.reverse_drop] at bef_rev_tak
+              apply List.reverse_injective
+              exact bef_rev_tak.symm
             · constructor
               · rw [aft]
                 intro contra
@@ -2488,9 +2485,7 @@ by
                       simp at imposs
                 | inr hZv =>
                   apply no_Z
-                  rw [ends_with_H]
-                  rw [bef]
-                  rw [List.mem_append]
+                  rw [ends_with_H, bef, List.mem_append]
                   right
                   exact hZv
               · rw [aft]

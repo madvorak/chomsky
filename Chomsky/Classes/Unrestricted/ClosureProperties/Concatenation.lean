@@ -1474,45 +1474,44 @@ by
     · rw [List.length_append, List.length_append, List.length_singleton]
       clear * -
       linarith
-    sorry /-
-    rw [List.getElem_append_right] at eqi_symb
-    simp only [Nat.sub_self, List.singleton_append, List.get] at eqi_symb
-    have eq_none :
-      (x.map (wrapSymbol₁ g₂.nt) ++ y.map (wrapSymbol₂ g₁.nt)).nthLe u.length ulen₁ =
-        Symbol.nonterminal ◩none)
-    · clear * - eqi_symb
-      cases'
-        (x.map (wrapSymbol₁ g₂.nt) ++ y.map (wrapSymbol₂ g₁.nt)).nthLe u.length ulen₁ with
-        t s
-      · exfalso
-        unfold correspondingSymbols at eqi_symb
-        exact eqi_symb
-      cases s
-      · cases s
-        · rfl
+    have eq_none : (x.map (wrapSymbol₁ g₂.nt) ++ y.map (wrapSymbol₂ g₁.nt))[u.length]'ulen₁ = Symbol.nonterminal ◩none
+    · simp at eqi_symb
+      cases hxyu : (x.map (wrapSymbol₁ g₂.nt) ++ y.map (wrapSymbol₂ g₁.nt))[u.length] with
+      | terminal t =>
         exfalso
-        clear * - eqi_symb
-        cases s <;> tauto
-      · exfalso
-        clear * - eqi_symb
-        cases s <;> tauto
-    have impossible_in :
-      Symbol.nonterminal ◩none) ∈
-        x.map (wrapSymbol₁ g₂.nt) ++ y.map (wrapSymbol₂ g₁.nt)
-    · rw [List.mem_iff_nthLe]
+        simp_all [correspondingSymbols]
+      | nonterminal s =>
+        cases s with
+        | inl sₒ =>
+          cases sₒ with
+          | none => rfl
+          | some => simp_all [correspondingSymbols]
+        | inr sₜ => simp_all [correspondingSymbols]
+    have impossible_in : Symbol.nonterminal ◩none ∈ x.map (wrapSymbol₁ g₂.nt) ++ y.map (wrapSymbol₂ g₁.nt)
+    · rw [List.mem_iff_getElem]
       use u.length
       use ulen₁
       exact eq_none
     rw [List.mem_append] at impossible_in
-    cases impossible_in <;>
-      · rw [List.mem_map] at impossible_in
-        rcases impossible_in with ⟨s, -, contradic⟩
-        clear * - contradic
-        cases s
-        · have imposs := Symbol.nonterminal.inj contradic
-          exact Sum.noConfusion imposs
-        · have impos := Sum.inl.inj (Symbol.nonterminal.inj contradic)
-          exact Option.noConfusion impos-/
+    cases impossible_in with
+    | inl hinx =>
+      rw [List.mem_map] at hinx
+      rcases hinx with ⟨s, -, contradic⟩
+      clear * - contradic
+      cases s
+      · have imposs := Symbol.nonterminal.inj contradic
+        exact Sum.noConfusion imposs
+      · have impos := Sum.inl.inj (Symbol.nonterminal.inj contradic)
+        exact Option.noConfusion impos
+    | inr hiny =>
+      rw [List.mem_map] at hiny
+      rcases hiny with ⟨s, -, contradic⟩
+      clear * - contradic
+      cases s
+      · have imposs := Symbol.nonterminal.inj contradic
+        exact Sum.noConfusion imposs
+      · have impos := Sum.inl.inj (Symbol.nonterminal.inj contradic)
+        exact Option.noConfusion impos
   · cases' induction_step_for_lifted_rule_from_g₁ rin₁ bef aft ih_x ih_y ih_concat with x' pros
     exact ⟨x', y, pros⟩
   · use x

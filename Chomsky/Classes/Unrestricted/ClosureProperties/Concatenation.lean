@@ -681,12 +681,12 @@ by
         cases t with
         | inl t₁ =>
           cases z with
-            | nil => tauto
-            | cons a => cases a <;> tauto
+          | nil => tauto
+          | cons a => cases a <;> tauto
         | inr t₂ =>
           cases z with
-            | nil => tauto
-            | cons a => cases a <;> tauto
+          | nil => tauto
+          | cons a => cases a <;> tauto
 
 private lemma correspondingStrings_after_wrap_unwrap_self₂ {N₁ N₂ : Type} {w : List (nst T N₁ N₂)}
     (hNw : ∃ z : List (Symbol T N₂), correspondingStrings (z.map (wrapSymbol₂ N₁)) w) :
@@ -725,12 +725,12 @@ by
         cases t with
         | inl t₁ =>
           cases z with
-            | nil => tauto
-            | cons a => cases a <;> tauto
+          | nil => tauto
+          | cons a => cases a <;> tauto
         | inr t₂ =>
           cases z with
-            | nil => tauto
-            | cons a => cases a <;> tauto
+          | nil => tauto
+          | cons a => cases a <;> tauto
 
 private lemma correspondingStrings_getElem {N₁ N₂ : Type} {x y : List (nst T N₁ N₂)} {i : ℕ}
     (i_lt_len_x : i < x.length) (i_lt_len_y : i < y.length)
@@ -796,79 +796,70 @@ by
         (u ++ r₁.inputL.map (wrapSymbol₁ g₂.nt) ++ [Symbol.nonterminal ◩(some ◩r₁.inputN)] ++
           r₁.inputR.map (wrapSymbol₁ g₂.nt)).length - 1 <
         (x.map (wrapSymbol₁ g₂.nt) ++ y.map (wrapSymbol₂ g₁.nt)).length
-      · rw [equal_total_len]
-        aesop
+      · rw [equal_total_len, ←wrap_r₁_eq_r]
+        simp_all
       have inequality_map_opp :
         (x.map (wrapSymbol₁ g₂.nt)).length ≤
         (u ++ r₁.inputL.map (wrapSymbol₁ g₂.nt) ++ [Symbol.nonterminal ◩(some ◩r₁.inputN)] ++
           r₁.inputR.map (wrapSymbol₁ g₂.nt)).length - 1
-      · clear * - contra
-        apply Nat.le_pred_of_lt
-        repeat' rw [List.length_append]
-        repeat' rw [List.length_map]
-        rw [List.length_map] at contra
-        rw [List.length_map] at contra
-        rw [List.length_singleton]
-        rw [add_assoc]
-        rw [add_assoc]
-        rw [add_assoc] at contra
-        exact contra
-      have clash := List.Forall₂.get ih_concat inequality_map (wrap_r₁_eq_r ▸ inequality_cat)
-      sorry /-have clash := correspondingStrings_nthLe inequality_map inequality_cat ih_concat
+      · apply Nat.le_pred_of_lt
+        repeat rw [List.length_append]
+        simpa [←add_assoc] using contra
+      have clash := correspondingStrings_getElem inequality_map (wrap_r₁_eq_r ▸ inequality_cat) ih_concat
+      -- maybe wrong assoc ?
       rw [List.getElem_append] at clash
-      rw [List.nthLe_append_right inequality_map_opp inequality_map] at clash
-      rw [List.nthLe_map] at clash ; swap
-      · have inequality_map := inequality_map
+      --rw [List.getElem_append_right] at clash -- WRONG !!
+      split at clash
+      · rw [List.getElem_map] at clash
+        have inequality_map := inequality_map
         rw [List.length_append _ (y.map (wrapSymbol₂ g₁.nt))] at inequality_map
-        rw [List.length_map _ y] at inequality_map
-        rw [tsub_lt_iff_left inequality_map_opp]
-        exact inequality_map
-      by_cases (r₁.input_R.map (wrapSymbol₁ g₂.nt)).length ≥ 1
-      · rw [List.nthLe_append_right] at clash ; swap
-        · rw [List.length_append _ (r₁.input_R.map (wrapSymbol₁ g₂.nt))]
-          have trivi_ineq : ∀ m k : ℕ, k ≥ 1 → m ≤ m + k - 1 :=
+        rw [y.length_map] at inequality_map
+        linarith
+      · sorry  /-
+        by_cases h1 : (r₁.inputR.map (wrapSymbol₁ g₂.nt)).length ≥ 1
+        · rw [List.getElem_append_right] at clash ; swap
+          · rw [List.length_append _ (r₁.inputR.map (wrapSymbol₁ g₂.nt))]
+            have trivi_ineq : ∀ m k : ℕ, k ≥ 1 → m ≤ m + k - 1
+            · clear * -
+              omega
+            --convert trivi_ineq (u ++ _ ++ [_]).length _ h1 using 1
+            sorry
+            /-
+            rw [List.length_map] at h1
+            repeat' rw [List.length_append]
+            repeat' rw [List.length_map]
+            rw [List.length_singleton]
+            have easy_ineq : ∀ m k : ℕ, k ≥ 1 → m + k - 1 - m < k :=
+              by
+              clear * -
+              omega
+            convert easy_ineq (u.length + r₁.input_L.length + 1) _ h-/
+          rw [List.getElem_map] at clash
+          exact correspondingSymbols_never₂ clash
+        · push_neg at h1
+          have ris_third_is_nil : r₁.inputR.map (wrapSymbol₁ g₂.nt) = []
+          · rwa [←List.length_eq_zero_iff, ←Nat.lt_one_iff]
+          have inequality_m0 :
+            (u ++ r₁.inputL.map (wrapSymbol₁ g₂.nt) ++
+                    [Symbol.nonterminal ◩(some ◩r₁.inputN)]).length -
+                1 <
+              (u ++ r₁.inputL.map (wrapSymbol₁ g₂.nt) ++
+                  [Symbol.nonterminal ◩(some ◩r₁.inputN)]).length :=
             by
-            clear * -
-            omega
-          convert trivi_ineq (u ++ _ ++ [_]).length _ h
-        rw [List.nthLe_map] at clash ; swap
-        · rw [List.length_map] at h
-          repeat' rw [List.length_append]
-          repeat' rw [List.length_map]
-          rw [List.length_singleton]
-          have easy_ineq : ∀ m k : ℕ, k ≥ 1 → m + k - 1 - m < k :=
-            by
-            clear * -
-            omega
-          convert easy_ineq (u.length + r₁.input_L.length + 1) _ h
-        exact corresponding_symbols_never₂ clash
-      · push_neg at h
-        have ris_third_is_nil : r₁.input_R.map (wrapSymbol₁ g₂.nt) = [] :=
-          by
-          rw [← List.length_eq_zero]
-          rw [← Nat.lt_one_iff]
-          exact h
-        have inequality_m0 :
-          (u ++ r₁.input_L.map (wrapSymbol₁ g₂.nt) ++
-                  [Symbol.nonterminal ◩(some ◩r₁.input_N)]).length -
-              1 <
-            (u ++ r₁.input_L.map (wrapSymbol₁ g₂.nt) ++
-                [Symbol.nonterminal ◩(some ◩r₁.input_N)]).length :=
-          by
-          rw [ris_third_is_nil] at inequality_m1
-          rw [List.append_nil] at inequality_m1
-          exact inequality_m1
-        simp_rw [ris_third_is_nil] at clash
-        simp only [List.append_nil] at clash
-        rw [List.nthLe_append_right] at clash
-        swap;
-        · apply le_of_eq
-          rw [List.length_append _ [_]]
-          rw [List.length_singleton]
-          apply Nat.succ_sub_one
-        rw [List.nthLe_singleton] at clash
-        change corresponding_symbols _ (wrapSymbol₁ g₂.nt (Symbol.nonterminal r₁.input_N)) at clash
-        exact corresponding_symbols_never₂ clash-/
+            rw [ris_third_is_nil] at inequality_m1
+            rw [List.append_nil] at inequality_m1
+            exact inequality_m1
+          simp_rw [ris_third_is_nil] at clash
+          simp only [List.append_nil] at clash
+          rw [List.getElem_append_right] at clash
+          swap;
+          · apply le_of_eq
+            rw [List.length_append _ [_]]
+            rw [List.length_singleton]
+            apply Nat.succ_sub_one
+          rw [List.nthLe_singleton] at clash
+          change corresponding_symbols _ (wrapSymbol₁ g₂.nt (Symbol.nonterminal r₁.input_N)) at clash
+          exact corresponding_symbols_never₂ clash-/
     omega
   constructor
   · constructor

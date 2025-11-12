@@ -83,7 +83,7 @@ def lg₁ : LiftedGrammar T :=
       · exact rin₁
       · exfalso
         rcases rin₂ with ⟨r₂, r₂_in, r₂_lift⟩
-        rw [← r₂_lift] at rnt
+        rw [←r₂_lift] at rnt
         have rnti := Option.some.inj rnt
         exact Sum.noConfusion rnti
     )
@@ -144,7 +144,7 @@ def lg₂ : LiftedGrammar T :=
         exact Option.noConfusion rnt
       · exfalso
         rcases rin₁ with ⟨r₁, r₁_in, r₁_lift⟩
-        rw [← r₁_lift] at rnt
+        rw [←r₁_lift] at rnt
         have rnti := Option.some.inj rnt
         exact Sum.noConfusion rnti
       · exact rin₂
@@ -174,7 +174,7 @@ by
     repeat' rw [List.length_append] at bef_len
     rw [List.length_singleton] at bef_len
     constructor <;>
-    · rw [← List.length_eq_zero_iff]
+    · rw [←List.length_eq_zero_iff]
       linarith
   rw [uv_nil.left, List.nil_append, uv_nil.right, List.append_nil] at bef aft
   have same_nt : (unionGrammar g₁ g₂).initial = r.inputN
@@ -209,7 +209,7 @@ by
     unfold sinkString
     rw [List.filterMap_map]
     convert_to w.map Symbol.terminal = w.filterMap (Option.some ∘ Symbol.terminal)
-    rw [← List.filterMap_map, List.filterMap_some]
+    rw [←List.filterMap_map, List.filterMap_some]
   · rw [req₂] at aft
     dsimp only at aft
     rw [aft] at deri
@@ -303,13 +303,13 @@ by
   apply Set.eq_of_subset_of_subset
   · intro w ass
     rw [Language.mem_add]
-    rw [← eq_L₁, ← eq_L₂]
+    rw [←eq_L₁, ←eq_L₂]
     exact in_L₁_or_L₂_of_in_union ass
   · intro w ass
     cases' ass with case₁ case₂
-    · rw [← eq_L₁] at case₁
+    · rw [←eq_L₁] at case₁
       exact in_union_of_in_L₁ case₁
-    · rw [← eq_L₂] at case₂
+    · rw [←eq_L₂] at case₂
       exact in_union_of_in_L₂ case₂
 
 #print axioms GG_of_GG_u_GG

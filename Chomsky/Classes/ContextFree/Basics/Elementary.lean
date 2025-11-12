@@ -88,7 +88,7 @@ lemma language_of_cfgEmptyWord : CFG.language (@cfgEmptyWord T) = singleton [] :
     rcases step_init with ⟨r, rin, pre, pos, bef, aft⟩
     have rule : r = ((0 : Fin 1), []) :=
       by
-      rw [← List.mem_singleton]
+      rw [←List.mem_singleton]
       exact rin
     have empty_surrounding : pre = [] ∧ Pos = [] :=
       by
@@ -122,7 +122,7 @@ lemma language_of_cfgEmptyWord : CFG.language (@cfgEmptyWord T) = singleton [] :
     have impossible_lengths := congr_arg List.length h
     rw [List.length] at impossible_lengths
     rw [List.length_map] at impossible_lengths
-    rw [← impossible_lengths] at w_not_nil
+    rw [←impossible_lengths] at w_not_nil
     exact Nat.lt_irrefl 0 w_not_nil
   · exfalso
     rcases h with ⟨-, ⟨trash_r, -, trash_1, trash_2, impossible, -⟩, -⟩
@@ -249,7 +249,7 @@ lemma language_of_cfgSymbolStar (a : T) :
               a::List.replicate n (Symbol.terminal a) ++ [Symbol.nonterminal (0 : Fin 1)]) =
           List.replicate n (Symbol.terminal a) ++ ([Symbol.terminal a] ++ [Symbol.nonterminal 0])
       sorry /-
-      rw [← List.cons_append]
+      rw [←List.cons_append]
       trace
         "./././Mathport/Syntax/Translate/Tactic/Builtin.lean:73:14: unsupported tactic `trim #[]"
       have count_succ_left :

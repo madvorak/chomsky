@@ -39,14 +39,14 @@ by
   use y.reverse
   use x.reverse
   constructor
-  · rw [← List.reverse_singleton, ← List.reverse_append_append]
+  · rw [←List.reverse_singleton, ←List.reverse_append_append]
     have fst_from_r : r₀.fst = r.fst
-    · rw [← r_from_r₀]
+    · rw [←r_from_r₀]
     rw [fst_from_r]
     exact congr_arg List.reverse bef
   · have snd_from_r : r₀.snd = r.snd.reverse
-    · rw [← r_from_r₀, List.reverse_reverse]
-    rw [snd_from_r, ← List.reverse_append_append]
+    · rw [←r_from_r₀, List.reverse_reverse]
+    rw [snd_from_r, ←List.reverse_append_append]
     exact congr_arg List.reverse aft
 
 private lemma reversed_word_in_original_language {g : CFG T} {w : List T}
@@ -63,7 +63,7 @@ theorem CF_of_reverse_CF (L : Language T) :
   L.IsCF → L.reverse.IsCF :=
 by
   rintro ⟨g, hgL⟩
-  rw [← hgL]
+  rw [←hgL]
   use g.reverse
   apply Set.eq_of_subset_of_subset
   · intro _

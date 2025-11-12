@@ -38,11 +38,11 @@ by
   rw [unionCFG_same_language]
   apply Set.eq_of_subset_of_subset
   · intro w hyp
-    rw [← eq_L₁, ← eq_L₂]
+    rw [←eq_L₁, ←eq_L₂]
     exact in_L₁_or_L₂_of_in_union hyp
   · intro w hyp
     cases' hyp with case_1 case_2
-    · rw [← eq_L₁] at case_1
+    · rw [←eq_L₁] at case_1
       exact in_union_of_in_L₁ case_1
-    · rw [← eq_L₂] at case_2
+    · rw [←eq_L₂] at case_2
       exact in_union_of_in_L₂ case_2

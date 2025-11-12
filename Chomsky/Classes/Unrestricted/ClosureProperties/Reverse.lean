@@ -43,23 +43,23 @@ by
   use r₀, rin₀, y.reverse, x.reverse
   constructor
   · have rid₁ : r₀.inputL = r.inputR.reverse
-    · rw [← r_from_r₀]
+    · rw [←r_from_r₀]
       unfold reversalGrule
       rw [List.reverse_reverse]
     have rid₂ : [Symbol.nonterminal r₀.inputN] = [Symbol.nonterminal r.inputN].reverse
-    · rw [← r_from_r₀]
+    · rw [←r_from_r₀]
       rw [List.reverse_singleton]
       rfl
       exact T
     have rid₃ : r₀.inputR = r.inputL.reverse
-    · rw [← r_from_r₀]
+    · rw [←r_from_r₀]
       unfold reversalGrule
       rw [List.reverse_reverse]
-    rw [rid₁, rid₂, rid₃, ← List.reverse_append_append, ← List.reverse_append_append, ←
-      List.append_assoc, ← List.append_assoc]
+    rw [rid₁, rid₂, rid₃, ←List.reverse_append_append, ←List.reverse_append_append, ←
+      List.append_assoc, ←List.append_assoc]
     congr
   · have snd_from_r : r₀.output = r.output.reverse
-    · rw [← r_from_r₀]
+    · rw [←r_from_r₀]
       unfold reversalGrule
       rw [List.reverse_reverse]
     rw [snd_from_r, ←List.reverse_append_append]
@@ -71,7 +71,7 @@ private lemma reversed_word_in_original_language {g : Grammar T} {w : List T}
 by
   unfold Grammar.language at *
   have almost_done := derives_reversed g (List.map Symbol.terminal w) hwg
-  rw [← List.map_reverse] at almost_done
+  rw [←List.map_reverse] at almost_done
   exact almost_done
 
 

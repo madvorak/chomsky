@@ -134,7 +134,7 @@ private lemma LiftedCFG.sink_produces {G : LiftedCFG T}
         sinkString, List.filterMap_append, liftRule, liftString, List.filterMap_map, List.filterMap_some, ←hrr₀, correct_inverse
       ] using congr_arg (sinkString G.sinkNT) aft
   · rw [bef] at hw₁
-    rw [aft, ← hrr₀]
+    rw [aft, ←hrr₀]
     simp only [GoodString, List.forall_mem_append] at hw₁ ⊢
     refine ⟨⟨hw₁.left.left, ?_⟩, hw₁.right⟩
     intro a ha
@@ -143,7 +143,7 @@ private lemma LiftedCFG.sink_produces {G : LiftedCFG T}
     dsimp only [liftRule, liftString] at ha
     rw [List.mem_map] at ha
     rcases ha with ⟨s, -, hs⟩
-    rw [← hs]
+    rw [←hs]
     cases s with
     | terminal _ => exact False.elim (Symbol.noConfusion hs)
     | nonterminal s' => exact ⟨s', G.sinkNT_liftNT s'⟩

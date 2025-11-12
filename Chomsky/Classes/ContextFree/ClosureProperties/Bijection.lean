@@ -29,7 +29,7 @@ lemma CF_of_bijemap_CF (π : Equiv T₁ T₂) (L : Language T₁) : L.IsCF → (
   · intro w hw
     unfold bijemapLang
     change List.map π.inv_fun w ∈ L
-    rw [← hg]
+    rw [←hg]
     unfold cFLanguage at hw ⊢
     rw [Set.mem_setOf_eq] at hw ⊢
     unfold CFGenerates at hw ⊢
@@ -57,7 +57,7 @@ lemma CF_of_bijemap_CF (π : Equiv T₁ T₂) (L : Language T₁) : L.IsCF → (
         have b_eq : lsT₂_of_lsT₁ π b = r.snd := (congr_arg Prod.snd ab_eq).congr_right.mp rfl
         rw [a_eq] at ab_in
         convert ab_in
-        rw [← b_eq]
+        rw [←b_eq]
         unfold lsT₁_of_lsT₂
         unfold lsT₂_of_lsT₁
         rw [List.map_map]
@@ -91,7 +91,7 @@ lemma CF_of_bijemap_CF (π : Equiv T₁ T₂) (L : Language T₁) : L.IsCF → (
   · intro w hw
     unfold bijemapLang at hw
     change List.map π.inv_fun w ∈ L at hw
-    rw [← hg] at hw
+    rw [←hg] at hw
     unfold cFLanguage at hw
     rw [Set.mem_setOf_eq] at hw
     unfold CFGenerates at hw

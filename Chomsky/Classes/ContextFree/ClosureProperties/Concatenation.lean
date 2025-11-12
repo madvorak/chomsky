@@ -88,7 +88,7 @@ private def g₁g (g₁ g₂ : CFG T) : @LiftedGrammar T :=
         use r₁
         constructor
         · exact r₁_in
-        rw [← r₁_convert_r]
+        rw [←r₁_convert_r]
         simp only [liftRule, ruleOfRule₁, liftString, lsTNOfLsTN₁, Prod.mk.inj_iff,
           eq_self_iff_true, true_and_iff]
         run_tac
@@ -96,7 +96,7 @@ private def g₁g (g₁ g₂ : CFG T) : @LiftedGrammar T :=
       · exfalso
         rw [List.mem_map] at r_in
         rcases r_in with ⟨r₂, r₂_in, r₂_convert_r⟩
-        rw [← r₂_convert_r] at r_ntype
+        rw [←r₂_convert_r] at r_ntype
         unfold ruleOfRule₂ at r_ntype
         dsimp only at r_ntype
         cases' r_ntype with n₁ contr
@@ -165,7 +165,7 @@ private def g₂g (g₁ g₂ : CFG T) : @LiftedGrammar T :=
       · exfalso
         rw [List.mem_map] at r_in
         rcases r_in with ⟨r₁, r₁_in, r₁_convert_r⟩
-        rw [← r₁_convert_r] at r_ntype
+        rw [←r₁_convert_r] at r_ntype
         unfold ruleOfRule₁ at r_ntype
         dsimp only at r_ntype
         cases' r_ntype with n₂ contr
@@ -176,7 +176,7 @@ private def g₂g (g₁ g₂ : CFG T) : @LiftedGrammar T :=
         use r₂
         constructor
         · exact r₂_in
-        rw [← r₂_convert_r]
+        rw [←r₂_convert_r]
         simp only [liftRule, ruleOfRule₂, liftString, lsTNOfLsTN₂, Prod.mk.inj_iff,
           eq_self_iff_true, true_and_iff]
         run_tac
@@ -264,7 +264,7 @@ private lemma v_eq_drop_map_w {g₁ g₂ : CFG T} (u : List (Symbol T g₁.nt))
     have hunltuv : u.length + n < u.length + v.length := by apply add_lt_add_left h
     have hunltw : u.length + n < w.length :=
       by
-      rw [← total_len]
+      rw [←total_len]
       exact hunltuv
     have hlen₁ : u.length + n < (List.map sTNOfSTN₁ u ++ List.map sTNOfSTN₂ v).length :=
       by
@@ -320,7 +320,7 @@ private lemma v_eq_drop_map_w {g₁ g₂ : CFG T} (u : List (Symbol T g₁.nt))
     push_neg at h
     rw [List.get?_eq_none]
     rw [List.length_map]
-    rw [← total_len]
+    rw [←total_len]
     apply add_le_add_left h
   rfl
 
@@ -361,7 +361,7 @@ private lemma self_of_lsTN₁ {g₁ g₂ : CFG T} (stri : List (Symbol T g₁.nt
       by
       ext1
       apply self_of_sTN₁
-    rw [← equal_functions]
+    rw [←equal_functions]
     apply congr_fun
     apply congr_arg
     ext1
@@ -382,7 +382,7 @@ private lemma self_of_lsTN₂ {g₁ g₂ : CFG T} (stri : List (Symbol T g₂.nt
       by
       ext1
       apply self_of_sTN₂
-    rw [← equal_functions]
+    rw [←equal_functions]
     apply congr_fun
     apply congr_arg
     ext1
@@ -523,7 +523,7 @@ private lemma in_concatenated_of_in_combined {g₁ g₂ : CFG T} {w : List T}
     rcases ih with ⟨u, v, ⟨ih₁, ih₂⟩, ih_concat⟩
     cases orig_in
     · exfalso
-      rw [← ih_concat] at bef
+      rw [←ih_concat] at bef
       rw [orig_in] at bef
       clear * - bef
       dsimp only at bef
@@ -574,7 +574,7 @@ private lemma in_concatenated_of_in_combined {g₁ g₂ : CFG T} {w : List T}
       rw [aft]
       rw [bef] at ih_concat
       clear bef aft a b
-      rw [← r₁_conv] at ih_concat ⊢
+      rw [←r₁_conv] at ih_concat ⊢
       clear r₁_conv orig_rule
       have part_for_u := congr_arg (List.take (@lsTNOfLsTN₁ T g₁ g₂ u).length) ih_concat
       have part_for_v := congr_arg (List.drop (@lsTNOfLsTN₁ T g₁ g₂ u).length) ih_concat
@@ -631,7 +631,7 @@ private lemma in_concatenated_of_in_combined {g₁ g₂ : CFG T} {w : List T}
               (lsTN₁_of_lsTN
                 (c ++ (ruleOfRule₁ r₁).snd ++
                   List.take ((lsTNOfLsTN₁ u).length - (c.length + 1)) d))
-          · rw [← part_for_u]
+          · rw [←part_for_u]
             rw [self_of_lsTN₁]
           use r₁
           constructor
@@ -719,7 +719,7 @@ private lemma in_concatenated_of_in_combined {g₁ g₂ : CFG T} {w : List T}
           rw [List.length_singleton] at lengs
           have uleng_le : u.length ≤ c.length + 1 + d.length :=
             by
-            rw [← min_eq_left_iff]
+            rw [←min_eq_left_iff]
             exact lengs.symm
           clear * - uleng_le
           omega
@@ -741,7 +741,7 @@ private lemma in_concatenated_of_in_combined {g₁ g₂ : CFG T} {w : List T}
             List.map sTNOfSTN₁ (List.filterMap sTN₁_of_sTN (List.take c.length (lsTNOfLsTN₁ u))) = c
           · rw [taken_c_from_u]
           unfold lsTNOfLsTN₁
-          rw [← List.map_take]
+          rw [←List.map_take]
           change List.map sTNOfSTN₁ (lsTN₁_of_lsTN (lsTNOfLsTN₁ (List.take c.length u))) = _
           rw [self_of_lsTN₁]
           rw [List.map_take]
@@ -769,16 +769,16 @@ private lemma in_concatenated_of_in_combined {g₁ g₂ : CFG T} {w : List T}
             rw [List.length_singleton]
           rw [translate_counts] at taken_d_from_dropped_u
           rw [List.drop_left] at taken_d_from_dropped_u
-          rw [← translate_counts] at taken_d_from_dropped_u
+          rw [←translate_counts] at taken_d_from_dropped_u
           change
             List.map sTNOfSTN₁
                 (List.filterMap sTN₁_of_sTN
                   (List.take ((@lsTNOfLsTN₁ T g₁ g₂ u).length - (c.length + 1)) d)) =
               _
-          rw [← taken_d_from_dropped_u]
+          rw [←taken_d_from_dropped_u]
           change
             List.map sTNOfSTN₁ (lsTN₁_of_lsTN (List.drop (c.length + 1) (List.map sTNOfSTN₁ u))) = _
-          rw [← List.map_drop]
+          rw [←List.map_drop]
           change List.map sTNOfSTN₁ (lsTN₁_of_lsTN (lsTNOfLsTN₁ (List.drop (c.length + 1) u))) = _
           rw [self_of_lsTN₁]
           rw [List.map_drop]
@@ -896,7 +896,7 @@ private lemma in_concatenated_of_in_combined {g₁ g₂ : CFG T} {w : List T}
           change _ = List.drop (List.map sTNOfSTN₁ u').length (c ++ (ruleOfRule₁ r₁).snd ++ d)
           rw [List.length_map]
           rw [len_u']
-          rw [← List.length_append]
+          rw [←List.length_append]
           rw [List.drop_append]
           rw [List.length_take]
           rw [trivi_min]
@@ -908,7 +908,7 @@ private lemma in_concatenated_of_in_combined {g₁ g₂ : CFG T} {w : List T}
       rw [aft]
       rw [bef] at ih_concat
       clear bef aft a b
-      rw [← r₂_conv] at ih_concat ⊢
+      rw [←r₂_conv] at ih_concat ⊢
       clear r₂_conv orig_rule
       have part_for_u := congr_arg (List.take (@lsTNOfLsTN₁ T g₁ g₂ u).length) ih_concat
       have part_for_v := congr_arg (List.drop (@lsTNOfLsTN₁ T g₁ g₂ u).length) ih_concat
@@ -943,7 +943,7 @@ private lemma in_concatenated_of_in_combined {g₁ g₂ : CFG T} {w : List T}
             rw [Nat.sub_self]
             rfl
           rw [dlengthth] at ldth
-          rw [← List.length_reverse] at contra
+          rw [←List.length_reverse] at contra
           rw [List.get?_append_right contra] at ldth
           have rrr := List.get?_mem ldth
           rw [List.mem_reverse'] at rrr
@@ -991,7 +991,7 @@ private lemma in_concatenated_of_in_combined {g₁ g₂ : CFG T} {w : List T}
                 (List.drop (lsTNOfLsTN₁ u).length
                   (c ++ [Symbol.nonterminal (ruleOfRule₂ r₂).fst] ++ d)))
               (lsTN₂_of_lsTN (List.drop (lsTNOfLsTN₁ u).length c ++ (ruleOfRule₂ r₂).snd ++ d))
-          · rw [← part_for_v]
+          · rw [←part_for_v]
             rw [self_of_lsTN₂]
           use r₂
           constructor
@@ -1008,7 +1008,7 @@ private lemma in_concatenated_of_in_combined {g₁ g₂ : CFG T} {w : List T}
             unfold lsTN₂_of_lsTN
             rw [List.append_assoc]
             rw [List.drop_append_of_le_length hlen_uc_orig]
-            rw [← List.append_assoc]
+            rw [←List.append_assoc]
             rw [List.filterMap_append_append]
             rw [eq_c']
             rfl
@@ -1044,23 +1044,23 @@ private lemma in_concatenated_of_in_combined {g₁ g₂ : CFG T} {w : List T}
           rw [List.map_append_append]
           rw [List.append_assoc c]
           rw [List.drop_append_of_le_length hlen_uc]
-          rw [← List.append_assoc]
+          rw [←List.append_assoc]
           apply congr_arg₂; apply congr_arg₂
           · have aux_plus_minus :
               (lsTNOfLsTN₁ u).length + (c.length - (lsTNOfLsTN₁ u).length) = c.length :=
               by
-              rw [← Nat.add_sub_assoc hlen_uc]
+              rw [←Nat.add_sub_assoc hlen_uc]
               rw [Nat.add_sub_cancel_left]
             have taken_c_from_v :=
               congr_arg (List.take (c.length - (@lsTNOfLsTN₁ T g₁ g₂ u).length)) part_for_v
-            rw [← List.drop_take] at taken_c_from_v
+            rw [←List.drop_take] at taken_c_from_v
             rw [List.append_assoc] at taken_c_from_v
             rw [List.take_append_of_le_length (le_of_eq aux_plus_minus)] at taken_c_from_v
             rw [aux_plus_minus] at taken_c_from_v
             rw [List.take_length] at taken_c_from_v
-            rw [← taken_c_from_v]
+            rw [←taken_c_from_v]
             unfold lsTNOfLsTN₂
-            rw [← List.map_take]
+            rw [←List.map_take]
             change
               lsTNOfLsTN₂
                   (lsTN₂_of_lsTN (lsTNOfLsTN₂ (List.take (c.length - (lsTNOfLsTN₁ u).length) v))) =
@@ -1091,9 +1091,9 @@ private lemma in_concatenated_of_in_combined {g₁ g₂ : CFG T} {w : List T}
               apply Nat.add_sub_cancel
             rw [dropped_exactly_length] at taken_d_from_v
             rw [List.drop_left] at taken_d_from_v
-            rw [← taken_d_from_v]
+            rw [←taken_d_from_v]
             unfold lsTNOfLsTN₂
-            rw [← List.map_drop]
+            rw [←List.map_drop]
             change
               lsTNOfLsTN₂
                   (lsTN₂_of_lsTN
@@ -1200,7 +1200,7 @@ private lemma in_combined_of_in_concatenated {g₁ g₂ : CFG T} {w : List T}
     · apply List.mem_cons_self
     use [], []
     constructor <;> rfl
-  rw [← hw]
+  rw [←hw]
   rw [List.map_append]
   apply
     @CF_deri_of_deri_deri T (combined_grammar g₁ g₂) _
@@ -1257,12 +1257,12 @@ lemma CF_of_CF_c_CF (L₁ : Language T) (L₂ : Language T) : L₁.IsCF ∧ L₂
   apply Set.eq_of_subset_of_subset
   · -- prove `L₁ * L₂ ⊇ ` here
     intro w hyp
-    rw [← eq_L₁]
-    rw [← eq_L₂]
+    rw [←eq_L₁]
+    rw [←eq_L₂]
     exact in_concatenated_of_in_combined hyp
   · -- prove `L₁ * L₂ ⊆ ` here
     intro w hyp
-    rw [← eq_L₁] at hyp
-    rw [← eq_L₂] at hyp
+    rw [←eq_L₁] at hyp
+    rw [←eq_L₂] at hyp
     exact in_combined_of_in_concatenated hyp
 -/

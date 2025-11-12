@@ -135,7 +135,7 @@ by
   · rw [bef] at ok_input
     rw [aft]
     unfold GoodString at ok_input ⊢
-    rw [← preimage]
+    rw [←preimage]
     clear * - ok_input
     rw [List.forall_mem_append_append] at ok_input ⊢
     rw [List.forall_mem_append_append] at ok_input
@@ -151,7 +151,7 @@ by
     unfold liftString at a_in_ros
     rw [List.mem_map] at a_in_ros
     rcases a_in_ros with ⟨s, trash, a_from_s⟩
-    rw [← a_from_s]
+    rw [←a_from_s]
     cases' s with s' s''
     · exfalso
       clear * - a_from_s
@@ -178,7 +178,7 @@ by
     unfold sinkString at *
     rw [List.filterMap_append_append] at sink_bef
     rw [List.filterMap_append_append] at sink_bef
-    convert sink_bef <;> rw [← preimage] <;> unfold liftRule <;> dsimp only <;> clear * - correct_inverse
+    convert sink_bef <;> rw [←preimage] <;> unfold liftRule <;> dsimp only <;> clear * - correct_inverse
     · unfold liftString
       rw [List.filterMap_map]
       rw [correct_inverse]
@@ -193,7 +193,7 @@ by
     unfold sinkString at *
     rw [List.filterMap_append_append] at sink_aft
     convert sink_aft
-    rw [← preimage]
+    rw [←preimage]
     clear * - correct_inverse
     unfold liftRule
     dsimp only

@@ -114,7 +114,7 @@ by
           cases' rin with ris rof
           · simp [ris]
           rcases rof with ⟨r₁, -, eqr⟩
-          rw [← eqr]
+          rw [←eqr]
           simp only [grule_of_CSR, List.append_assoc, List.length_append, add_pos_iff]
           right; left
           rw [List.length_map]
@@ -149,5 +149,5 @@ theorem CS_subclass_RE {L : Language T} :
 by
   rintro ⟨g, eq_L⟩
   use grammar_of_csg g
-  rw [← eq_L]
+  rw [←eq_L]
   rw [csLanguage_eq_grammarLanguage]

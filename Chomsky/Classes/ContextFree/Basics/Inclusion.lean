@@ -51,7 +51,7 @@ by
 lemma cfLanguage_eq_grammarLanguage (g : CFG T) :
   g.language = (grammar_of_cfg g).language :=
 by
-  rw [← grammar_of_cfg_well_defined]
+  rw [←grammar_of_cfg_well_defined]
   rw [cfLanguage_eq_csLanguage]
   rw [csLanguage_eq_grammarLanguage]
 
@@ -60,7 +60,7 @@ theorem CF_subclass_CS {L : Language T} :
 by
   rintro ⟨g, eq_L⟩
   use csg_of_cfg g
-  rw [← eq_L]
+  rw [←eq_L]
   rw [cfLanguage_eq_csLanguage]
 
 theorem CF_subclass_RE {L : Language T} :

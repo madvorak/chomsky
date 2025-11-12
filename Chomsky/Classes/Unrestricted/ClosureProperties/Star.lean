@@ -181,7 +181,7 @@ by
                       unfold rulesThatScanTerminals at rin
                       rw [List.mem_map] at rin
                       rcases rin with ⟨t, tin, r_of_tg⟩
-                      rw [← r_of_tg] at nrn
+                      rw [←r_of_tg] at nrn
                       exact Sum.noConfusion nrn)
       convert_to G.g.Derives [Symbol.nonterminal ◩g.initial] (liftString G.liftNt (v.map Symbol.terminal))
       · unfold liftString
@@ -230,7 +230,7 @@ by
   · rw [wlk_succ]
     generalize substit : w.length - k.succ = q
     rw [substit] at lt_wl
-    rw [← List.take_append_drop q w]
+    rw [←List.take_append_drop q w]
     rw [List.getElem?_append_right]
     swap; · apply List.length_take_le
     have eq_q : (w.take q).length = q
@@ -241,7 +241,7 @@ by
     have drop_q_succ : (w.take q ++ w.drop q).drop q.succ = (w.drop q).drop 1
     · rw [List.drop_drop, List.take_append_drop]
     rw [drop_q_succ, List.drop_left' eq_q, List.drop_drop]
-    rw [← List.take_append_drop (1 + q) w]
+    rw [←List.take_append_drop (1 + q) w]
     have q_lt : q < (w.take (1 + q)).length
     · rw [List.length_take]
       exact lt_min (lt_one_add q) lt_wl
@@ -251,7 +251,7 @@ by
       simp [*]
     · rw [List.take_append_drop, add_comm]
   apply gr_deri_append
-  rw [split_ldw, List.map_append, List.flatten_append, ← List.append_assoc]
+  rw [split_ldw, List.map_append, List.flatten_append, ←List.append_assoc]
   apply gr_deri_append
   rw [wlk_succ, List.take_succ, List.map_append, List.flatten_append, List.append_assoc,
     List.append_assoc]
@@ -444,7 +444,7 @@ by
   rcases contra with ⟨l, l_in, in_l⟩
   rw [List.mem_map] at l_in
   rcases l_in with ⟨y, -, eq_l⟩
-  rw [← eq_l] at in_l
+  rw [←eq_l] at in_l
   rw [Function.comp_apply, List.mem_append] at in_l
   cases in_l with
   | inl hiy => exact map_wrap_never_contains_nt_inr i hiy
@@ -515,7 +515,7 @@ by
       show
         some H =
         (x.map (fun l : List (Symbol T g.nt) => [H].reverse ++ (l.map wrapSym).reverse)).reverse.flatten[0]?
-      rw [← List.map_reverse]
+      rw [←List.map_reverse]
       have xrnn : x.reverse ≠ []
       · intro xr_nil
         rw [List.reverse_eq_iff] at xr_nil
@@ -525,7 +525,7 @@ by
         exact xrnn hx
       rw [List.map_cons, List.flatten, List.append_assoc, List.getElem?_append]
       simp
-    rw [← List.map_reverse] at hH
+    rw [←List.map_reverse] at hH
     cases hr₀ : r₀.inputR.reverse
     · rw [hr₀] at hH
       simp at hH
@@ -579,9 +579,9 @@ by
     · intro
       rw [List.countIn_singleton_eq H, inside_wrap]
     have inside_take : (((x[m]'mxl).map wrapSym).take k).countIn H = 0
-    · rw [← List.map_take, inside_wrap]
+    · rw [←List.map_take, inside_wrap]
     have inside_drop : (((x[m']'mxl').map wrapSym).drop k').countIn H + [@H T g.nt].countIn H = 1
-    · rw [← List.map_drop, inside_wrap, List.countIn_singleton_eq (@H T g.nt)]
+    · rw [←List.map_drop, inside_wrap, List.countIn_singleton_eq (@H T g.nt)]
     have counted_Hs : x.length = (m + 0) + (1 + (x.length - m'.succ))
     · convert count_Hs using 3
       · show x.length = (x.map (fun l : List (Symbol T g.nt) => (l.map wrapSym ++ [H]).countIn H)).sum
@@ -658,10 +658,10 @@ by
     repeat rw [List.length_append] at hyp_len
     rw [List.length_singleton] at hyp_len
     have left_nil : u ++ r₀.inputL.map wrapSym = []
-    · rw [← List.length_eq_zero_iff, List.length_append]
+    · rw [←List.length_eq_zero_iff, List.length_append]
       omega
     have right_nil : r₀.inputR.map wrapSym ++ v = []
-    · rw [← List.length_eq_zero_iff, List.length_append]
+    · rw [←List.length_eq_zero_iff, List.length_append]
       omega
     rw [left_nil, List.nil_append, List.append_assoc, right_nil, List.append_nil] at hyp
     have imposs := List.head_eq_of_cons_eq hyp
@@ -687,7 +687,7 @@ by
   rw [List.tail] at hypr
   repeat rw [List.append_assoc] at hypr
   rw [List.tail_append_of_ne_nil unn] at hypr
-  repeat rw [← List.append_assoc] at hypr
+  repeat rw [←List.append_assoc] at hypr
   rcases cases_1_and_2_and_3a_match_aux is_x_nil hypr with ⟨m, u₁, v₁, u_eq, xm_eq, v_eq⟩
   use m, u₁, v₁
   constructor
@@ -741,7 +741,7 @@ by
       | tail _ xin => exact valid xᵢ xin
     have u_nil : u = []
     · clear * - bef cat
-      rw [← List.length_eq_zero_iff]
+      rw [←List.length_eq_zero_iff]
       by_contra
       have ul_pos : 0 < u.length
       · rwa [pos_iff_ne_zero]
@@ -754,7 +754,7 @@ by
           apply List.mem_append_right
           apply List.mem_singleton_self
         rw [cat, List.singleton_append, List.tail_cons, List.cons_append, List.cons_append, List.tail_cons] at bef_tail
-        rw [← bef_tail] at Z_in_tail
+        rw [←bef_tail] at Z_in_tail
         exact Z_not_in_join_mpHmmw Z_in_tail
     have v_rest : v = ((x.map (List.map wrapSym)).map (· ++ [H])).flatten
     · rw [u_nil, cat] at bef
@@ -771,7 +771,7 @@ by
       · exact valid
       have u_nil : u = []
       · clear * - bef cat
-        rw [← List.length_eq_zero_iff]
+        rw [←List.length_eq_zero_iff]
         by_contra
         have ul_pos : 0 < u.length
         · rwa [pos_iff_ne_zero]
@@ -786,7 +786,7 @@ by
           rw [cat, List.singleton_append, List.tail_cons,
             List.cons_append, List.cons_append, List.append_nil, List.append_nil, List.cons_append, List.tail_cons
           ] at bef_tail
-          rw [← bef_tail] at Z_in_tail
+          rw [←bef_tail] at Z_in_tail
           exact Z_not_in_join_mpHmmw Z_in_tail
       have v_rest : v = ((x.map (List.map wrapSym)).map (· ++ [H])).flatten
       · rw [cat, u_nil] at bef
@@ -817,7 +817,7 @@ by
           rfl
         | tail _ rin =>
           have rin' : r ∈ rulesThatScanTerminals g ∨ r ∈ g.rules.map wrapGr
-          · rwa [or_comm, ← List.mem_append]
+          · rwa [or_comm, ←List.mem_append]
           clear rin
           cases' rin' with rin' rin'
           · exfalso
@@ -830,7 +830,7 @@ by
             unfold rulesThatScanTerminals at rin'
             rw [List.mem_map] at rin'
             rcases rin' with ⟨t, -, form⟩
-            rw [← form]
+            rw [←form]
             rfl
           · left
             rw [List.mem_map] at rin'
@@ -874,7 +874,7 @@ by
   have lens := congr_arg List.length ass
   simp only [List.length_append, List.length, zero_add] at lens
   constructor <;>
-    · rw [← List.length_eq_zero_iff]
+    · rw [←List.length_eq_zero_iff]
       omega
 
 private lemma u_nil_when_RH {g : Grammar T} {x : List (List (Symbol T g.nt))} {u v : List (ns T g.nt)}
@@ -961,7 +961,7 @@ by
         exact Sum.noConfusion inr_eq_inl
   have hyptt := congr_arg List.tail hypt
   rw [List.tail, List.tail_append_of_ne_nil utnn] at hyptt
-  repeat rw [← List.append_assoc] at hyptt
+  repeat rw [←List.append_assoc] at hyptt
   rcases cases_1_and_2_and_3a_match_aux is_x_nil hyptt with ⟨m, u₁, v₁, u_eq, xm_eq, v_eq⟩
   use m, u₁, v₁
   constructor
@@ -1044,7 +1044,7 @@ by
       rw [cat] at bef
       have u_nil := u_nil_when_RH bef
       rw [u_nil, List.nil_append] at bef ⊢
-      rw [← List.append_inj_right bef (by rfl), List.map_cons, List.map_cons, List.flatten, ← List.append_assoc, ← List.append_assoc]
+      rw [←List.append_inj_right bef (by rfl), List.map_cons, List.map_cons, List.flatten, ←List.append_assoc, ←List.append_assoc]
   · cases hx : x with
     | nil =>
       right; right; left
@@ -1072,10 +1072,10 @@ by
       rw [u_nil, List.nil_append] at bef
       have v_eq := Eq.symm (List.append_inj_right bef (by rfl))
       rw [u_nil, List.nil_append, v_eq, RH_nil, List.nil_append, hx, List.map_cons, List.map_cons,
-          List.flatten, List.append_assoc, List.append_flatten_map_append, ← List.append_assoc] at aft
+          List.flatten, List.append_assoc, List.append_flatten_map_append, ←List.append_assoc] at aft
       constructor
       · use x₀.map wrapSym ++ ((L.map (List.map wrapSym)).map ([H] ++ ·)).flatten
-      rw [List.append_assoc, ← List.append_flatten_map_append] at aft
+      rw [List.append_assoc, ←List.append_flatten_map_append] at aft
       rw [aft]
       constructor <;> intro contra <;> rw [List.mem_append] at contra
       · refine contra.casesOn map_wrap_never_contains_Z (fun contr => ?_)
@@ -1126,7 +1126,7 @@ by
     unfold rulesThatScanTerminals at Rt_tR
     rw [List.mem_map] at Rt_tR
     rcases Rt_tR with ⟨t, -, form⟩
-    rw [← form] at bef
+    rw [←form] at bef
     dsimp only at bef
     rw [List.append_nil] at bef
     have u_nil : u = []
@@ -1156,13 +1156,13 @@ by
           rcases Rin with ⟨p, pin, Rinp⟩
           rw [List.mem_map] at pin
           rcases pin with ⟨q, qin, eq_p⟩
-          rw [← eq_p] at Rinp
+          rw [←eq_p] at Rinp
           rw [List.mem_append] at Rinp
           cases Rinp with
           | inl hRq =>
             rw [List.mem_map] at qin
             rcases qin with ⟨p', -, eq_q⟩
-            rw [← eq_q] at hRq
+            rw [←eq_q] at hRq
             exact map_wrap_never_contains_R hRq
           | inr hRH =>
             rw [List.mem_singleton] at hRH
@@ -1259,8 +1259,8 @@ by
   rw [List.idxOf_append_of_not_mem R_ni_u] at first_R
   rw [List.idxOf_append_of_not_mem H_ni_u] at first_H
   rw [List.append_assoc _ [H], List.singleton_append, List.idxOf_cons_self, add_zero] at first_R
-  rw [List.append_assoc _ [H], List.singleton_append, ← R, List.idxOf_cons_ne _ H_neq_R.symm,
-      List.singleton_append, H, List.idxOf_cons_self, ← first_R
+  rw [List.append_assoc _ [H], List.singleton_append, ←R, List.idxOf_cons_ne _ H_neq_R.symm,
+      List.singleton_append, H, List.idxOf_cons_self, ←first_R
   ] at first_H
   rw [List.length_append, List.length_append, List.length_append, List.length_singleton,
       ←add_zero ((w.flatten.map Symbol.terminal).length + (β.map Symbol.terminal).length + 1)
@@ -1273,7 +1273,7 @@ private lemma case_3_v_nil {g : Grammar T} {w : List (List T)} {β : List T} {u 
 by
   have rev := congr_arg List.reverse ass
   simp only [List.reverse_append, List.reverse_singleton] at rev
-  rw [← List.reverse_nil]
+  rw [←List.reverse_nil]
   cases hv : v.reverse with
   | nil => exact List.reverse_eq_iff.→ hv
   | cons d l =>
@@ -1366,7 +1366,7 @@ by
   | inl hypl =>
     rcases hypl with ⟨u', u_eq, xj_eq⟩
     left
-    repeat rw [← List.append_assoc] at xj_eq
+    repeat rw [←List.append_assoc] at xj_eq
     by_cases is_x_nil : x = []
     · exfalso
       rw [is_x_nil, List.map_nil, List.map_nil, List.flatten] at xj_eq
@@ -1666,7 +1666,7 @@ by
           rw [List.append_nil] at bef aft
           rw [cat] at bef
           have gamma_nil_here := case_3_gamma_nil bef
-          rw [← List.reverse_reverse x] at *
+          rw [←List.reverse_reverse x] at *
           cases' hx : x.reverse with xₘ L
           · right; left
             rw [gamma_nil_here, List.map_nil, List.append_nil] at bef
@@ -1718,7 +1718,7 @@ by
             unfold rulesThatScanTerminals at hrg
             rw [List.mem_map] at hrg
             rcases hrg with ⟨t, -, r_is⟩
-            rw [← r_is] at bef aft
+            rw [←r_is] at bef aft
             dsimp only at bef aft
             rw [List.append_nil, cat] at bef
             have u_matches : u = w.flatten.map (@Symbol.terminal T (nn g.nt)) ++ β.map Symbol.terminal :=
@@ -1873,7 +1873,7 @@ by
         | nil =>
           rw [hv, List.nil_append, List.singleton_append] at rev
           have tails := List.tail_eq_of_cons_eq rev
-          rw [← List.map_reverse] at tails
+          rw [←List.map_reverse] at tails
           cases hw : w.reverse with
           | nil =>
             rw [hw, List.map_nil] at tails
@@ -1914,7 +1914,7 @@ by
           | nil =>
             rw [hv, List.nil_append, List.singleton_append] at rev
             have tails := List.tail_eq_of_cons_eq rev
-            rw [← List.map_reverse] at tails
+            rw [←List.map_reverse] at tails
             cases hw : w.reverse with
             | nil =>
               rw [hw, List.map_nil] at tails
@@ -1963,9 +1963,9 @@ by
                   have tak := congr_arg (List.take u.length) ur_eq
                   rw [List.take_left] at tak
                   exact tak
-                rw [← List.map_take] at u_from_w
+                rw [←List.map_take] at u_from_w
                 rw [u_from_w] at aft
-                rw [← r_of_r₀] at aft
+                rw [←r_of_r₀] at aft
                 dsimp only [wrapGr] at aft
                 use w.take u.length ++ r₀.output
                 rw [List.map_append]
@@ -1989,9 +1989,9 @@ by
                 repeat
                   rw [List.reverse_singleton] at ru_eq
                   rw [List.singleton_append] at ru_eq
-                rw [← r_of_r₀] at ru_eq
+                rw [←r_of_r₀] at ru_eq
                 dsimp only [wrapGr, R] at ru_eq
-                rw [← List.map_reverse] at ru_eq
+                rw [←List.map_reverse] at ru_eq
                 cases hr₀ : r₀.inputR.reverse with
                 | nil =>
                   rw [hr₀, List.map_nil, List.nil_append] at ru_eq
@@ -2025,7 +2025,7 @@ by
             unfold rulesThatScanTerminals at hrg
             rw [List.mem_map] at hrg
             rcases hrg with ⟨t, -, eq_r⟩
-            rw [← eq_r] at bef
+            rw [←eq_r] at bef
             clear eq_r
             dsimp only at bef
             rw [List.append_nil] at bef
@@ -2037,7 +2037,7 @@ by
             | nil =>
               rw [hv, List.nil_append, List.singleton_append] at rev
               have tails := List.tail_eq_of_cons_eq rev
-              rw [← List.map_reverse] at tails
+              rw [←List.map_reverse] at tails
               cases hw : w.reverse with
               | nil =>
                 rw [hw, List.map_nil] at tails
@@ -2132,13 +2132,13 @@ by
                 have v_nil := zero_of_not_ge_one contra
                 rw [List.length_eq_zero_iff] at v_nil
                 rw [v_nil] at bef
-                rw [← r_of_r₀] at bef
+                rw [←r_of_r₀] at bef
                 rw [List.append_nil] at bef
                 unfold wrapGr at bef
                 have rev := congr_arg List.reverse bef
                 clear * - rev
                 repeat rw [List.reverse_append] at rev
-                rw [← List.map_reverse _ r₀.inputR] at rev
+                rw [←List.map_reverse _ r₀.inputR] at rev
                 rw [List.reverse_singleton] at rev
                 cases hr₀ : r₀.inputR.reverse with
                 | nil =>
@@ -2275,7 +2275,7 @@ by
       exact List.not_mem_nil y imposs
     · rfl
   cases' ih with ih ih
-  · rw [← or_assoc]
+  · rw [←or_assoc]
     left
     exact star_case_1 orig ih
   cases' ih with ih ih
@@ -2340,15 +2340,15 @@ theorem GG_of_star_GG (L : Language T) : L.IsGG → (KStar.kstar L).IsGG := by
         by
         have st_inj : Function.Injective (@Symbol.terminal T g.star.nt)
         · apply Symbol.terminal.inj
-        rw [← List.map_injective_iff] at st_inj
+        rw [←List.map_injective_iff] at st_inj
         exact st_inj map_eq_map
-      rw [w_eq_u, ← hg]
+      rw [w_eq_u, ←hg]
       exact win
     cases' result with result result
     · exfalso
       cases' result with σ contr
       have last_symbols := congr_arg (·[0]?) (congr_arg List.reverse contr)
-      rw [← List.map_reverse, List.reverse_append, List.reverse_singleton, List.singleton_append] at last_symbols
+      rw [←List.map_reverse, List.reverse_append, List.reverse_singleton, List.singleton_append] at last_symbols
       cases hw0 : w.reverse[0]?
       · simp_all
       · clear * - last_symbols
@@ -2357,7 +2357,7 @@ theorem GG_of_star_GG (L : Language T) : L.IsGG → (KStar.kstar L).IsGG := by
     · exfalso
       rcases result with ⟨⟨ω, contr⟩, -⟩
       have last_symbols := congr_arg (·[0]?) (congr_arg List.reverse contr)
-      rw [← List.map_reverse, List.reverse_append, List.reverse_singleton, List.singleton_append] at last_symbols
+      rw [←List.map_reverse, List.reverse_append, List.reverse_singleton, List.singleton_append] at last_symbols
       cases hw0 : w.reverse[0]?
       · simp_all
       · clear * - last_symbols
@@ -2370,10 +2370,10 @@ theorem GG_of_star_GG (L : Language T) : L.IsGG → (KStar.kstar L).IsGG := by
     let v := w.reverse
     have v_reverse : v.reverse = w
     · apply List.reverse_reverse
-    rw [← v_reverse] at w_join parts_in_L
+    rw [←v_reverse] at w_join parts_in_L
     rw [w_join]
     clear w_join p
-    rw [← hg] at parts_in_L
+    rw [←hg] at parts_in_L
     cases' short_induction parts_in_L with derived terminated
     apply gr_deri_of_deri_deri derived
     apply gr_deri_of_tran_deri

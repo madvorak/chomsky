@@ -71,7 +71,7 @@ by
       cases' hruv with bef aft
       constructor
       · simp only [grule_of_kurodaRule, List.append_nil, List.append_assoc, List.singleton_append]
-        rw [← List.append_assoc]
+        rw [←List.append_assoc]
         exact bef
       · simp only [grule_of_kurodaRule]
         exact aft
@@ -108,12 +108,12 @@ by
       · exact rink
       use u, v
       dsimp only at hr₀ ⊢
-      rw [← hr₀] at hruv
+      rw [←hr₀] at hruv
       dsimp only at hruv
       cases' hruv with bef aft
       constructor
       · simp only [List.append_nil, List.append_assoc, List.singleton_append] at bef
-        rw [← List.append_assoc] at bef
+        rw [←List.append_assoc] at bef
         exact bef
       · exact aft
     | one_two A B C =>
@@ -122,7 +122,7 @@ by
       · exact rink
       use u, v
       dsimp only at hr₀ ⊢
-      rw [← hr₀] at hruv
+      rw [←hr₀] at hruv
       dsimp only at hruv
       cases' hruv with bef aft
       constructor
@@ -135,7 +135,7 @@ by
       · exact rink
       use u, v
       dsimp only at hr₀ ⊢
-      rw [← hr₀] at hruv
+      rw [←hr₀] at hruv
       dsimp only at hruv
       cases' hruv with bef aft
       constructor
@@ -148,7 +148,7 @@ by
       · exact rink
       use u, v
       dsimp only at hr₀ ⊢
-      rw [← hr₀] at hruv
+      rw [←hr₀] at hruv
       dsimp only at hruv
       cases' hruv with bef aft
       constructor
@@ -185,5 +185,5 @@ by
   · sorry -- this direction will be very hard
   · rintro ⟨k, eq_L⟩
     use grammar_of_kurodaGrammar k
-    rw [← k.lang_eq]
+    rw [←k.lang_eq]
     exact eq_L

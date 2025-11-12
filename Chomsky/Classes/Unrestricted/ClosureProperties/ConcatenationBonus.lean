@@ -69,11 +69,11 @@ private lemma bonus_CF_of_CF_c_CF (L₁ : Language T) (L₂ : Language T) :
   rw [big_CF_grammar_same_language]
   apply Set.eq_of_subset_of_subset
   · intro w hyp
-    rw [← eq_L₁]
-    rw [← eq_L₂]
+    rw [←eq_L₁]
+    rw [←eq_L₂]
     exact in_concatenated_of_in_big hyp
   · intro w hyp
-    rw [← eq_L₁] at hyp
-    rw [← eq_L₂] at hyp
+    rw [←eq_L₁] at hyp
+    rw [←eq_L₂] at hyp
     exact in_big_of_in_concatenated hyp
 -/

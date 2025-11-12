@@ -169,7 +169,7 @@ private lemma substitute_terminals {g₁ g₂ : Grammar T} {s : T → Sum T T} {
 by
   induction' w with d l ih
   · apply gr_deri_self
-  rw [List.map_cons, List.map_cons, ← List.singleton_append, ← List.singleton_append]
+  rw [List.map_cons, List.map_cons, ←List.singleton_append, ←List.singleton_append]
   have step_head :
     (bigGrammar g₁ g₂).Transforms
       ([(Symbol.nonterminal ∘ Sum.inr ∘ s) d] ++ l.map (Symbol.nonterminal ∘ Sum.inr ∘ s))
@@ -205,7 +205,7 @@ by
       (g := bigGrammar g₁ g₂)
       (v := u.map Symbol.terminal ++ [Symbol.nonterminal ◩(some ◪g₂.initial)])
   · clear * - hu
-    rw [← List.singleton_append]
+    rw [←List.singleton_append]
     apply gr_deri_append
     apply
       gr_deri_of_deri_deri
@@ -760,7 +760,7 @@ by
   rw [List.mem_map] at rin
   rcases rin with ⟨r₁, rin₁, wrap_r₁_eq_r⟩
   simp [wrapGrule₁] at *
-  rw [← List.singleton_append] at bef
+  rw [←List.singleton_append] at bef
   let m : ℕ := (r₁.inputL.map (wrapSymbol₁ g₂.nt)).length + 1 + (r₁.inputR.map (wrapSymbol₁ g₂.nt)).length
   let b' : List (nst T g₁.nt g₂.nt) := u ++ r₁.output.map (wrapSymbol₁ g₂.nt) ++ v.take (x.length - u.length - m)
   use b'.filterMap unwrapSymbol₁
@@ -771,7 +771,7 @@ by
       push_neg at contra
       rw [bef] at ih_concat
       clear bef
-      repeat' rw [← List.append_assoc] at ih_concat
+      repeat' rw [←List.append_assoc] at ih_concat
       have len_pos : (u ++ r₁.inputL.map (wrapSymbol₁ g₂.nt) ++ [Symbol.nonterminal ◩(some ◩r₁.inputN)] ++ r₁.inputR.map (wrapSymbol₁ g₂.nt)
           ).length > 0
       · repeat' rw [List.length_append]
@@ -876,8 +876,8 @@ by
               v).take x.length)
         · rw [bef] at ih_concat
           clear * - ih_concat wrap_r₁_eq_r
-          rw [← List.append_assoc _ _ v] at ih_concat
-          rw [← List.append_assoc _ _ v] at ih_concat
+          rw [←List.append_assoc _ _ v] at ih_concat
+          rw [←List.append_assoc _ _ v] at ih_concat
           rw [List.append_assoc u]
           rw [List.append_assoc u]
           rw [List.append_assoc u]
@@ -990,7 +990,7 @@ by
         · convert equiv_sgmnt_1
           rw [List.map_take]
         have segment_1_equ := (filterMap_unwrap_of_correspondingStrings₁ segment_1_eqi).symm
-        rw [← List.take_append_drop u.length x]
+        rw [←List.take_append_drop u.length x]
         apply congr_arg₂
         · exact segment_1_equ
         clear segment_1_equ segment_1_eqi equiv_sgmnt_1
@@ -1003,7 +1003,7 @@ by
           simp
         have segment_2_equ := (filterMap_unwrap_of_correspondingStrings₁ segment_2_eqi).symm
         rw [unwrap_wrap₁_string] at segment_2_equ
-        rw [← List.take_append_drop r₁.inputL.length (x.drop u.length)]
+        rw [←List.take_append_drop r₁.inputL.length (x.drop u.length)]
         apply congr_arg₂
         · exact segment_2_equ
         clear segment_2_equ segment_2_eqi equiv_sgmnt_2
@@ -1013,11 +1013,11 @@ by
             (((x.drop (r₁.inputL.length + u.length)).take 1).map (wrapSymbol₁ g₂.nt))
             ([Symbol.nonterminal r₁.inputN].map (wrapSymbol₁ g₂.nt))
         · convert equiv_sgmnt_3
-          rw [List.map_take, List.map_drop, ← add_assoc, List.drop_take, add_comm]
+          rw [List.map_take, List.map_drop, ←add_assoc, List.drop_take, add_comm]
           simp
         have segment_3_equ := (filterMap_unwrap_of_correspondingStrings₁ segment_3_eqi).symm
         rw [unwrap_wrap₁_string] at segment_3_equ
-        sorry /-rw [← List.take_append_drop 1 (x.drop (r₁.inputL.length + u.length))]
+        sorry /-rw [←List.take_append_drop 1 (x.drop (r₁.inputL.length + u.length))]
         apply congr_arg₂
         · exact segment_3_equ
         clear segment_3_equ segment_3_eqi equiv_sgmnt_3
@@ -1062,7 +1062,7 @@ by
           have add_mirror :
             r₁.input_R.length + 1 + r₁.input_L.length = r₁.input_L.length + 1 + r₁.input_R.length :=
             by ring
-          rw [List.length_map, List.length_map, ← add_mirror] at critical
+          rw [List.length_map, List.length_map, ←add_mirror] at critical
           have min1 : min u.length x.length = u.length :=
             by
             apply min_eq_left
@@ -1088,7 +1088,7 @@ by
           rw [min1, min2, min3, min4]
           rw [le_tsub_iff_right ul_le_xl] at critical
           clear * - critical add_mirror
-          repeat' rw [← add_assoc]
+          repeat' rw [←add_assoc]
           have sum_eq_sum :
             u.length + r₁.input_L.length + 1 + r₁.input_R.length =
               r₁.input_R.length + 1 + r₁.input_L.length + u.length :=
@@ -1097,7 +1097,7 @@ by
             rw [add_assoc]
             rw [add_assoc]
             rw [add_comm]
-            rw [← add_assoc _ 1 _]
+            rw [←add_assoc _ 1 _]
           rw [sum_eq_sum]
           exact Nat.add_sub_of_le critical
         rw [sum_of_min_lengths]
@@ -1107,7 +1107,7 @@ by
             u.length + (r₁.input_L.length + (r₁.input_R.length + 1)) :=
           by ring
         rw [another_rearranging]
-        rw [← List.map_drop] at equiv_sgmnt_5
+        rw [←List.map_drop] at equiv_sgmnt_5
         symm
         exact filter_map_unwrap_of_corresponding_strings₁ equiv_sgmnt_5-/
       · sorry/-rw [List.filterMap_append_append]
@@ -1128,7 +1128,7 @@ by
       omega
     rw [List.take_append_of_le_length trivi] at part_for_u
     clear * - part_for_u
-    rw [← List.map_take] at part_for_u
+    rw [←List.map_take] at part_for_u
     apply correspondingStrings_after_wrap_unwrap_self₁
     use x.take u.length
   apply correspondingStrings_append
@@ -1143,7 +1143,7 @@ by
     rw [List.take_left] at eqi
     have part_for_v_beginning := correspondingStrings_drop (u.length + m) eqi
     clear * - part_for_v_beginning critical
-    rw [← List.map_drop] at part_for_v_beginning
+    rw [←List.map_drop] at part_for_v_beginning
     apply correspondingStrings_after_wrap_unwrap_self₁
     use x.drop (u.length + m)
     convert part_for_v_beginning using 1
@@ -1159,9 +1159,9 @@ by
         _ ≤ u.length + m := le_self_add
     rw [List.drop_eq_nil_of_le tul_lt]
     rw [List.nil_append]
-    rw [← List.append_assoc _ _ v]
-    rw [← List.append_assoc _ _ v]
-    rw [← List.append_assoc]
+    rw [←List.append_assoc _ _ v]
+    rw [←List.append_assoc _ _ v]
+    rw [←List.append_assoc]
     rw [List.take_append_eq_append_take]
     rw [List.drop_append_eq_append_drop]
     have rul_inp_len :
@@ -1211,17 +1211,17 @@ by
     rw [List.length_map] at len_concat
     rw [List.length_map] at len_concat
     rw [List.length_singleton] at len_concat
-    rw [← Nat.add_sub_assoc]; swap
+    rw [←Nat.add_sub_assoc]; swap
     · exact critical
-    rw [← Nat.add_sub_assoc]; swap
+    rw [←Nat.add_sub_assoc]; swap
     · clear * - critical
       omega
     rw [add_comm] at len_concat
     rw [len_concat]
     clear len_concat
     rw [add_tsub_cancel_left]
-    rw [← Nat.add_assoc]
-    rw [← Nat.add_assoc]
+    rw [←Nat.add_assoc]
+    rw [←Nat.add_assoc]
     sorry
   have yl_lt_vl : y.length ≤ v.length := Nat.le.intro len_sum
   convert_to correspondingStrings _ (v.reverse.take y.length)
@@ -1263,7 +1263,7 @@ by
   rw [←wrap_r₂_eq_r] at bef aft
   clear wrap_r₂_eq_r r
   simp only [wrapGrule₂] at * -- originally not `only`
-  rw [← List.singleton_append] at bef -- questionable
+  rw [←List.singleton_append] at bef -- questionable
   rw [bef] at ih_concat
   let b' := u.drop x.length ++ r₂.output.map (wrapSymbol₂ g₁.nt) ++ v
   use b'.filterMap unwrapSymbol₂
@@ -1303,8 +1303,8 @@ by
       clear corres_y
       --rw [List.take_left] at seg1
       --rw [List.drop_left] at rest1
-      rw [← List.take_append_drop ((u.drop x.length).filterMap unwrapSymbol₂).length y]
-      rw [← List.map_take] at seg1
+      rw [←List.take_append_drop ((u.drop x.length).filterMap unwrapSymbol₂).length y]
+      rw [←List.map_take] at seg1
       have min_uxy : min (u.length - x.length) y.length = u.length - x.length :=
         by
         rw [min_eq_left]
@@ -1340,8 +1340,8 @@ by
       rw [←(y.drop ((u.drop x.length).filterMap unwrapSymbol₂).length).take_append_drop (r₂.inputL.map (wrapSymbol₂ g₁.nt)).length]
       apply congr_arg₂
       · clear * - seg2 fml
-        rw [← List.map_drop] at seg2
-        rw [← List.map_take] at seg2
+        rw [←List.map_drop] at seg2
+        rw [←List.map_take] at seg2
         have fmu2 := filterMap_unwrap_of_correspondingStrings₂ seg2
         rw [List.length_map] at fmu2
         rw [List.length_map]
@@ -1359,14 +1359,14 @@ by
       rw [fml]
       rw [(y.drop (r₂.inputL.length + (u.drop x.length).length)).take_append_drop 1]
       apply congr_arg₂
-      · rw [← List.map_drop] at seg3
-        rw [← List.map_take] at seg3
+      · rw [←List.map_drop] at seg3
+        rw [←List.map_take] at seg3
         have fmu3 := filter_map_unwrap_of_corresponding_strings₂ seg3
         exact fmu3.symm
       clear seg3
       rw [List.drop_drop] at rest3 ⊢
-      rw [← List.map_drop] at rest3
-      rw [← filter_map_unwrap_of_corresponding_strings₂ rest3]
+      rw [←List.map_drop] at rest3
+      rw [←filter_map_unwrap_of_corresponding_strings₂ rest3]
       rw [List.filterMap_append]
       rw [unwrap_wrap₂_string]-/
     · rw [List.filterMap_append_append]
@@ -1380,7 +1380,7 @@ by
       apply correspondingStrings_append
       · apply correspondingStrings_self
       apply corresponding_string_after_wrap_unwrap_self₂
-      repeat' rw [← List.append_assoc] at ih_concat
+      repeat' rw [←List.append_assoc] at ih_concat
       have rev := corresponding_strings_reverse ih_concat
       rw [List.reverse_append _ v] at rev
       have tak := corresponding_strings_take v.reverse.length rev
@@ -1400,10 +1400,10 @@ by
       rw [List.reverse_take] at rtr ; swap
       · rw [List.length_reverse (y.map (wrapSymbol₂ g₁.nt))] at nec
         exact nec
-      rw [← List.map_drop] at rtr
+      rw [←List.map_drop] at rtr
       rw [List.reverse_reverse] at rtr
       exact ⟨_, rtr⟩
-    · rw [← List.take_append_drop x.length u]
+    · rw [←List.take_append_drop x.length u]
       apply correspondingStrings_append
       · have almost := correspondingStrings_take x.length ih_concat
         rw [List.take_append_of_le_length matched_right] at almost
@@ -1417,7 +1417,7 @@ by
         rw [List.take_left] at tdc
         have ul_eq : u.length = x.length + (u.length - x.length) :=
           by
-          rw [← Nat.add_sub_assoc matched_right]
+          rw [←Nat.add_sub_assoc matched_right]
           rw [add_comm]
           rw [Nat.add_sub_assoc]; swap
           · rfl
@@ -1428,7 +1428,7 @@ by
         rw [List.drop_take] at tdc
         rw [List.drop_left'] at tdc ; swap
         · apply List.length_map
-        rw [← List.map_take] at tdc
+        rw [←List.map_take] at tdc
         exact ⟨_, tdc⟩-/
 
 private lemma big_induction {g₁ g₂ : Grammar T} {w : List (nst T g₁.nt g₂.nt)}
@@ -1532,7 +1532,7 @@ by
     · unfold rulesForTerminals₁ at rin
       rw [List.mem_map] at rin
       rcases rin with ⟨t, -, eq_r⟩
-      rw [← eq_r] at *
+      rw [←eq_r] at *
       clear eq_r
       rw [List.append_nil] at ih_concat
       rw [List.append_nil] at ih_concat
@@ -1630,7 +1630,7 @@ by
     · unfold rulesForTerminals₂ at rin
       rw [List.mem_map] at rin
       rcases rin with ⟨t, -, eq_r⟩
-      rw [← eq_r] at *
+      rw [←eq_r] at *
       clear eq_r
       rw [List.append_nil] at ih_concat
       rw [List.append_nil] at ih_concat
@@ -1756,20 +1756,20 @@ by
         List.length_singleton, List.length_singleton] at bef_len
     have u_nil : u = []
     · clear * - bef_len
-      rw [← List.length_eq_zero_iff]
+      rw [←List.length_eq_zero_iff]
       linarith
     have v_nil : v = []
     · clear * - bef_len
-      rw [← List.length_eq_zero_iff]
+      rw [←List.length_eq_zero_iff]
       linarith
     have rif_nil : r.inputL = []
     · clear * - bef_len
-      rw [← List.length_eq_zero_iff]
+      rw [←List.length_eq_zero_iff]
       linarith
     have nt_match : Symbol.nonterminal (bigGrammar g₁ g₂).initial = Symbol.nonterminal r.inputN
     · have bef_fst := congr_arg (·[0]?) bef
       rw [u_nil, rif_nil] at bef_fst
-      rw [← Option.some_inj]
+      rw [←Option.some_inj]
       exact bef_fst
     simp only [bigGrammar, List.mem_cons, List.mem_append, or_assoc, List.mem_map] at rin
     rcases rin with rinit | rin₁ | rin₂ | rte₁ | rte₂
@@ -1780,7 +1780,7 @@ by
       exact aft
     · exfalso
       rcases rin₁ with ⟨r₀, hr₀g₁, wrap_eq_r⟩
-      rw [← wrap_eq_r] at nt_match
+      rw [←wrap_eq_r] at nt_match
       unfold wrapGrule₁ at nt_match
       have inl_match := Symbol.nonterminal.inj nt_match
       change Sum.inl none = Sum.inl (some ◩r₀.inputN) at inl_match
@@ -1788,7 +1788,7 @@ by
       exact Option.noConfusion none_eq_some
     · exfalso
       rcases rin₂ with ⟨r₀, hr₀g₂, wrap_eq_r⟩
-      rw [← wrap_eq_r] at nt_match
+      rw [←wrap_eq_r] at nt_match
       unfold wrapGrule₂ at nt_match
       have inl_match := Symbol.nonterminal.inj nt_match
       change Sum.inl none = Sum.inl (some ◪r₀.inputN) at inl_match
@@ -1797,13 +1797,13 @@ by
     · unfold rulesForTerminals₁ at rte₁
       rw [List.mem_map] at rte₁
       rcases rte₁ with ⟨t, htg₁, tt_eq_r⟩
-      rw [← tt_eq_r] at nt_match
+      rw [←tt_eq_r] at nt_match
       have inl_eq_inr := Symbol.nonterminal.inj nt_match
       exact Sum.noConfusion inl_eq_inr
     · unfold rulesForTerminals₂ at rte₂
       rw [List.mem_map] at rte₂
       rcases rte₂ with ⟨t, htg₂, tt_eq_r⟩
-      rw [← tt_eq_r] at nt_match
+      rw [←tt_eq_r] at nt_match
       have inl_eq_inr := Symbol.nonterminal.inj nt_match
       exact Sum.noConfusion inl_eq_inr
   clear hyp_tran
@@ -1967,7 +1967,7 @@ by
         · unfold wrapSymbol₂ at eqiv_symb
           unfold corresponding_symbols at eqiv_symb
           have eq_symb := congr_arg Symbol.terminal eqiv_symb
-          rw [← eq_symb]
+          rw [←eq_symb]
           apply congr_arg Symbol.terminal
           simp only [List.length_map]
         · exfalso
@@ -2002,13 +2002,13 @@ by
   apply Set.eq_of_subset_of_subset
   · -- prove `L₁ * L₂ ⊇` here
     intro w hyp
-    rw [← eq_L₁]
-    rw [← eq_L₂]
+    rw [←eq_L₁]
+    rw [←eq_L₂]
     exact in_concatenated_of_in_big hyp
   · -- prove `L₁ * L₂ ⊆` here
     intro w hyp
-    rw [← eq_L₁] at hyp
-    rw [← eq_L₂] at hyp
+    rw [←eq_L₁] at hyp
+    rw [←eq_L₂] at hyp
     exact in_big_of_in_concatenated hyp
 
 #print axioms GG_of_GG_c_GG

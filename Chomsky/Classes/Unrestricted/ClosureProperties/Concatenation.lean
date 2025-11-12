@@ -1883,10 +1883,17 @@ by
     · simp_all
     rw [asdf, List.get_map] at equivalent_ith
     set I : Fin x.length := ⟨i, iltxl⟩
-    cases' x.get I with t n₁
-    · simp [wrapSymbol₁, correspondingSymbols] at equivalent_ith
+    cases hxI : x.get I with
+    | terminal t =>
+      rw [List.get_eq_getElem] at hxI
+      simp [hxI, wrapSymbol₁, correspondingSymbols] at equivalent_ith
+      rw [←equivalent_ith]
+      apply congr_arg
       sorry
-    by_cases hi : i ≥ x.length
+    | nonterminal n₁ =>
+      rw [List.get_eq_getElem] at hxI
+      simp [hxI, wrapSymbol₁, correspondingSymbols] at equivalent_ith
+    /-by_cases hi : i ≥ x.length
     · convert_to none = none
       · have xlen : x.length = ((w.take x.length).map (@Symbol.terminal T g₁.nt)).length
         · clear * - xylen
@@ -1912,8 +1919,8 @@ by
     have i_lt_len₁ : i < (x.map (wrapSymbol₁ g₂.nt) ++ y.map (wrapSymbol₂ g₁.nt)).length
     · rw [List.length_append]
       apply lt_of_lt_of_le i_lt_len_lwx
-      apply le_self_add
-    sorry /-have i_lt_len₂ : i < (w.map Symbol.terminal).length
+      apply le_self_add-/
+    /-have i_lt_len₂ : i < (w.map Symbol.terminal).length
     · exact List.length_map _ _ ▸ i_lt_len_w -- TODO inline
     rw [List.get?_map]
     rw [List.get?_take hix]
@@ -1949,127 +1956,83 @@ by
     clear deri_y
     have xylen := correspondingStrings_length concat_xy
     rw [List.length_append] at xylen
-    repeat' rw [List.length_map] at xylen
-    sorry /-ext1 i
-    by_cases i ≥ y.length
-    · convert_to none = none
-      · have ylen :
-          y.length = ((w.drop x.length).map (@Symbol.terminal T g₁.nt)).length :=
-          by
-          clear * - xylen
+    have remaining : (w.drop x.length).map Symbol.terminal = y
+    · ext1 i
+      by_cases hiy : i ≥ y.length
+      · convert_to none = none
+        · have ylen : y.length = ((w.drop x.length).map (@Symbol.terminal T g₂.nt)).length
+          · clear * - xylen
+            rw [List.length_map]
+            rw [List.length_drop]
+            simp at xylen
+            exact Nat.eq_sub_of_add_eq' xylen
+          rw [ylen] at hiy
+          exact List.getElem?_eq_none_iff.← hiy
+        · exact List.getElem?_eq_none_iff.← hiy
+        rfl
+      push_neg at hiy
+      rw [←List.take_append_drop (x.map (wrapSymbol₁ g₂.nt)).length (w.map Symbol.terminal)] at concat_xy
+      have equivalent_second_parts :
+        correspondingStrings
+          (y.map (wrapSymbol₂ g₁.nt))
+          ((w.map Symbol.terminal).drop (x.map (wrapSymbol₁ g₂.nt)).length)
+      · /-have llen_eq_llen : (x.map (wrapSymbol₁ g₂.nt)).length =
+            ((w.map (@Symbol.terminal T _)).take (x.map (wrapSymbol₁ g₂.nt)).length).length
+        · rw [List.length_take]
+          symm
+          apply min_eq_left
           rw [List.length_map]
-          rw [List.length_drop]
-          sorry
-        rw [ylen] at h
-        clear * - h
-        rw [List.get?_eq_none]
-        rw [List.length_map] at *
-        exact h
-      · clear * - h
-        rw [List.get?_eq_none]
-        exact h
-      rfl
-    push_neg at h
-    rename' h => hiy
-    rw [←List.take_append_drop (x.map (wrapSymbol₁ g₂.nt)).length (w.map Symbol.terminal)] at concat_xy
-    rw [List.get?_map]
-    have equivalent_second_parts :
-      corresponding_strings (y.map (wrapSymbol₂ g₁.nt))
-        ((w.map Symbol.terminal).drop (x.map (wrapSymbol₁ g₂.nt)).length) :=
-      by
-      have llen_eq_llen :
-        (x.map (wrapSymbol₁ g₂.nt)).length =
-          ((w.map Symbol.terminal).take (x.map (wrapSymbol₁ g₂.nt)).length).length :=
-        by
-        rw [List.length_take]
-        symm
-        apply min_eq_left
-        rw [List.length_map]
-        rw [List.length_map]
-        exact Nat.le.intro xylen
-      convert corresponding_strings_drop (x.map (wrapSymbol₁ g₂.nt)).length concat_xy
-      · rw [List.drop_left]
-      · rw [List.take_append_drop]
-      exact T
-    clear concat_xy
-    symm
-    have i_lt_len_lwy : i < (y.map (wrapSymbol₂ g₁.nt)).length :=
-      by
-      rw [List.length_map]
-      exact hiy
-    have i_lt_len_dxw : i < ((w.map Symbol.terminal).drop x.length).length :=
-      by
-      rw [List.length_drop]
-      rw [List.length_map]
-      rw [← xylen]
-      convert i_lt_len_lwy
-      rw [List.length_map]
-      rw [add_comm]
-      rw [Nat.add_sub_assoc]
-      rw [Nat.sub_self]
-      rw [Nat.add_zero]
-      rfl
-    have i_lt_len_mtw : i < ((w.drop x.length).map Symbol.terminal).length :=
-      by
-      convert i_lt_len_dxw
-      apply List.map_drop
-    have i_lt_len_dlmxw :
-      i < (List.drop (x.map (wrapSymbol₁ g₂.nt)).length (w.map Symbol.terminal)).length :=
-      by
-      rw [List.length_map]
-      -- DO NOT call `i_lt_len_dxw` even though it looks like a good idea!
-      rw [List.length_drop]
-      rw [List.length_map]
-      rw [← xylen]
-      convert i_lt_len_lwy
-      rw [List.length_map]
-      rw [add_comm]
-      rw [Nat.add_sub_assoc]
-      rw [Nat.sub_self]
-      rw [Nat.add_zero]
-      rfl
-    have eqiv_symb :=
-      correspondingStrings_nthLe i_lt_len_lwy i_lt_len_dlmxw equivalent_second_parts
-    have goal_as_ith_drop :
-      y.nth_le i hiy =
-        (List.drop x.length (w.map Symbol.terminal)).nthLe i i_lt_len_dxw :=
-      by
-      have xli_lt_len_w : x.length + i < w.length :=
-        by
-        clear * - hiy xylen
-        linarith
-      rw [List.nthLe_map _ _ hiy] at eqiv_symb
-      rw [List.nthLe_drop'] at *
-      rw [List.nthLe_map]; swap
-      · exact xli_lt_len_w
-      rw [List.nthLe_map] at eqiv_symb ; swap
+          rw [List.length_map]
+          apply Nat.le.intro
+          simpa using xylen-/
+        convert correspondingStrings_drop (x.map (wrapSymbol₁ g₂.nt)).length concat_xy
+        · rw [List.drop_left]
+        · rw [List.take_append_drop]
+      have i_lt_len_lwy : i < (y.map (wrapSymbol₂ g₁.nt)).length
       · rw [List.length_map]
-        exact xli_lt_len_w
-      clear * - eqiv_symb
-      cases' y.nth_le i hiy with t n
-      · unfold wrapSymbol₂ at eqiv_symb
-        unfold corresponding_symbols at eqiv_symb
-        have eq_symb := congr_arg Symbol.terminal eqiv_symb
-        rw [← eq_symb]
-        apply congr_arg Symbol.terminal
-        simp only [List.length_map]
-      · exfalso
-        unfold wrapSymbol₂ at eqiv_symb
-        unfold corresponding_symbols at eqiv_symb
-        exact eqiv_symb
-    have goal_as_some_ith :
-      some (y.nth_le i hiy) =
-        some (((w.drop x.length).map Symbol.terminal).nthLe i i_lt_len_mtw) :=
-      by
-      rw [goal_as_ith_drop]
-      clear * -
-      congr
-      rw [List.map_drop]
-    clear * - goal_as_some_ith
-    rw [← List.nthLe_get? hiy] at goal_as_some_ith
-    rw [← List.nthLe_get? i_lt_len_mtw] at goal_as_some_ith
-    convert goal_as_some_ith
-    rw [List.get?_map]-/
+        exact hiy
+      have i_lt_len_dxw : i < ((w.map Symbol.terminal).drop x.length).length
+      swap
+      have i_lt_len_mtw : i < ((w.drop x.length).map Symbol.terminal).length
+      · convert i_lt_len_dxw
+        apply List.map_drop
+      have goal_as_ith_drop : y[i]'hiy = (List.drop x.length (w.map Symbol.terminal))[i]'i_lt_len_dxw
+      · sorry /-
+        have xli_lt_len_w : x.length + i < w.length
+        · clear * - hiy xylen
+          linarith
+        have eqiv_symb := correspondingStrings_nthLe i_lt_len_lwy i_lt_len_dlmxw equivalent_second_parts
+        rw [List.nthLe_map _ _ hiy] at eqiv_symb
+        rw [List.nthLe_drop'] at *
+        rw [List.nthLe_map]; swap
+        · exact xli_lt_len_w
+        rw [List.nthLe_map] at eqiv_symb ; swap
+        · rw [List.length_map]
+          exact xli_lt_len_w
+        clear * - eqiv_symb
+        cases' y.nth_le i hiy with t n
+        · unfold wrapSymbol₂ at eqiv_symb
+          unfold corresponding_symbols at eqiv_symb
+          have eq_symb := congr_arg Symbol.terminal eqiv_symb
+          rw [← eq_symb]
+          apply congr_arg Symbol.terminal
+          simp only [List.length_map]
+        · exfalso
+          unfold wrapSymbol₂ at eqiv_symb
+          unfold corresponding_symbols at eqiv_symb
+          exact eqiv_symb-/
+      have goal_as_some_ith : some (y[i]'hiy) = some (((w.drop x.length).map Symbol.terminal)[i]'i_lt_len_mtw)
+      · rw [goal_as_ith_drop]
+        congr
+        symm
+        apply List.map_drop
+      simp_all
+      · simp at xylen
+        rw [List.length_drop, List.length_map, ←xylen]
+        convert i_lt_len_lwy
+        rw [List.length_map, add_comm, Nat.add_sub_assoc (by rfl), Nat.sub_self, Nat.add_zero]
+    repeat' rw [List.length_map] at xylen
+    exact remaining
   apply List.take_append_drop
 
 end very_complicated

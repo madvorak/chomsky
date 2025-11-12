@@ -1832,9 +1832,9 @@ by
     have i_lt_lenr : i < (w.map Symbol.terminal).length
     · simp_all
     have equivalent_ith := correspondingStrings_get i_lt_lenl i_lt_lenr concat_xy
-    have asdf : (x.map (wrapSymbol₁ g₂.nt) ++ y.map (wrapSymbol₂ g₁.nt)).get ⟨i, i_lt_lenl⟩ = wrapSymbol₁ g₂.nt (x.get ⟨i, iltxl⟩)
+    have hxyg₂ : (x.map (wrapSymbol₁ g₂.nt) ++ y.map (wrapSymbol₂ g₁.nt)).get ⟨i, i_lt_lenl⟩ = wrapSymbol₁ g₂.nt (x.get ⟨i, iltxl⟩)
     · simp_all
-    rw [asdf, List.get_map] at equivalent_ith
+    rw [hxyg₂, List.get_map] at equivalent_ith
     set I : Fin x.length := ⟨i, iltxl⟩
     cases hxI : x.get I with
     | terminal t =>
@@ -1842,6 +1842,13 @@ by
       simp [hxI, wrapSymbol₁, correspondingSymbols] at equivalent_ith
       rw [←equivalent_ith]
       apply congr_arg
+      -- DO NOT `simp; congr 2`
+      have hiwx : i < (w.take x.length).length
+      · rw [List.length_take, lt_inf_iff]
+        constructor
+        · exact iltxl
+        · simpa using i_lt_lenr
+      rw [←List.get_eq_getElem] -- ??
       sorry
     | nonterminal n₁ =>
       rw [List.get_eq_getElem] at hxI
@@ -1929,16 +1936,7 @@ by
         correspondingStrings
           (y.map (wrapSymbol₂ g₁.nt))
           ((w.map Symbol.terminal).drop (x.map (wrapSymbol₁ g₂.nt)).length)
-      · /-have llen_eq_llen : (x.map (wrapSymbol₁ g₂.nt)).length =
-            ((w.map (@Symbol.terminal T _)).take (x.map (wrapSymbol₁ g₂.nt)).length).length
-        · rw [List.length_take]
-          symm
-          apply min_eq_left
-          rw [List.length_map]
-          rw [List.length_map]
-          apply Nat.le.intro
-          simpa using xylen-/
-        convert correspondingStrings_drop (x.map (wrapSymbol₁ g₂.nt)).length concat_xy
+      · convert correspondingStrings_drop (x.map (wrapSymbol₁ g₂.nt)).length concat_xy
         · rw [List.drop_left]
         · rw [List.take_append_drop]
       have i_lt_len_lwy : i < (y.map (wrapSymbol₂ g₁.nt)).length
@@ -1950,30 +1948,22 @@ by
       · convert i_lt_len_dxw
         apply List.map_drop
       have goal_as_ith_drop : y[i]'hiy = (List.drop x.length (w.map Symbol.terminal))[i]'i_lt_len_dxw
-      · sorry /-
-        have xli_lt_len_w : x.length + i < w.length
-        · clear * - hiy xylen
-          linarith
-        have eqiv_symb := correspondingStrings_nthLe i_lt_len_lwy i_lt_len_dlmxw equivalent_second_parts
-        rw [List.nthLe_map _ _ hiy] at eqiv_symb
-        rw [List.nthLe_drop'] at *
-        rw [List.nthLe_map]; swap
-        · exact xli_lt_len_w
-        rw [List.nthLe_map] at eqiv_symb ; swap
-        · rw [List.length_map]
-          exact xli_lt_len_w
-        clear * - eqiv_symb
-        cases' y.nth_le i hiy with t n
-        · unfold wrapSymbol₂ at eqiv_symb
-          unfold corresponding_symbols at eqiv_symb
-          have eq_symb := congr_arg Symbol.terminal eqiv_symb
-          rw [←eq_symb]
-          apply congr_arg Symbol.terminal
-          simp only [List.length_map]
-        · exfalso
-          unfold wrapSymbol₂ at eqiv_symb
-          unfold corresponding_symbols at eqiv_symb
-          exact eqiv_symb-/
+      · have xli_lt_len_w : x.length + i < w.length
+        · apply Nat.add_lt_of_lt_sub'
+          simpa using i_lt_len_dxw
+        have eqiv_symb := correspondingStrings_getElem i_lt_len_lwy (by simpa using i_lt_len_dxw) equivalent_second_parts
+        simp only [correspondingSymbols] at eqiv_symb
+        -- TODO refactor!
+        aesop
+        --aesop (add norm wrapSymbol₂) (add unsafe 90% apply Sum.inr.inj) (config := { maxRuleApplicationDepth := 100 })
+        simp [wrapSymbol₂] at heq
+        aesop
+        simp [wrapSymbol₂] at heq
+        aesop
+        simpa using Sum.inr.inj heq
+        simp [wrapSymbol₂] at heq
+        aesop
+        exact Sum.inr.inj (Sum.inr.inj heq)
       have goal_as_some_ith : some (y[i]'hiy) = some (((w.drop x.length).map Symbol.terminal)[i]'i_lt_len_mtw)
       · rw [goal_as_ith_drop]
         congr

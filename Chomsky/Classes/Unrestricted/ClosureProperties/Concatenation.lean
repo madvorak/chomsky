@@ -1728,6 +1728,7 @@ by
             rw [middle_nt_elem]
             unfold corresponding_symbols-/
 
+set_option maxHeartbeats 666666 in
 lemma in_concatenated_of_in_big {g₁ g₂ : Grammar T} {w : List T}
     (hwgg : w ∈ (bigGrammar g₁ g₂).language) :
   w ∈ g₁.language * g₂.language :=
@@ -1821,92 +1822,26 @@ by
     have xylen := correspondingStrings_length concat_xy
     rw [List.length_append] at xylen
     repeat' rw [List.length_map] at xylen
-    apply List.ext_get
-    · rw [List.length_map, List.length_take_of_le]
-      exact le_of_add_le_left (le_of_eq xylen)
+    apply List.ext_getElem
+    · simp
+      exact Nat.le.intro xylen
     intros i iltwl iltxl
-    rw [List.get_map]
     have i_lt_lenl : i < (x.map (wrapSymbol₁ g₂.nt) ++ y.map (wrapSymbol₂ g₁.nt)).length
     · rw [List.length_append, List.length_map]
       exact Nat.lt_add_right (y.map (wrapSymbol₂ g₁.nt)).length iltxl
     have i_lt_lenr : i < (w.map Symbol.terminal).length
     · simp_all
-    have equivalent_ith := correspondingStrings_get i_lt_lenl i_lt_lenr concat_xy
-    have hxyg₂ : (x.map (wrapSymbol₁ g₂.nt) ++ y.map (wrapSymbol₂ g₁.nt)).get ⟨i, i_lt_lenl⟩ = wrapSymbol₁ g₂.nt (x.get ⟨i, iltxl⟩)
+    have equivalent_ith := correspondingStrings_getElem i_lt_lenl i_lt_lenr concat_xy
+    have hxyg₂ : (x.map (wrapSymbol₁ g₂.nt) ++ y.map (wrapSymbol₂ g₁.nt))[i]'i_lt_lenl = wrapSymbol₁ g₂.nt (x[i]'iltxl)
     · simp_all
-    rw [hxyg₂, List.get_map] at equivalent_ith
-    set I : Fin x.length := ⟨i, iltxl⟩
-    cases hxI : x.get I with
-    | terminal t =>
-      rw [List.get_eq_getElem] at hxI
-      simp [hxI, wrapSymbol₁, correspondingSymbols] at equivalent_ith
-      rw [←equivalent_ith]
-      apply congr_arg
-      -- DO NOT `simp; congr 2`
-      have hiwx : i < (w.take x.length).length
-      · rw [List.length_take, lt_inf_iff]
-        constructor
-        · exact iltxl
-        · simpa using i_lt_lenr
-      rw [←List.get_eq_getElem] -- ??
-      sorry
-    | nonterminal n₁ =>
-      rw [List.get_eq_getElem] at hxI
-      simp [hxI, wrapSymbol₁, correspondingSymbols] at equivalent_ith
-    /-by_cases hi : i ≥ x.length
-    · convert_to none = none
-      · have xlen : x.length = ((w.take x.length).map (@Symbol.terminal T g₁.nt)).length
-        · clear * - xylen
-          rw [List.length_map]
-          rw [List.length_take]
-          symm
-          apply min_eq_left
-          exact Nat.le.intro xylen
-        rw [xlen] at hi
-        clear * - hi
-        linarith
-      · exact T
-      rfl
-    push_neg at hi
-    have i_lt_len_lwx : i < (x.map (wrapSymbol₁ g₂.nt)).length :=
-      by
-      rw [List.length_map]
-      exact hi
-    have i_lt_len_w : i < w.length :=
-      by
-      apply lt_of_lt_of_le hi
-      exact Nat.le.intro xylen
-    have i_lt_len₁ : i < (x.map (wrapSymbol₁ g₂.nt) ++ y.map (wrapSymbol₂ g₁.nt)).length
-    · rw [List.length_append]
-      apply lt_of_lt_of_le i_lt_len_lwx
-      apply le_self_add-/
-    /-have i_lt_len₂ : i < (w.map Symbol.terminal).length
-    · exact List.length_map _ _ ▸ i_lt_len_w -- TODO inline
-    rw [List.get?_map]
-    rw [List.get?_take hix]
-    have equivalent_ith :
-      corresponding_symbols
-        (List.nthLe (x.map (wrapSymbol₁ g₂.nt) ++ y.map (wrapSymbol₂ g₁.nt)) i i_lt_len₁)
-        (List.nthLe (w.map Symbol.terminal) i i_lt_len₂) :=
-      by
-      apply correspondingStrings_nthLe
-      exact concat_xy
-    rw [List.nthLe_map] at equivalent_ith ; swap
-    · exact i_lt_len_w
-    rw [List.nthLe_append] at equivalent_ith ; swap
-    · exact i_lt_len_lwx
-    rw [List.nthLe_map] at equivalent_ith ; swap
-    · exact hix
-    clear * - equivalent_ith
-    rw [List.nthLe_get? hix]
-    cases' x.nth_le i hix with t n <;> unfold wrapSymbol₁ at equivalent_ith  <;>
-      unfold corresponding_symbols at equivalent_ith
-    · have symbol_ith := congr_arg (@Symbol.terminal T g₁.nt) equivalent_ith
-      rw [List.nthLe_get? i_lt_len_w]
-      rw [Option.map_some']
-      exact congr_arg Option.some symbol_ith
-    · exfalso
-      exact equivalent_ith -/
+    rw [hxyg₂, List.getElem_map] at equivalent_ith
+    symm
+    -- TODO refactor!
+    simp [wrapSymbol₁, correspondingSymbols] at equivalent_ith
+    aesop
+    exact Sum.inl.inj (Sum.inr.inj heq)
+    exfalso
+    simpa using Sum.inr.inj heq
   use w.drop x.length
   constructor
   · clear deri_x

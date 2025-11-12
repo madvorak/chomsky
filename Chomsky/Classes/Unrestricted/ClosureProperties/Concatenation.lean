@@ -732,6 +732,14 @@ by
             | nil => tauto
             | cons a => cases a <;> tauto
 
+private lemma correspondingStrings_getElem {N₁ N₂ : Type} {x y : List (nst T N₁ N₂)} {i : ℕ}
+    (i_lt_len_x : i < x.length) (i_lt_len_y : i < y.length)
+    (ass : correspondingStrings x y) :
+  correspondingSymbols (x[i]'i_lt_len_x) (y[i]'i_lt_len_y) :=
+by
+  apply list_forall₂_get
+  exact ass
+
 end unwrapping_nst
 
 section very_complicated
@@ -1258,225 +1266,179 @@ private lemma induction_step_for_lifted_rule_from_g₂ {g₁ g₂ : Grammar T}
     g₁.Derives [Symbol.nonterminal g₁.initial] x   ∧
     g₂.Derives [Symbol.nonterminal g₂.initial] y'  ∧
     correspondingStrings (x.map (wrapSymbol₁ g₂.nt) ++ y'.map (wrapSymbol₂ g₁.nt)) b :=
-by sorry
-  /-rw [List.mem_map] at rin
+by
+  rw [List.mem_map] at rin
   rcases rin with ⟨r₂, rin₂, wrap_r₂_eq_r⟩
-  rw [← wrap_r₂_eq_r] at *
-  clear wrap_r₂_eq_r
-  simp [wrap_grule₂] at *
-  rw [← List.singleton_append] at bef
+  rw [←wrap_r₂_eq_r] at bef aft
+  clear wrap_r₂_eq_r r
+  simp only [wrapGrule₂] at * -- originally not `only`
+  rw [← List.singleton_append] at bef -- questionable
   rw [bef] at ih_concat
-  let b' := u.drop x.length ++ r₂.output_string.map (wrapSymbol₂ g₁.nt) ++ v
-  use List.filterMap unwrap_symbol₂ b'
-  have total_len := corresponding_strings_length ih_concat
+  let b' := u.drop x.length ++ r₂.output.map (wrapSymbol₂ g₁.nt) ++ v
+  use b'.filterMap unwrapSymbol₂
+  have total_len := correspondingStrings_length ih_concat
   repeat' rw [List.length_append] at total_len
   repeat' rw [List.length_map] at total_len
-  have matched_right : u.length ≥ x.length :=
-    by
-    clear * - ih_concat total_len
-    by_contra
-    push_neg at h
-    rename' h => ul_lt_xl
-    have ul_lt_ihls :
-      u.length < (x.map (wrapSymbol₁ g₂.nt) ++ y.map (wrapSymbol₂ g₁.nt)).length :=
-      by
-      rw [List.length_append]
-      rw [List.length_map]
-      rw [List.length_map]
-      exact Nat.lt_add_right _ _ _ ul_lt_xl
-    have ul_lt_ihrs :
-      u.length <
-        (u ++
-            (r₂.input_L.map (wrapSymbol₂ g₁.nt) ++
-              ([Symbol.nonterminal ◩(some ◪r₂.input_N)))] ++
-                (r₂.input_R.map (wrapSymbol₂ g₁.nt) ++ v)))).length :=
-      by
-      repeat' rw [List.length_append]
-      rw [List.length_singleton]
-      clear * -
-      linarith
-    have ulth := correspondingStrings_nthLe ul_lt_ihls ul_lt_ihrs ih_concat
-    rw [List.nthLe_append ul_lt_ihls] at ulth ; swap
+  have matched_right : u.length ≥ x.length
+  · by_contra! ul_lt_xl
+    have ul_lt_ihls : u.length < (x.map (wrapSymbol₁ g₂.nt) ++ y.map (wrapSymbol₂ g₁.nt)).length
+    · rw [List.length_append, List.length_map, List.length_map]
+      exact Nat.lt_add_right _ ul_lt_xl
+    have ulth := correspondingStrings_getElem ul_lt_ihls (by simp) ih_concat
+    have ul_lt_xlm : u.length < (x.map (wrapSymbol₁ g₂.nt)).length
     · rw [List.length_map]
       exact ul_lt_xl
-    rw [List.nthLe_append_right] at ulth ; swap
-    · rfl
-    rw [List.nthLe_map] at ulth ; swap
-    · exact ul_lt_xl
-    by_cases (r₂.input_L.map (wrapSymbol₂ g₁.nt)).length > u.length - u.length
-    · rw [List.nthLe_append _ h] at ulth
-      rw [List.nthLe_map] at ulth ; swap
-      · rw [List.length_map] at h
-        exact h
-      exact corresponding_symbols_never₁ ulth
-    push_neg at h
-    rw [List.nthLe_append_right h] at ulth
-    have matched_central_nt :
-      corresponding_symbols (wrapSymbol₁ g₂.nt (x.nth_le u.length ul_lt_xl))
-        (wrapSymbol₂ g₁.nt (Symbol.nonterminal r₂.input_N)) :=
-      by
-      clear * - ulth
-      finish
-    exact corresponding_symbols_never₁ matched_central_nt
+    simp_rw [List.getElem_append, ul_lt_xlm] at ulth
+    simp [List.getElem_append] at ulth
+    split at ulth
+    · exact correspondingSymbols_never₁ ulth
+    · change correspondingSymbols (wrapSymbol₁ g₂.nt x[u.length]) (wrapSymbol₂ g₁.nt (Symbol.nonterminal r₂.inputN)) at ulth
+      exact correspondingSymbols_never₁ ulth
   constructor
-  · constructor
-    · exact ih_x
-    · apply gr_deri_of_deri_tran ih_y
-      use r₂
-      constructor
-      · exact rin₂
-      use List.filterMap unwrap_symbol₂ (u.drop x.length)
-      use List.filterMap unwrap_symbol₂ v
-      constructor
-      · have corres_y :=
-          corresponding_strings_drop (x.map (wrapSymbol₁ g₂.nt)).length ih_concat
-        rw [List.drop_left] at corres_y
-        rw [List.drop_append_of_le_length] at corres_y ; swap
-        · rw [List.length_map]
-          exact matched_right
-        clear * - corres_y total_len
-        repeat' rw [List.append_assoc]
-        obtain ⟨seg1, rest1⟩ :=
-          corresponding_strings_split (u.drop (x.map (wrapSymbol₁ g₂.nt)).length).length
-            corres_y
-        clear corres_y
-        rw [List.take_left] at seg1
-        rw [List.drop_left] at rest1
-        rw [← List.take_append_drop (List.filterMap unwrap_symbol₂ (u.drop x.length)).length y]
-        rw [← List.map_take] at seg1
-        have min_uxy : min (u.length - x.length) y.length = u.length - x.length :=
-          by
-          rw [min_eq_left]
-          clear * - total_len
-          omega
-        have tuxy :
-          y.take (y.take (u.length - x.length)).length =
-            y.take (u.length - x.length) :=
-          by
-          rw [List.length_take]
-          rw [min_uxy]
-        have fmu1 := filter_map_unwrap_of_corresponding_strings₂ seg1
-        rw [List.length_map] at fmu1
-        have fml :
-          (List.filterMap unwrap_symbol₂ (u.drop x.length)).length =
-            (u.drop x.length).length :=
-          by
-          rw [congr_arg List.length fmu1]
-          rw [List.length_take] at tuxy
-          rw [List.length_drop]
-          rw [min_uxy] at tuxy
-          rw [congr_arg List.length tuxy]
-          rw [List.length_take]
-          exact min_uxy
-        apply congr_arg₂
-        · rw [fmu1]
-          rw [List.length_drop]
-          exact tuxy
-        clear seg1 fmu1 tuxy min_uxy
-        rw [List.length_map] at rest1
-        obtain ⟨seg2, rest2⟩ :=
-          corresponding_strings_split (r₂.input_L.map (wrapSymbol₂ g₁.nt)).length rest1
-        clear rest1
-        rw [List.take_left] at seg2
-        rw [List.drop_left] at rest2
-        rw [←
-          List.take_append_drop (r₂.input_L.map (wrapSymbol₂ g₁.nt)).length
-            (y.drop (List.filterMap unwrap_symbol₂ (u.drop x.length)).length)]
-        apply congr_arg₂
-        · clear * - seg2 fml
-          rw [← List.map_drop] at seg2
-          rw [← List.map_take] at seg2
-          have fmu2 := filter_map_unwrap_of_corresponding_strings₂ seg2
-          rw [List.length_map] at fmu2
-          rw [List.length_map]
-          rw [unwrap_wrap₂_string] at fmu2
-          rw [fml]
-          exact fmu2.symm
-        clear seg2
-        rw [List.length_map] at rest2
-        rw [List.drop_drop] at rest2 ⊢
-        obtain ⟨seg3, rest3⟩ := corresponding_strings_split 1 rest2
-        clear rest2
-        rw [List.take_left' (List.length_singleton _)] at seg3
-        rw [List.drop_left' (List.length_singleton _)] at rest3
+  · exact ih_x
+  constructor
+  · apply gr_deri_of_deri_tran ih_y
+    use r₂, rin₂, (u.drop x.length).filterMap unwrapSymbol₂, v.filterMap unwrapSymbol₂
+    constructor
+    · have corres_y := correspondingStrings_drop (x.map (wrapSymbol₁ g₂.nt)).length ih_concat
+      rw [List.drop_left] at corres_y
+      rw [List.drop_append_of_le_length] at corres_y ; swap
+      · simp
+        linarith
+      clear * - corres_y total_len
+      repeat' rw [List.append_assoc]
+      rw [List.append_nil] at corres_y -- just added
+      obtain ⟨seg1, rest1⟩ := correspondingStrings_split (u.drop (x.map (wrapSymbol₁ g₂.nt)).length).length corres_y
+      clear corres_y
+      --rw [List.take_left] at seg1
+      --rw [List.drop_left] at rest1
+      rw [← List.take_append_drop ((u.drop x.length).filterMap unwrapSymbol₂).length y]
+      rw [← List.map_take] at seg1
+      have min_uxy : min (u.length - x.length) y.length = u.length - x.length :=
+        by
+        rw [min_eq_left]
+        clear * - total_len
+        omega
+      have tuxy :
+        y.take (y.take (u.length - x.length)).length =
+          y.take (u.length - x.length) :=
+        by
+        rw [List.length_take]
+        rw [min_uxy]
+      have fmu1 := filterMap_unwrap_of_correspondingStrings₂ seg1
+      rw [List.length_map] at fmu1
+      sorry /-
+      have fml : ((u.drop x.length).filterMap unwrapSymbol₂).length = (u.drop x.length).length
+      · rw [congr_arg List.length fmu1]
+        rw [List.length_take] at tuxy
+        rw [List.length_drop]
+        rw [min_uxy] at tuxy
+        rw [congr_arg List.length tuxy]
+        rw [List.length_take]
+        exact min_uxy
+      apply congr_arg₂
+      · rw [fmu1]
+        rw [List.length_drop]
+        exact tuxy
+      clear seg1 fmu1 tuxy min_uxy
+      rw [List.length_map] at rest1
+      obtain ⟨seg2, rest2⟩ := correspondingStrings_split (r₂.inputL.map (wrapSymbol₂ g₁.nt)).length rest1
+      clear rest1
+      --rw [List.take_left] at seg2
+      --rw [List.drop_left] at rest2
+      rw [←(y.drop ((u.drop x.length).filterMap unwrapSymbol₂).length).take_append_drop (r₂.inputL.map (wrapSymbol₂ g₁.nt)).length]
+      apply congr_arg₂
+      · clear * - seg2 fml
+        rw [← List.map_drop] at seg2
+        rw [← List.map_take] at seg2
+        have fmu2 := filterMap_unwrap_of_correspondingStrings₂ seg2
+        rw [List.length_map] at fmu2
         rw [List.length_map]
+        rw [unwrap_wrap₂_string] at fmu2
         rw [fml]
-        rw [←
-          List.take_append_drop 1 (y.drop (r₂.input_L.length + (u.drop x.length).length))]
-        apply congr_arg₂
-        · rw [← List.map_drop] at seg3
-          rw [← List.map_take] at seg3
-          have fmu3 := filter_map_unwrap_of_corresponding_strings₂ seg3
-          exact fmu3.symm
-        clear seg3
-        rw [List.drop_drop] at rest3 ⊢
-        rw [← List.map_drop] at rest3
-        rw [← filter_map_unwrap_of_corresponding_strings₂ rest3]
-        rw [List.filterMap_append]
-        rw [unwrap_wrap₂_string]
-      · rw [List.filterMap_append_append]
-        congr
-        apply unwrap_wrap₂_string
-  rw [aft]
-  rw [List.filterMap_append_append]
-  rw [List.map_append_append]
-  rw [List.append_assoc]
-  rw [← List.append_assoc (x.map (wrapSymbol₁ g₂.nt))]
-  apply corresponding_strings_append; swap
-  · rw [unwrap_wrap₂_string]
-    apply corresponding_strings_append
-    · apply corresponding_strings_self
-    apply corresponding_string_after_wrap_unwrap_self₂
-    repeat' rw [← List.append_assoc] at ih_concat
-    have rev := corresponding_strings_reverse ih_concat
-    rw [List.reverse_append _ v] at rev
-    have tak := corresponding_strings_take v.reverse.length rev
-    rw [List.take_left] at tak
-    have rtr := corresponding_strings_reverse tak
-    have nec : v.reverse.length ≤ (y.map (wrapSymbol₂ g₁.nt)).reverse.length :=
-      by
-      clear * - matched_right total_len
-      rw [List.length_reverse]
-      rw [List.length_reverse]
+        exact fmu2.symm
+      clear seg2
+      rw [List.length_map] at rest2
+      rw [List.drop_drop] at rest2 ⊢
+      obtain ⟨seg3, rest3⟩ := correspondingStrings_split 1 rest2
+      clear rest2
+      rw [List.take_left' (List.length_singleton _)] at seg3
+      rw [List.drop_left' (List.length_singleton _)] at rest3
       rw [List.length_map]
-      linarith
-    clear * - rtr nec
-    rw [List.reverse_reverse] at rtr
-    rw [List.reverse_append] at rtr
-    rw [List.take_append_of_le_length nec] at rtr
-    rw [List.reverse_take] at rtr ; swap
-    · rw [List.length_reverse (y.map (wrapSymbol₂ g₁.nt))] at nec
-      exact nec
-    rw [← List.map_drop] at rtr
-    rw [List.reverse_reverse] at rtr
-    exact ⟨_, rtr⟩
-  rw [← List.take_append_drop x.length u]
-  apply corresponding_strings_append
-  · have almost := corresponding_strings_take x.length ih_concat
-    rw [List.take_append_of_le_length matched_right] at almost
-    convert almost
-    have xl_eq : x.length = (x.map (wrapSymbol₁ g₂.nt)).length := by rw [List.length_map]
-    rw [xl_eq]
-    rw [List.take_left]
-  · rw [List.take_append_drop]
-    apply corresponding_string_after_wrap_unwrap_self₂
-    have tdc := corresponding_strings_drop x.length (corresponding_strings_take u.length ih_concat)
-    rw [List.take_left] at tdc
-    have ul_eq : u.length = x.length + (u.length - x.length) :=
-      by
-      rw [← Nat.add_sub_assoc matched_right]
-      rw [add_comm]
-      rw [Nat.add_sub_assoc]; swap
-      · rfl
-      rw [Nat.sub_self]
-      rw [add_zero]
-    rw [ul_eq] at tdc
-    clear * - tdc
-    rw [List.drop_take] at tdc
-    rw [List.drop_left'] at tdc ; swap
-    · apply List.length_map
-    rw [← List.map_take] at tdc
-    exact ⟨_, tdc⟩-/
+      rw [fml]
+      rw [(y.drop (r₂.inputL.length + (u.drop x.length).length)).take_append_drop 1]
+      apply congr_arg₂
+      · rw [← List.map_drop] at seg3
+        rw [← List.map_take] at seg3
+        have fmu3 := filter_map_unwrap_of_corresponding_strings₂ seg3
+        exact fmu3.symm
+      clear seg3
+      rw [List.drop_drop] at rest3 ⊢
+      rw [← List.map_drop] at rest3
+      rw [← filter_map_unwrap_of_corresponding_strings₂ rest3]
+      rw [List.filterMap_append]
+      rw [unwrap_wrap₂_string]-/
+    · rw [List.filterMap_append_append]
+      congr
+      apply unwrap_wrap₂_string
+  · -- TODO replace `b'` ?
+    rw [aft, List.filterMap_append_append, List.map_append_append, List.append_assoc, ←List.append_assoc (x.map (wrapSymbol₁ g₂.nt))]
+    sorry /-
+    apply correspondingStrings_append ; swap
+    · rw [unwrap_wrap₂_string]
+      apply correspondingStrings_append
+      · apply correspondingStrings_self
+      apply corresponding_string_after_wrap_unwrap_self₂
+      repeat' rw [← List.append_assoc] at ih_concat
+      have rev := corresponding_strings_reverse ih_concat
+      rw [List.reverse_append _ v] at rev
+      have tak := corresponding_strings_take v.reverse.length rev
+      rw [List.take_left] at tak
+      have rtr := corresponding_strings_reverse tak
+      have nec : v.reverse.length ≤ (y.map (wrapSymbol₂ g₁.nt)).reverse.length :=
+        by
+        clear * - matched_right total_len
+        rw [List.length_reverse]
+        rw [List.length_reverse]
+        rw [List.length_map]
+        linarith
+      clear * - rtr nec
+      rw [List.reverse_reverse] at rtr
+      rw [List.reverse_append] at rtr
+      rw [List.take_append_of_le_length nec] at rtr
+      rw [List.reverse_take] at rtr ; swap
+      · rw [List.length_reverse (y.map (wrapSymbol₂ g₁.nt))] at nec
+        exact nec
+      rw [← List.map_drop] at rtr
+      rw [List.reverse_reverse] at rtr
+      exact ⟨_, rtr⟩
+    · rw [← List.take_append_drop x.length u]
+      apply correspondingStrings_append
+      · have almost := correspondingStrings_take x.length ih_concat
+        rw [List.take_append_of_le_length matched_right] at almost
+        convert almost
+        have xl_eq : x.length = (x.map (wrapSymbol₁ g₂.nt)).length := by rw [List.length_map]
+        rw [xl_eq]
+        rw [List.take_left]
+      · rw [List.take_append_drop]
+        apply correspondingStrings_after_wrap_unwrap_self₂
+        have tdc := correspondingStrings_drop x.length (correspondingStrings_take u.length ih_concat)
+        rw [List.take_left] at tdc
+        have ul_eq : u.length = x.length + (u.length - x.length) :=
+          by
+          rw [← Nat.add_sub_assoc matched_right]
+          rw [add_comm]
+          rw [Nat.add_sub_assoc]; swap
+          · rfl
+          rw [Nat.sub_self]
+          rw [add_zero]
+        rw [ul_eq] at tdc
+        clear * - tdc
+        rw [List.drop_take] at tdc
+        rw [List.drop_left'] at tdc ; swap
+        · apply List.length_map
+        rw [← List.map_take] at tdc
+        exact ⟨_, tdc⟩-/
 
 private lemma big_induction {g₁ g₂ : Grammar T} {w : List (nst T g₁.nt g₂.nt)}
     (hggw : (bigGrammar g₁ g₂).Derives

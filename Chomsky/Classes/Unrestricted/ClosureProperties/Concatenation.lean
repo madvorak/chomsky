@@ -436,12 +436,13 @@ by
   unfold correspondingStrings at hxy
   exact List.Forall₂.length_eq hxy
 
-private lemma correspondingStrings_get {N₁ N₂ : Type} {x y : List (nst T N₁ N₂)} {i : ℕ}
-    (hix : i < x.length) (hiy : i < y.length) (hxy : correspondingStrings x y) :
-  correspondingSymbols (x.get ⟨i, hix⟩) (y.get ⟨i, hiy⟩) :=
+private lemma correspondingStrings_getElem {N₁ N₂ : Type} {x y : List (nst T N₁ N₂)} {i : ℕ}
+    (i_lt_len_x : i < x.length) (i_lt_len_y : i < y.length)
+    (ass : correspondingStrings x y) :
+  correspondingSymbols (x[i]'i_lt_len_x) (y[i]'i_lt_len_y) :=
 by
   apply list_forall₂_get
-  exact hxy
+  exact ass
 
 private lemma correspondingStrings_reverse {N₁ N₂ : Type} {x y : List (nst T N₁ N₂)}
     (hxy : correspondingStrings x y) :
@@ -483,6 +484,7 @@ by
   · exact correspondingStrings_drop n hxy
 
 end correspondence_for_terminals
+
 
 section unwrapping_nst
 
@@ -732,15 +734,8 @@ by
           | nil => tauto
           | cons a => cases a <;> tauto
 
-private lemma correspondingStrings_getElem {N₁ N₂ : Type} {x y : List (nst T N₁ N₂)} {i : ℕ}
-    (i_lt_len_x : i < x.length) (i_lt_len_y : i < y.length)
-    (ass : correspondingStrings x y) :
-  correspondingSymbols (x[i]'i_lt_len_x) (y[i]'i_lt_len_y) :=
-by
-  apply list_forall₂_get
-  exact ass
-
 end unwrapping_nst
+
 
 section very_complicated
 
@@ -1541,9 +1536,7 @@ by
     · convert part_for_u
       convert (congr_arg (List.take u.length) bef).symm
       simp
-    · rw [bef] at ih_concat
-      rw [List.append_nil] at ih_concat
-      rw [List.append_nil] at ih_concat
+    · rw [bef, List.append_nil, List.append_nil] at ih_concat
       have ul_lt_len_um : u.length < (u ++ [Symbol.nonterminal ◪◩t]).length
       · rw [List.length_append]
         rw [List.length_singleton]
@@ -1556,8 +1549,6 @@ by
       · rw [correspondingStrings_length ih_concat]
         simp
       have middle_nt := correspondingStrings_getElem ul_lt_len_xy ul_lt_len_umv ih_concat
-      --rw [List.getElem_append _ ul_lt_len_umv ul_lt_len_um] at middle_nt
-      --rw [List.getElem_append_right (by rfl) ul_lt_len_um] at middle_nt
       have middle_nt_elem :
         correspondingSymbols
           ((x.map (wrapSymbol₁ g₂.nt) ++ y.map (wrapSymbol₂ g₁.nt))[u.length]'ul_lt_len_xy)
@@ -1572,7 +1563,7 @@ by
       rw [xy_split_nt]
       apply correspondingStrings_append; swap
       · rw [List.drop_drop]
-        have part_for_v := correspondingStrings_drop (u.length + 1) ih_concat
+        have part_for_v := correspondingStrings_drop u.length.succ ih_concat
         convert part_for_v
         have correct_len : 1 + u.length = (u ++ [Symbol.nonterminal ◪◩t]).length
         · rw [add_comm, List.length_append, List.length_singleton]
@@ -1584,148 +1575,125 @@ by
         · apply list_take_one_drop
         clear * - middle_nt_elem
         apply correspondingStrings_singleton
-        cases' (x.map (wrapSymbol₁ g₂.nt) ++ y.map (wrapSymbol₂ g₁.nt))[u.length]'ul_lt_len_xy with e s
-        · exfalso
+        cases hxul : (x.map (wrapSymbol₁ g₂.nt) ++ y.map (wrapSymbol₂ g₁.nt))[u.length]'ul_lt_len_xy with
+        | terminal =>
+          exfalso
           unfold correspondingSymbols at middle_nt_elem
-          sorry
-        -- will never work without the two commented lines above!
-        cases s with
-        | inl sₒ =>
-          cases sₒ with
-          | none =>
-            --simp [correspondingSymbols] at middle_nt_elem
-            sorry
-          | some sₙ =>
-            cases sₙ with
+          aesop
+        | nonterminal s =>
+          rw [hxul] at middle_nt_elem
+          cases hs : s with
+          | inl sₒ =>
+            rw [hs] at middle_nt_elem
+            cases sₒ with
+            | none =>
+              exact middle_nt_elem
+            | some sₙ =>
+              cases sₙ with
+              | inl s₁ =>
+                unfold correspondingSymbols at middle_nt_elem ⊢
+                aesop
+              | inr s₂ =>
+                unfold correspondingSymbols at middle_nt_elem ⊢
+                aesop
+          | inr sₜ =>
+            rw [hs] at middle_nt_elem
+            cases sₜ with
             | inl s₁ =>
-              sorry
+              unfold correspondingSymbols at middle_nt_elem ⊢
+              aesop
             | inr s₂ =>
-              sorry
-        | inr sₜ =>
-          cases sₜ with
-          | inl s₁ =>
-            sorry
-          | inr s₂ =>
-            sorry
-        /-
-        cases s
-        · exfalso
-          cases s; swap
-          cases s
-          all_goals
-            unfold corresponding_symbols at middle_nt_elem
-            exact middle_nt_elem
-        · cases s
-          · unfold corresponding_symbols at middle_nt_elem
-            rw [middle_nt_elem]
-            unfold corresponding_symbols
-          · exfalso
-            unfold corresponding_symbols at middle_nt_elem
-            exact middle_nt_elem-/
+              unfold correspondingSymbols at middle_nt_elem ⊢
+              aesop
   · use x, y, ih_x, ih_y
-    rw [aft]
-    rw [bef] at ih_concat
-    sorry/-
-    · unfold rulesForTerminals₂ at rin
-      rw [List.mem_map] at rin
-      rcases rin with ⟨t, -, eq_r⟩
-      rw [←eq_r] at *
-      clear eq_r
-      rw [List.append_nil] at ih_concat
-      rw [List.append_nil] at ih_concat
-      have xy_split_v :
-        x.map (wrapSymbol₁ g₂.nt) ++ y.map (wrapSymbol₂ g₁.nt) =
-          List.take (u.length + 1)
-              (x.map (wrapSymbol₁ g₂.nt) ++ y.map (wrapSymbol₂ g₁.nt)) ++
-            List.drop (u.length + 1)
-              (x.map (wrapSymbol₁ g₂.nt) ++ y.map (wrapSymbol₂ g₁.nt)) :=
-        by rw [List.take_append_drop]
-      rw [xy_split_v]
-      have part_for_v := corresponding_strings_drop (u.length + 1) ih_concat
-      apply corresponding_strings_append; swap
-      · convert part_for_v
-        have rewr_len : u.length + 1 = (u ++ [Symbol.nonterminal ◪◪t))]).length :=
-          by
-          rw [List.length_append]
-          rw [List.length_singleton]
-        rw [rewr_len]
-        rw [List.drop_left]
-      have ul_lt_len_um : u.length < (u ++ [Symbol.nonterminal ◪◪t))]).length :=
-        by
-        rw [List.length_append]
+    unfold rulesForTerminals₂ at rte₂
+    rw [List.mem_map] at rte₂
+    rcases rte₂ with ⟨t, -, eq_r⟩
+    rw [←eq_r] at bef aft
+    clear eq_r r
+    dsimp only at bef aft
+    have xy_split_u : x.map (wrapSymbol₁ g₂.nt) ++ y.map (wrapSymbol₂ g₁.nt) =
+        (x.map (wrapSymbol₁ g₂.nt) ++ y.map (wrapSymbol₂ g₁.nt)).take u.length.succ ++
+        (x.map (wrapSymbol₁ g₂.nt) ++ y.map (wrapSymbol₂ g₁.nt)).drop u.length.succ
+    · symm
+      apply List.take_append_drop
+    rw [xy_split_u, aft]
+    have part_for_v := correspondingStrings_drop u.length.succ ih_concat
+    apply correspondingStrings_append
+    · rw [bef, List.append_nil, List.append_nil] at ih_concat
+      have ul_lt_len_um : u.length < (u ++ [Symbol.nonterminal ◪◪t]).length
+      · rw [List.length_append]
         rw [List.length_singleton]
         apply lt_add_one
-      have ul_lt_len_umv :
-        u.length < (u ++ [Symbol.nonterminal ◪◪t))] ++ v).length :=
-        by
-        rw [List.length_append]
+      have ul_lt_len_umv : u.length < (u ++ [Symbol.nonterminal ◪◪t] ++ v).length
+      · rw [List.length_append]
         apply lt_of_lt_of_le ul_lt_len_um
         apply le_self_add
-      have ul_lt_len_xy :
-        u.length < (x.map (wrapSymbol₁ g₂.nt) ++ y.map (wrapSymbol₂ g₁.nt)).length :=
-        by
-        have same_len := corresponding_strings_length ih_concat
+      have ul_lt_len_xy : u.length < (x.map (wrapSymbol₁ g₂.nt) ++ y.map (wrapSymbol₂ g₁.nt)).length
+      · have same_len := correspondingStrings_length ih_concat
         rw [same_len]
         exact ul_lt_len_umv
-      have middle_nt := correspondingStrings_nthLe ul_lt_len_xy ul_lt_len_umv ih_concat
-      rw [List.nthLe_append ul_lt_len_umv ul_lt_len_um] at middle_nt
-      rw [List.nthLe_append_right (by rfl) ul_lt_len_um] at middle_nt
+      have middle_nt := correspondingStrings_getElem ul_lt_len_xy ul_lt_len_umv ih_concat
       have middle_nt_elem :
-        corresponding_symbols
-          ((x.map (wrapSymbol₁ g₂.nt) ++ y.map (wrapSymbol₂ g₁.nt)).nthLe u.length
-            ul_lt_len_xy)
-          (Symbol.nonterminal ◪◪t))) :=
-        by
-        convert middle_nt
-        sorry
-      have xy_split_nt :
-        List.take (u.length + 1)
-            (x.map (wrapSymbol₁ g₂.nt) ++ y.map (wrapSymbol₂ g₁.nt)) =
-          List.take u.length
-              (List.take (u.length + 1)
-                (x.map (wrapSymbol₁ g₂.nt) ++ y.map (wrapSymbol₂ g₁.nt))) ++
-            List.drop u.length
-              (List.take (u.length + 1)
-                (x.map (wrapSymbol₁ g₂.nt) ++ y.map (wrapSymbol₂ g₁.nt))) :=
-        by rw [List.take_append_drop u.length]
+        correspondingSymbols
+          ((x.map (wrapSymbol₁ g₂.nt) ++ y.map (wrapSymbol₂ g₁.nt))[u.length]'ul_lt_len_xy)
+          (Symbol.nonterminal ◪◪t)
+      · convert middle_nt
+        simp
+      have xy_split_nt : (x.map (wrapSymbol₁ g₂.nt) ++ y.map (wrapSymbol₂ g₁.nt)).take u.length.succ =
+          ((x.map (wrapSymbol₁ g₂.nt) ++ y.map (wrapSymbol₂ g₁.nt)).take u.length.succ).take u.length ++
+          ((x.map (wrapSymbol₁ g₂.nt) ++ y.map (wrapSymbol₂ g₁.nt)).take u.length.succ).drop u.length
+      · symm
+        apply List.take_append_drop
       rw [xy_split_nt]
-      apply corresponding_strings_append
+      apply correspondingStrings_append
       · rw [List.take_take]
-        have part_for_u := corresponding_strings_take u.length ih_concat
+        have part_for_u := correspondingStrings_take u.length ih_concat
         convert part_for_u
         · apply min_eq_left
           apply Nat.le_succ
         rw [List.append_assoc]
         rw [List.take_left]
       · convert_to
-          corresponding_strings
-            [List.nthLe (x.map (wrapSymbol₁ g₂.nt) ++ y.map (wrapSymbol₂ g₁.nt)) u.length
-                ul_lt_len_xy]
+          correspondingStrings
+            [(x.map (wrapSymbol₁ g₂.nt) ++ y.map (wrapSymbol₂ g₁.nt))[u.length]'ul_lt_len_xy]
             [Symbol.terminal t]
         · apply list_drop_take_succ
         clear * - middle_nt_elem
-        apply corresponding_strings_singleton
-        cases'
-          (x.map (wrapSymbol₁ g₂.nt) ++ y.map (wrapSymbol₂ g₁.nt)).nthLe u.length
-            ul_lt_len_xy with
-          e s
-        · exfalso
-          unfold corresponding_symbols at middle_nt_elem
-          exact middle_nt_elem
-        cases s
-        · exfalso
-          cases s; swap
-          cases s
-          all_goals
-            unfold corresponding_symbols at middle_nt_elem
-            exact middle_nt_elem
-        · cases s
-          · exfalso
-            unfold corresponding_symbols at middle_nt_elem
-            exact middle_nt_elem
-          · unfold corresponding_symbols at middle_nt_elem
-            rw [middle_nt_elem]
-            unfold corresponding_symbols-/
+        apply correspondingStrings_singleton
+        cases hxul : (x.map (wrapSymbol₁ g₂.nt) ++ y.map (wrapSymbol₂ g₁.nt))[u.length]'ul_lt_len_xy with
+        | terminal =>
+          exfalso
+          unfold correspondingSymbols at middle_nt_elem
+          aesop
+        | nonterminal s =>
+          rw [hxul] at middle_nt_elem
+          cases hs : s with
+          | inl sₒ =>
+            rw [hs] at middle_nt_elem
+            cases sₒ with
+            | none =>
+              exact middle_nt_elem
+            | some sₙ =>
+              cases sₙ with
+              | inl s₁ =>
+                unfold correspondingSymbols at middle_nt_elem ⊢
+                aesop
+              | inr s₂ =>
+                unfold correspondingSymbols at middle_nt_elem ⊢
+                aesop
+          | inr sₜ =>
+            rw [hs] at middle_nt_elem
+            cases sₜ with
+            | inl s₁ =>
+              unfold correspondingSymbols at middle_nt_elem ⊢
+              aesop
+            | inr s₂ =>
+              unfold correspondingSymbols at middle_nt_elem ⊢
+              aesop
+    · convert part_for_v using 1
+      convert (congr_arg (List.drop u.length.succ) bef).symm
+      simp
 
 set_option maxHeartbeats 666666 in
 lemma in_concatenated_of_in_big {g₁ g₂ : Grammar T} {w : List T}

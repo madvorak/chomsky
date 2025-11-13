@@ -24,8 +24,7 @@ private lemma unionCFG_same_language (g₁ g₂ : CFG T) :
   (unionGrammar (grammar_of_cfg g₁) (grammar_of_cfg g₂)).language :=
 by
   rw [cfLanguage_eq_grammarLanguage]
-  unfold unionCFG grammar_of_cfg unionGrammar
-  simp
+  simp only [unionCFG, grammar_of_cfg, unionGrammar, List.cons_append, List.map_cons, List.map_append, List.map_map]
   rfl
 
 private theorem bonus_CF_of_CF_u_CF (L₁ : Language T) (L₂ : Language T) :

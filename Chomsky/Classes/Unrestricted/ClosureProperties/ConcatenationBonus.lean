@@ -45,7 +45,7 @@ private lemma big_CF_grammar_same_language (g₁ g₂ : CFG T) :
   unfold bigGrammar
   dsimp only [List.map]
   congr
-  repeat' rw [List.map_append]
+  repeat rw [List.map_append]
   trace "./././Mathport/Syntax/Translate/Tactic/Builtin.lean:73:14: unsupported tactic `trim #[]"
   · apply congr_arg₂
     · unfold rulesForTerminals₁

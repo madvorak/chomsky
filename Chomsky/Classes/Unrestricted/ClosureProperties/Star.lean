@@ -310,7 +310,7 @@ by
           rw [←(((w[w.length - k.succ]'lt_wl).drop n).map Symbol.terminal).take_append_drop 1]
           rw [←List.singleton_append]
           apply congr_arg₂
-          · rewrite [←List.map_take, list_take_one_drop small]
+          · rewrite [←List.map_take, List.take_one_drop_eq_of_lt_length small]
             rfl
           · simp
       · rw [List.take_succ, List.map_append]

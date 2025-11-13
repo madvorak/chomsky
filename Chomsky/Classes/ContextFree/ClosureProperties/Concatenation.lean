@@ -930,7 +930,7 @@ private lemma in_concatenated_of_in_combined {g₁ g₂ : CFG T} {w : List T}
         have yes_in : Symbol.nonterminal (ruleOfRule₂ r₂).fst ∈ lsTNOfLsTN₁ u :=
           by
           have ih_backwards := congr_arg List.reverse ih_concat
-          repeat' rw [List.reverse_append] at ih_backwards
+          repeat rw [List.reverse_append] at ih_backwards
           have ldth := congr_fun (congr_arg List.get? ih_backwards) d.length
           have dlengthth :
             (d.reverse ++ ([Symbol.nonterminal (ruleOfRule₂ r₂).fst].reverse ++ c.reverse)).get?
@@ -950,7 +950,7 @@ private lemma in_concatenated_of_in_combined {g₁ g₂ : CFG T} {w : List T}
           exact rrr
         exact not_in yes_in
       have total_length := congr_arg List.length ih_concat
-      repeat' rw [List.length_append] at total_length
+      repeat rw [List.length_append] at total_length
       rw [List.length_singleton] at total_length
       have hlen_uc : (@lsTNOfLsTN₁ T g₁ g₂ u).length ≤ c.length :=
         by
@@ -1028,7 +1028,7 @@ private lemma in_concatenated_of_in_combined {g₁ g₂ : CFG T} {w : List T}
               (c ++ [Symbol.nonterminal (ruleOfRule₂ r₂).fst] ++ d) =
             List.take (@lsTNOfLsTN₁ T g₁ g₂ u).length (c ++ (ruleOfRule₂ r₂).snd ++ d) :=
           by-- both are equal to `list.take (@lsTN_of_lsTN₁ T g₁ g₂ u).length c`
-          repeat'
+          repeat
             rw [List.append_assoc]
             rw [List.take_append_of_le_length hlen_uc]
         have express_v'_as_crd :
@@ -1147,7 +1147,7 @@ private lemma in_concatenated_of_in_combined {g₁ g₂ : CFG T} {w : List T}
       rw [List.map_drop]
       have hwlen := congr_arg List.length hw
       rw [List.length_append] at hwlen
-      repeat' rw [List.length_map] at hwlen
+      repeat rw [List.length_map] at hwlen
       exact v_eq_drop_map_w u v w hwlen (congr_arg (List.drop u.length) hw)
     cases' v_from_terminals with vₜ hvt
     rw [hvt]
@@ -1158,7 +1158,7 @@ private lemma in_concatenated_of_in_combined {g₁ g₂ : CFG T} {w : List T}
   rw [List.filterMap_append] at huvw
   unfold lsTNOfLsTN₁ at huvw
   unfold lsTNOfLsTN₂ at huvw
-  repeat' rw [List.filterMap_map] at huvw
+  repeat rw [List.filterMap_map] at huvw
   have disappear_sTN_of_sTN₁ : @oT_of_sTN₃ T (combined_grammar g₁ g₂) ∘ sTNOfSTN₁ = oT_of_sTN₃ :=
     by
     ext1

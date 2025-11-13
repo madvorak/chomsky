@@ -7,16 +7,10 @@ section list_technicalities
 
 variable {α β : Type}
 
--- TODO inline
-lemma list_take_one_drop {l : List α} {i : ℕ} (hil : i < l.length) :
-  (l.drop i).take 1 = [l.get ⟨i, hil⟩] :=
-by
-  apply List.take_one_drop_eq_of_lt_length
-
 lemma list_drop_take_succ {l : List α} {i : ℕ} (hil : i < l.length) :
   (l.take (i + 1)).drop i = [l.get ⟨i, hil⟩] :=
 by
-  rw [List.drop_take, ←list_take_one_drop]
+  rw [List.drop_take, ←List.take_one_drop_eq_of_lt_length]
   congr
   omega
 
@@ -796,10 +790,10 @@ by
       push_neg at contra
       rw [bef] at ih_concat
       clear bef
-      repeat' rw [←List.append_assoc] at ih_concat
+      repeat rw [←List.append_assoc] at ih_concat
       have len_pos : (u ++ r₁.inputL.map (wrapSymbol₁ g₂.nt) ++ [Symbol.nonterminal ◩(some ◩r₁.inputN)] ++ r₁.inputR.map (wrapSymbol₁ g₂.nt)
           ).length > 0
-      · repeat' rw [List.length_append]
+      · repeat rw [List.length_append]
         rw [List.length_singleton]
         clear * -
         linarith
@@ -926,12 +920,12 @@ by
       clear * - x_equiv critical
       have ul_le_xl : u.length ≤ x.length
       · clear * - critical
-        have weaker_le : 1 ≤ x.length - u.length := by omega
-        have stupid_le : u.length + 1 ≤ x.length := by omega
+        have stupid_le : u.length + 1 ≤ x.length
+        · omega
         exact Nat.le_of_succ_le stupid_le
-      repeat' rw [List.take_append_eq_append_take] at x_equiv
+      repeat rw [List.take_append_eq_append_take] at x_equiv
       rw [List.take_of_length_le ul_le_xl] at x_equiv
-      repeat' rw [List.append_assoc]
+      repeat rw [List.append_assoc]
       have chunk2 : (r₁.inputL.map (wrapSymbol₁ g₂.nt)).take (x.length - u.length) = r₁.inputL.map (wrapSymbol₁ g₂.nt)
       · apply List.take_of_length_le
         clear * - critical
@@ -963,7 +957,7 @@ by
           (x.length - (u ++ r₁.inputL.map (wrapSymbol₁ g₂.nt) ++ [Symbol.nonterminal ◩(some ◩r₁.inputN)] ++
             r₁.inputR.map (wrapSymbol₁ g₂.nt)).length) =
           v.take (x.length - u.length - m)
-      · repeat' rw [List.length_append]
+      · repeat rw [List.length_append]
         apply congr_arg₂; swap
         · rfl
         have rearrange_sum_of_four : ∀ a b c d : ℕ, a + b + c + d = a + (b + c + d)
@@ -1083,9 +1077,9 @@ by
       · exact segment_4_equ
       clear segment_4_equ segment_4_eqi equiv_sgmnt_4
       rw [List.drop_drop]
-      repeat' rw [List.length_append]
-      repeat' rw [List.length_take]
-      repeat' rw [List.length_drop]
+      repeat rw [List.length_append]
+      repeat rw [List.length_take]
+      repeat rw [List.length_drop]
       have sum_of_min_lengths :
         min u.length x.length +
           (min r₁.inputL.length (x.length - u.length) +
@@ -1115,7 +1109,7 @@ by
         rw [min1, min2, min3, min4]
         rw [le_tsub_iff_right ul_le_xl] at critical
         clear * - critical add_mirror
-        repeat' rw [←add_assoc]
+        repeat rw [←add_assoc]
         have sum_eq_sum : u.length + r₁.inputL.length + 1 + r₁.inputR.length = r₁.inputR.length + 1 + r₁.inputL.length + u.length
         · rw [add_mirror, add_assoc, add_assoc, add_comm, ←add_assoc _ 1 _]
         rw [sum_eq_sum]
@@ -1207,7 +1201,7 @@ by
     rfl
   -- now we have what `g₂` generated
   have reverse_concat := correspondingStrings_reverse ih_concat
-  repeat' rw [List.reverse_append] at reverse_concat
+  repeat rw [List.reverse_append] at reverse_concat
   have the_part := correspondingStrings_take y.length reverse_concat
   apply correspondingStrings_of_reverse
   have len_sum : y.length + (x.length - u.length - m) = v.length
@@ -1217,7 +1211,7 @@ by
         ) =
       v.length
     have len_concat := correspondingStrings_length ih_concat
-    repeat' rw [List.length_append] at len_concat
+    repeat rw [List.length_append] at len_concat
     rw [List.length_map, List.length_map, List.length_singleton, add_comm] at len_concat
     rw [←Nat.add_sub_assoc]; swap
     · exact critical
@@ -1239,7 +1233,7 @@ by
   rw [List.take_append_of_le_length] at the_part ; swap
   · rw [List.length_reverse]
     rw [List.length_map]
-  repeat' rw [List.append_assoc] at the_part
+  repeat rw [List.append_assoc] at the_part
   rw [List.take_append_of_le_length] at the_part ; swap
   · rw [List.length_reverse]
     exact yl_lt_vl
@@ -1272,8 +1266,8 @@ by
   let b' := u.drop x.length ++ r₂.output.map (wrapSymbol₂ g₁.nt) ++ v
   use b'.filterMap unwrapSymbol₂
   have total_len := correspondingStrings_length ih_concat
-  repeat' rw [List.length_append] at total_len
-  repeat' rw [List.length_map] at total_len
+  repeat rw [List.length_append] at total_len
+  repeat rw [List.length_map] at total_len
   have matched_right : u.length ≥ x.length
   · by_contra! ul_lt_xl
     have ul_lt_ihls : u.length < (x.map (wrapSymbol₁ g₂.nt) ++ y.map (wrapSymbol₂ g₁.nt)).length
@@ -1301,7 +1295,7 @@ by
       · simp
         linarith
       clear * - corres_y total_len
-      repeat' rw [List.append_assoc]
+      repeat rw [List.append_assoc]
       obtain ⟨seg1, rest1⟩ := correspondingStrings_split (u.drop (x.map (wrapSymbol₁ g₂.nt)).length).length corres_y
       clear corres_y
       rw [List.take_left] at seg1
@@ -1369,7 +1363,7 @@ by
       apply correspondingStrings_append
       · apply correspondingStrings_self
       apply correspondingStrings_after_wrap_unwrap_self₂
-      repeat' rw [←List.append_assoc] at ih_concat
+      repeat rw [←List.append_assoc] at ih_concat
       have rev := correspondingStrings_reverse ih_concat
       rw [List.reverse_append _ v] at rev
       have tak := correspondingStrings_take v.reverse.length rev
@@ -1556,7 +1550,7 @@ by
           correspondingStrings
             [(x.map (wrapSymbol₁ g₂.nt) ++ y.map (wrapSymbol₂ g₁.nt))[u.length]'ul_lt_len_xy]
             [Symbol.terminal t]
-        · apply list_take_one_drop
+        · apply List.take_one_drop_eq_of_lt_length
         clear * - middle_nt_elem
         apply correspondingStrings_singleton
         cases hxul : (x.map (wrapSymbol₁ g₂.nt) ++ y.map (wrapSymbol₂ g₁.nt))[u.length]'ul_lt_len_xy with
@@ -1772,7 +1766,7 @@ by
     clear deri_x
     have xylen := correspondingStrings_length concat_xy
     rw [List.length_append] at xylen
-    repeat' rw [List.length_map] at xylen
+    repeat rw [List.length_map] at xylen
     apply List.ext_getElem
     · simp
       exact Nat.le.intro xylen
@@ -1860,7 +1854,7 @@ by
         rw [List.length_drop, List.length_map, ←xylen]
         convert i_lt_len_lwy
         rw [List.length_map, add_comm, Nat.add_sub_assoc (by rfl), Nat.sub_self, Nat.add_zero]
-    repeat' rw [List.length_map] at xylen
+    repeat rw [List.length_map] at xylen
     exact remaining
   apply List.take_append_drop
 

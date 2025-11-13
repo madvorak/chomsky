@@ -45,7 +45,7 @@ private lemma big_CS_grammar_same_language (g₁ g₂ : CSG T) :
   unfold bigGrammar
   dsimp only [List.map]
   congr
-  repeat' rw [List.map_append]
+  repeat rw [List.map_append]
   apply congr_arg₂
   ·
     apply congr_arg₂ <;>

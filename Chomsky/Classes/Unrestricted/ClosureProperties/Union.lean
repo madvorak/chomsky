@@ -171,7 +171,7 @@ by
   · have bef_len := congr_arg List.length bef
     clear * - bef_len
     rw [List.length_singleton] at bef_len
-    repeat' rw [List.length_append] at bef_len
+    repeat rw [List.length_append] at bef_len
     rw [List.length_singleton] at bef_len
     constructor <;>
     · rw [←List.length_eq_zero_iff]

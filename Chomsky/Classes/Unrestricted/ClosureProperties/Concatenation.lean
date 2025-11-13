@@ -1257,8 +1257,8 @@ by
   rcases rin with ⟨r₂, rin₂, wrap_r₂_eq_r⟩
   rw [←wrap_r₂_eq_r] at bef aft
   clear wrap_r₂_eq_r r
-  simp only [wrapGrule₂] at * -- originally not `only`
-  simp at bef -- !!
+  simp only [wrapGrule₂] at *
+  simp at bef
   rw [←List.singleton_append] at bef
   rw [bef] at ih_concat
   let b' := u.drop x.length ++ r₂.output.map (wrapSymbol₂ g₁.nt) ++ v
@@ -1353,36 +1353,26 @@ by
     · rw [List.filterMap_append_append]
       congr
       apply unwrap_wrap₂_string
-  · rw [aft, List.filterMap_append_append, List.map_append_append, List.append_assoc, ←List.append_assoc (x.map (wrapSymbol₁ g₂.nt))]
+  · rw [aft, List.filterMap_append_append, List.map_append_append, List.append_assoc,
+        ←List.append_assoc (x.map (wrapSymbol₁ g₂.nt)), List.append_assoc u]
     clear b'
-    sorry /-
     apply correspondingStrings_append ; swap
     · rw [unwrap_wrap₂_string]
       apply correspondingStrings_append
       · apply correspondingStrings_self
-      apply corresponding_string_after_wrap_unwrap_self₂
+      apply correspondingStrings_after_wrap_unwrap_self₂
       repeat' rw [←List.append_assoc] at ih_concat
-      have rev := corresponding_strings_reverse ih_concat
+      have rev := correspondingStrings_reverse ih_concat
       rw [List.reverse_append _ v] at rev
-      have tak := corresponding_strings_take v.reverse.length rev
+      have tak := correspondingStrings_take v.reverse.length rev
       rw [List.take_left] at tak
-      have rtr := corresponding_strings_reverse tak
+      have rtr := correspondingStrings_reverse tak
       have nec : v.reverse.length ≤ (y.map (wrapSymbol₂ g₁.nt)).reverse.length :=
         by
         clear * - matched_right total_len
-        rw [List.length_reverse]
-        rw [List.length_reverse]
-        rw [List.length_map]
+        rw [List.length_reverse, List.length_reverse, List.length_map]
         linarith
-      clear * - rtr nec
-      rw [List.reverse_reverse] at rtr
-      rw [List.reverse_append] at rtr
-      rw [List.take_append_of_le_length nec] at rtr
-      rw [List.reverse_take] at rtr ; swap
-      · rw [List.length_reverse (y.map (wrapSymbol₂ g₁.nt))] at nec
-        exact nec
-      rw [←List.map_drop] at rtr
-      rw [List.reverse_reverse] at rtr
+      rw [List.reverse_reverse, List.reverse_append, List.take_append_of_le_length nec, List.reverse_take, List.reverse_reverse, ←List.map_drop] at rtr
       exact ⟨_, rtr⟩
     · rw [←List.take_append_drop x.length u]
       apply correspondingStrings_append
@@ -1410,7 +1400,7 @@ by
         rw [List.drop_left'] at tdc ; swap
         · apply List.length_map
         rw [←List.map_take] at tdc
-        exact ⟨_, tdc⟩-/
+        exact ⟨_, tdc⟩
 
 private lemma big_induction {g₁ g₂ : Grammar T} {w : List (nst T g₁.nt g₂.nt)}
     (hggw : (bigGrammar g₁ g₂).Derives

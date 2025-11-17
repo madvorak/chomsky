@@ -10,12 +10,12 @@ def liftSymbol {N₀ N : Type} (liftN : N₀ → N) : Symbol T N₀ → Symbol T
   | Symbol.nonterminal n => Symbol.nonterminal (liftN n)
 
 /-- Sinking `Symbol` from a larger nonterminal type; may return `none`. -/
-def sinkSymbol {N₀ N : Type} (sinkN : N → Option N₀) : Symbol T N → Option (Symbol T N₀)
+def sinkSymbol {N N₀ : Type} (sinkN : N → Option N₀) : Symbol T N → Option (Symbol T N₀)
   | Symbol.terminal t => some (Symbol.terminal t)
   | Symbol.nonterminal n => Option.map Symbol.nonterminal (sinkN n)
 
 /-- Lifting `List Symbol` to a larger nonterminal type. -/
-def liftString {N₀ N : Type} (liftN : N₀ → N) :
+def liftString {N N₀ : Type} (liftN : N₀ → N) :
     List (Symbol T N₀) → List (Symbol T N) :=
   List.map (liftSymbol liftN)
 

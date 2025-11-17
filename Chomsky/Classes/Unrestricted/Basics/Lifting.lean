@@ -4,7 +4,7 @@ import Chomsky.Utilities.ListUtils
 
 section functions_lift_sink
 
-variable {T N₀ N : Type}
+variable {N N₀ T : Type}
 
 def liftSymbol (f : N₀ → N) : Symbol T N₀ → Symbol T N
   | Symbol.terminal t => Symbol.terminal t

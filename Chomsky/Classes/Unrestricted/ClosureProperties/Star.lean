@@ -4,7 +4,7 @@ import Chomsky.Classes.Unrestricted.ClosureProperties.Concatenation
 
 -- new nonterminal type
 private def nn (N : Type) : Type :=
-  N ⊕ (Fin 3)
+  N ⊕ Fin 3
 
 -- new symbol type
 private abbrev ns (T N : Type) : Type :=
@@ -56,12 +56,11 @@ end specific_symbols
 
 section construction
 
-private def wrapSym {N : Type} : Symbol T N → ns T N
-  | Symbol.terminal t => Symbol.terminal t
-  | Symbol.nonterminal n => Symbol.nonterminal ◩n
+private def wrapSym {N : Type} : Symbol T N → ns T N :=
+  liftSymbol Sum.inl
 
-private def wrapGr {N : Type} (r : Grule T N) : Grule T (nn N) :=
-  Grule.mk (r.inputL.map wrapSym) ◩r.inputN (r.inputR.map wrapSym) (r.output.map wrapSym)
+private def wrapGr {N : Type} : Grule T N → Grule T (nn N) :=
+  liftRule Sum.inl
 
 private def rulesThatScanTerminals (g : Grammar T) : List (Grule T (nn g.nt)) :=
   (allUsedTerminals g).map (fun t : T => Grule.mk [] ◪2 [Symbol.terminal t] [Symbol.terminal t, R])
@@ -149,13 +148,8 @@ by
             apply List.mem_cons_of_mem
             apply List.mem_append_left
             rw [List.mem_map]
-            use r
-            constructor
-            · exact rin
-            unfold wrapGr
-            unfold liftRule
-            unfold liftString
-            rw [wrap_eq_lift])
+            use r, rin
+            rfl)
           (by
             rintro r ⟨rin, n, nrn⟩
             cases rin with
@@ -175,7 +169,7 @@ by
                     cases rin with
                     | inl rin =>
                       rw [List.mem_map] at rin
-                      exact rin
+                      convert rin
                     | inr rin =>
                       exfalso
                       unfold rulesThatScanTerminals at rin
@@ -864,7 +858,8 @@ by
                   apply valid
                   exact List.mem_of_mem_drop xiin
             rw [List.singleton_append, aft]
-            simp [←wrap_orig, wrapGr]
+            simp [←wrap_orig]
+            rfl
 
 private lemma uv_nil_of_RH_eq {g : Grammar T} {u v : List (ns T g.nt)}
     (ass : [R, H] = u ++ [] ++ [Symbol.nonterminal ◪2] ++ [H] ++ v) :
@@ -1120,8 +1115,8 @@ by
           apply gr_deri_of_deri_tran _ last_step
           apply valid (u₁ ++ r₀.inputL ++ [Symbol.nonterminal r₀.inputN] ++ r₀.inputR ++ v₁)
           exact List.mem_of_getElem? xm_eq
-    rw [aft, ←wrap_orig]
-    simp
+    simp [aft, ←wrap_orig]
+    rfl
   · exfalso
     unfold rulesThatScanTerminals at Rt_tR
     rw [List.mem_map] at Rt_tR
@@ -1791,6 +1786,7 @@ by
                     assumption
               · rw [aft]
                 simp [←wrap_orig]
+                rfl
             | inr huv =>
               rcases huv with ⟨u₁, v₁, u_eq, γ_eq, v_eq⟩
               clear bef
@@ -1806,6 +1802,7 @@ by
               · exact valid_x
               · rw [aft]
                 simp [←wrap_orig]
+                rfl
 
 private lemma star_case_4 {g : Grammar T} {α α' : List (ns T g.nt)}
     (orig : g.star.Transforms α α')
@@ -1990,7 +1987,7 @@ by
                   rw [List.reverse_singleton] at ru_eq
                   rw [List.singleton_append] at ru_eq
                 rw [←r_of_r₀] at ru_eq
-                dsimp only [wrapGr, R] at ru_eq
+                dsimp only [wrapGr, liftRule, liftString, R] at ru_eq
                 rw [←List.map_reverse] at ru_eq
                 cases hr₀ : r₀.inputR.reverse with
                 | nil =>
@@ -2000,7 +1997,7 @@ by
                 | cons d l =>
                   rw [hr₀] at ru_eq
                   have imposs := List.head_eq_of_cons_eq ru_eq
-                  cases d <;> unfold wrapSym at imposs
+                  cases d
                   · exact Symbol.noConfusion imposs
                   · exact Sum.noConfusion (Symbol.nonterminal.inj imposs)
             | inr hbs =>
@@ -2020,6 +2017,7 @@ by
               use w.take u.length ++ r₀.output ++ w.drop (u ++ r.inputL ++ [Symbol.nonterminal r.inputN] ++ r.inputR).length
               rw [aft, ←r_of_r₀]
               simp [wrapGr]
+              rfl
           | inr hrg =>
             exfalso
             unfold rulesThatScanTerminals at hrg
@@ -2134,7 +2132,7 @@ by
                 rw [v_nil] at bef
                 rw [←r_of_r₀] at bef
                 rw [List.append_nil] at bef
-                unfold wrapGr at bef
+                unfold wrapGr liftRule liftString at bef
                 have rev := congr_arg List.reverse bef
                 clear * - rev
                 repeat rw [List.reverse_append] at rev
@@ -2157,7 +2155,7 @@ by
                   unfold H at H_is
                   cases d <;> unfold wrapSym at H_is
                   · exact Symbol.noConfusion H_is
-                  · simp at H_is
+                  · simp [liftSymbol] at H_is
               have bef_rev := congr_arg List.reverse bef
               repeat rw [List.reverse_append] at bef_rev
               have bef_rev_tak := congr_arg (List.take 1) bef_rev
@@ -2189,15 +2187,12 @@ by
                     exact hZu
                   | inr hZr =>
                     rw [←r_of_r₀] at hZr
-                    unfold wrapGr at hZr
+                    unfold wrapGr liftRule liftString at hZr
                     rw [List.mem_map] at hZr
                     rcases hZr with ⟨s, -, imposs⟩
                     cases s
-                    · unfold wrapSym at imposs
-                      exact Symbol.noConfusion imposs
-                    · unfold wrapSym at imposs
-                      unfold Z at imposs
-                      simp at imposs
+                    · exact Symbol.noConfusion imposs
+                    · simp [liftSymbol, Z] at imposs
                 | inr hZv =>
                   apply no_Z
                   rw [ends_with_H, bef, List.mem_append]
@@ -2220,14 +2215,12 @@ by
                     exact hRu
                   | inr hRr =>
                     rw [←r_of_r₀] at hRr
-                    unfold wrapGr at hRr
+                    unfold wrapGr liftRule liftString at hRr
                     rw [List.mem_map] at hRr
                     rcases hRr with ⟨s, -, imposs⟩
                     cases s
-                    · unfold wrapSym at imposs
-                      exact Symbol.noConfusion imposs
-                    · unfold wrapSym R at imposs
-                      simp at imposs
+                    · exact Symbol.noConfusion imposs
+                    · simp [liftSymbol, R] at imposs
                 | inr hRv =>
                   apply no_R
                   rw [ends_with_H]

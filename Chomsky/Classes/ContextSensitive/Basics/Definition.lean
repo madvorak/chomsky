@@ -2,7 +2,7 @@ import Chomsky.Classes.Unrestricted.Basics.Definition
 
 
 /-- Rewrite rule for a context-sensitive grammar. -/
-structure CSR (T : Type) (N : Type) where
+structure CSR (T N : Type) where
   contextLeft : List (Symbol T N)
   inputNonterminal : N
   contextRight : List (Symbol T N)
@@ -11,10 +11,10 @@ structure CSR (T : Type) (N : Type) where
 
 /-- Context-sensitive grammar that generates words over the alphabet `T` (a type of terminals). -/
 structure CSG (T : Type) where
-  nt : Type                  -- type of nonterminals
-  initial : nt               -- initial symbol
-  rules : List (CSR T nt) -- rewrite rules
-  allow_empty : Bool         -- whether empty word can be generated
+  nt : Type                 -- type of nonterminals
+  initial : nt              -- initial symbol
+  rules : List (CSR T nt)   -- rewrite rules
+  allowEmpty : Bool         -- whether empty word can be generated
 
 variable {T : Type}
 
@@ -32,7 +32,7 @@ def CSG.Derives (g : CSG T) : List (Symbol T g.nt) → List (Symbol T g.nt) → 
 
 /-- The set of words that can be derived from the initial nonterminal. -/
 def CSG.language (g : CSG T) : Language T :=
-  { w : List T | w = [] ∧ g.allow_empty ∨
+  { w : List T | w = [] ∧ g.allowEmpty ∨
                  g.Derives [Symbol.nonterminal g.initial] (w.map Symbol.terminal) }
 
 /-- Predicate "is context-sensitive"; defined by existence of a context-sensitive grammar for the given language. -/

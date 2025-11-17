@@ -3,7 +3,7 @@ import Mathlib.Computability.Language
 
 
 /-- Rewrite rule for a grammar without any restrictions. -/
-structure Grule (T : Type) (N : Type) where
+structure Grule (T N : Type) where
   inputL : List (Symbol T N)
   inputN : N
   inputR : List (Symbol T N)

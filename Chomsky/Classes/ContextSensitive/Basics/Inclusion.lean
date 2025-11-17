@@ -14,7 +14,7 @@ def grule_of_CSR {N : Type} (r : CSR T N) : Grule T (Option N) :=
 
 def grammar_of_csg (g : CSG T) : Grammar T :=
   let R := Grule.mk [] none [] [Symbol.nonterminal g.initial] :: List.map grule_of_CSR g.rules
-  Grammar.mk (Option g.nt) none (if g.allow_empty then Grule.mk [] none [] [] :: R else R)
+  Grammar.mk (Option g.nt) none (if g.allowEmpty then Grule.mk [] none [] [] :: R else R)
 
 private lemma CSderi_of_general {g : CSG T} {w : List (Symbol T g.nt)}
     (hgw : g.Derives [Symbol.nonterminal g.initial] w) :
@@ -25,7 +25,7 @@ by
     use Grule.mk [] none [] [Symbol.nonterminal (some g.initial)]
     constructor
     · dsimp only [grammar_of_csg]
-      cases g.allow_empty
+      cases g.allowEmpty
       · simp
       · simp
     use [], []
@@ -36,7 +36,7 @@ by
   constructor
   · clear * - rin
     dsimp only [grammar_of_csg]
-    by_cases empty_allowed : g.allow_empty
+    by_cases empty_allowed : g.allowEmpty
     · simp only [empty_allowed, ite_true, List.mem_cons, List.mem_map]
       right; right
       exact ⟨r, rin, rfl⟩
@@ -75,7 +75,7 @@ by
   unfold Grammar.language
   ext1 w
   by_cases emptyStr : w = []
-  · by_cases emptyCan : g.allow_empty
+  · by_cases emptyCan : g.allowEmpty
     · convert_to True ↔ True
       · rw [iff_true]
         simp only [CSG.language, emptyStr, emptyCan, and_true]

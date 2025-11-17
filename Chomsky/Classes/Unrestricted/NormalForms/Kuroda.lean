@@ -2,7 +2,7 @@ import Chomsky.Classes.Unrestricted.Basics.Definition
 
 
 /-- Transformation rule for a grammar in the Kuroda Normal Form. -/
-inductive KurodaRule (T : Type) (N : Type)
+inductive KurodaRule (T N : Type)
   | two_two (A B C D : N) : KurodaRule T N
   | one_two (A B C : N) : KurodaRule T N
   | one_one (A : N) (t : T) : KurodaRule T N

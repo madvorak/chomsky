@@ -58,7 +58,7 @@ end list_technicalities
 
 -- new nonterminal type
 def nnn (T N₁ N₂ : Type) : Type :=
-  Sum (Option (Sum N₁ N₂)) (Sum T T)
+  Option (N₁ ⊕ N₂) ⊕ (T ⊕ T)
 
 -- new symbol type
 abbrev nst (T N₁ N₂ : Type) : Type :=
@@ -153,7 +153,7 @@ by
   use [], []
   constructor <;> rfl
 
-private lemma substitute_terminals {g₁ g₂ : Grammar T} {s : T → Sum T T} {w : List T}
+private lemma substitute_terminals {g₁ g₂ : Grammar T} {s : T → T ⊕ T} {w : List T}
   (rule_for_each_terminal : ∀ t ∈ w,
       Grule.mk [] ◪(s t) [] [Symbol.terminal t] ∈
         rulesForTerminals₁ g₂.nt g₁ ++ rulesForTerminals₂ g₁.nt g₂) :

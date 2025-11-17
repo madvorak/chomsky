@@ -7,8 +7,8 @@ def CFG.union (g₁ g₂ : CFG T) : CFG T :=
   CFG.mk (Option (g₁.nt ⊕ g₂.nt)) none (
     ⟨none, [Symbol.nonterminal (some ◩g₁.initial)]⟩ :: (
     ⟨none, [Symbol.nonterminal (some ◪g₂.initial)]⟩ :: (
-    List.map (liftRule (Option.some ∘ Sum.inl)) g₁.rules ++
-    List.map (liftRule (Option.some ∘ Sum.inr)) g₂.rules)))
+    g₁.rules.map (liftRule (Option.some ∘ Sum.inl)) ++
+    g₂.rules.map (liftRule (Option.some ∘ Sum.inr)))))
 
 private lemma both_empty {u v : List T} {a b : T} (ha : [a] = u ++ [b] ++ v) :
     u = [] ∧ v = [] := by
@@ -202,8 +202,8 @@ private lemma impossible_rule {r : Option (g₁.nt ⊕ g₂.nt) × List (Symbol 
       ([] : List (Symbol T (CFG.union g₁ g₂).nt)) ++ [Symbol.nonterminal r.fst] ++
       ([] : List (Symbol T (CFG.union g₁ g₂).nt)))
     (hr : r ∈
-      List.map (liftRule (Option.some ∘ Sum.inl)) g₁.rules ++
-      List.map (liftRule (Option.some ∘ Sum.inr)) g₂.rules) :
+      g₁.rules.map (liftRule (Option.some ∘ Sum.inl)) ++
+      g₂.rules.map (liftRule (Option.some ∘ Sum.inr))) :
     False := by
   have rule_root : none = r.fst := Symbol.nonterminal.inj (List.head_eq_of_cons_eq hg)
   rw [List.mem_append] at hr

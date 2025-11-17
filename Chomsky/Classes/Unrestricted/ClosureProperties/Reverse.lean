@@ -20,7 +20,7 @@ by
   apply dual_of_reversalGrule
 
 private def reversalGrammar (g : Grammar T) : Grammar T :=
-  Grammar.mk g.nt g.initial (List.map reversalGrule g.rules)
+  Grammar.mk g.nt g.initial (g.rules.map reversalGrule)
 
 private lemma dual_of_reversalGrammar (g : Grammar T) :
   reversalGrammar (reversalGrammar g) = g :=

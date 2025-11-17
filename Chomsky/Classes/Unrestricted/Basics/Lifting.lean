@@ -6,26 +6,26 @@ section functions_lift_sink
 
 variable {T N₀ N : Type}
 
-def liftSymbol (liftN : N₀ → N) : Symbol T N₀ → Symbol T N
+def liftSymbol (f : N₀ → N) : Symbol T N₀ → Symbol T N
   | Symbol.terminal t => Symbol.terminal t
-  | Symbol.nonterminal n => Symbol.nonterminal (liftN n)
+  | Symbol.nonterminal n => Symbol.nonterminal (f n)
 
-def sinkSymbol (sinkN : N → Option N₀) : Symbol T N → Option (Symbol T N₀)
+def sinkSymbol (f : N → Option N₀) : Symbol T N → Option (Symbol T N₀)
   | Symbol.terminal t => some (Symbol.terminal t)
-  | Symbol.nonterminal n => Option.map Symbol.nonterminal (sinkN n)
+  | Symbol.nonterminal n => Option.map Symbol.nonterminal (f n)
 
-def liftString (liftN : N₀ → N) : List (Symbol T N₀) → List (Symbol T N) :=
-  List.map (liftSymbol liftN)
+def liftString (f : N₀ → N) : List (Symbol T N₀) → List (Symbol T N) :=
+  List.map (liftSymbol f)
 
-def sinkString (sinkN : N → Option N₀) : List (Symbol T N) → List (Symbol T N₀) :=
-  List.filterMap (sinkSymbol sinkN)
+def sinkString (f : N → Option N₀) : List (Symbol T N) → List (Symbol T N₀) :=
+  List.filterMap (sinkSymbol f)
 
-def liftRule (liftN : N₀ → N) : Grule T N₀ → Grule T N :=
+def liftRule (f : N₀ → N) : Grule T N₀ → Grule T N :=
   fun r : Grule T N₀ => Grule.mk
-    (liftString liftN r.inputL)
-    (liftN r.inputN)
-    (liftString liftN r.inputR)
-    (liftString liftN r.output)
+    (liftString f r.inputL)
+    (f r.inputN)
+    (liftString f r.inputR)
+    (liftString f r.output)
 
 end functions_lift_sink
 
@@ -69,7 +69,7 @@ section translating_derivations
 
 variable {T : Type}
 
-private lemma lift_tran {G : LiftedGrammar T} {w₁ w₂ : List (Symbol T G.g₀.nt)}
+lemma lift_tran {G : LiftedGrammar T} {w₁ w₂ : List (Symbol T G.g₀.nt)}
     (hGww : G.g₀.Transforms w₁ w₂) :
   G.g.Transforms (liftString G.liftNt w₁) (liftString G.liftNt w₂) :=
 by
@@ -106,17 +106,17 @@ def GoodLetter {G : LiftedGrammar T} : Symbol T G.g.nt → Prop
 def GoodString {G : LiftedGrammar T} (s : List (Symbol T G.g.nt)) : Prop :=
   ∀ a ∈ s, GoodLetter a
 
-private lemma sink_tran {G : LiftedGrammar T} {w₁ w₂ : List (Symbol T G.g.nt)}
-    (hGww : G.g.Transforms w₁ w₂) (ok_input : GoodString w₁) :
+lemma sink_tran {G : LiftedGrammar T} {w₁ w₂ : List (Symbol T G.g.nt)}
+    (hGww : G.g.Transforms w₁ w₂) (hw₁ : GoodString w₁) :
   G.g₀.Transforms (sinkString G.sinkNt w₁) (sinkString G.sinkNt w₂) ∧ GoodString w₂ :=
 by
   rcases hGww with ⟨r, rin, u, v, bef, aft⟩
   rcases G.preimage_of_rules r (by
       constructor
       · exact rin
-      rw [bef] at ok_input
+      rw [bef] at hw₁
       have good_matched_nonterminal : GoodLetter (Symbol.nonterminal r.inputN)
-      · apply ok_input (Symbol.nonterminal r.inputN)
+      · apply hw₁ (Symbol.nonterminal r.inputN)
         apply List.mem_append_left
         apply List.mem_append_left
         apply List.mem_append_right
@@ -132,17 +132,17 @@ by
     )
     with ⟨r₀, pre_in, preimage⟩
   constructor; swap
-  · rw [bef] at ok_input
+  · rw [bef] at hw₁
     rw [aft]
-    unfold GoodString at ok_input ⊢
+    unfold GoodString at hw₁ ⊢
     rw [←preimage]
-    clear * - ok_input
-    rw [List.forall_mem_append_append] at ok_input ⊢
-    rw [List.forall_mem_append_append] at ok_input
+    clear * - hw₁
+    rw [List.forall_mem_append_append] at hw₁ ⊢
+    rw [List.forall_mem_append_append] at hw₁
     constructor
-    · exact ok_input.left.left
+    · exact hw₁.left.left
     constructor; swap
-    · exact ok_input.right.right
+    · exact hw₁.right.right
     intro a a_in_ros
     cases a
     · simp [GoodLetter]
@@ -180,9 +180,7 @@ by
     rw [List.filterMap_append_append] at sink_bef
     convert sink_bef <;> rw [←preimage] <;> unfold liftRule <;> dsimp only <;> clear * - correct_inverse
     · unfold liftString
-      rw [List.filterMap_map]
-      rw [correct_inverse]
-      rw [List.filterMap_some]
+      rw [List.filterMap_map, correct_inverse, List.filterMap_some]
     · change
         [Symbol.nonterminal r₀.inputN] =
         List.filterMap (sinkSymbol G.sinkNt) (List.map (liftSymbol G.liftNt) [Symbol.nonterminal r₀.inputN])
@@ -196,18 +194,17 @@ by
     rw [←preimage]
     clear * - correct_inverse
     unfold liftRule
-    dsimp only
-    unfold liftString
+    dsimp only [liftString]
     rw [List.filterMap_map, correct_inverse, List.filterMap_some]
 
 private lemma sink_deri_aux {G : LiftedGrammar T} {w₁ w₂ : List (Symbol T G.g.nt)}
-    (hGww : G.g.Derives w₁ w₂) (ok_input : GoodString w₁) :
+    (hGww : G.g.Derives w₁ w₂) (hw₁ : GoodString w₁) :
   G.g₀.Derives (sinkString G.sinkNt w₁) (sinkString G.sinkNt w₂) ∧ GoodString w₂ :=
 by
   induction' hGww with u v _ orig ih
   · constructor
     · apply gr_deri_self
-    · exact ok_input
+    · exact hw₁
   have both := sink_tran orig ih.right
   constructor; swap
   · exact both.right
@@ -216,8 +213,8 @@ by
   · exact both.left
 
 lemma sink_deri (G : LiftedGrammar T) {w₁ w₂ : List (Symbol T G.g.nt)}
-    (hGww : G.g.Derives w₁ w₂) (ok_input : GoodString w₁) :
+    (hGww : G.g.Derives w₁ w₂) (hw₁ : GoodString w₁) :
   G.g₀.Derives (sinkString G.sinkNt w₁) (sinkString G.sinkNt w₂) :=
-(sink_deri_aux hGww ok_input).left
+(sink_deri_aux hGww hw₁).left
 
 end translating_derivations

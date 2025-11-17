@@ -5,15 +5,15 @@ variable {T : Type}
 
 
 private def liftCFrule₁ {N₁ : Type} (N₂ : Type) (r : N₁ × List (Symbol T N₁)) :
-  Option (Sum N₁ N₂) × List (Symbol T (Option (Sum N₁ N₂))) :=
+  Option (N₁ ⊕ N₂) × List (Symbol T (Option (N₁ ⊕ N₂))) :=
 (some ◩r.fst, liftString (Option.some ∘ Sum.inl) r.snd)
 
 private def liftCFrule₂ (N₁ : Type) {N₂ : Type} (r : N₂ × List (Symbol T N₂)) :
-  Option (Sum N₁ N₂) × List (Symbol T (Option (Sum N₁ N₂))) :=
+  Option (N₁ ⊕ N₂) × List (Symbol T (Option (N₁ ⊕ N₂))) :=
 (some ◪r.fst, liftString (Option.some ∘ Sum.inr) r.snd)
 
 private def unionCFG (g₁ g₂ : CFG T) : CFG T :=
-  CFG.mk (Option (Sum g₁.nt g₂.nt)) none (
+  CFG.mk (Option (g₁.nt ⊕ g₂.nt)) none (
     (none, [Symbol.nonterminal (some ◩g₁.initial)]) ::
     (none, [Symbol.nonterminal (some ◪g₂.initial)]) ::
     List.map (liftCFrule₁ g₂.nt) g₁.rules ++

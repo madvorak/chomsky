@@ -6,11 +6,11 @@ import Mathlib.Tactic.Linarith
 variable {T : Type}
 
 def unionGrammar (g₁ g₂ : Grammar T) : Grammar T :=
-  Grammar.mk (Option (Sum g₁.nt g₂.nt)) none (
+  Grammar.mk (Option (g₁.nt ⊕ g₂.nt)) none (
     ⟨[], none, [], [Symbol.nonterminal (some ◩g₁.initial)]⟩ :: (
     ⟨[], none, [], [Symbol.nonterminal (some ◪g₂.initial)]⟩ :: (
-    List.map (liftRule (some ∘ Sum.inl)) g₁.rules ++
-    List.map (liftRule (some ∘ Sum.inr)) g₂.rules)))
+    g₁.rules.map (liftRule (some ∘ Sum.inl)) ++
+    g₂.rules.map (liftRule (some ∘ Sum.inr)))))
 
 
 variable {g₁ g₂ : Grammar T}

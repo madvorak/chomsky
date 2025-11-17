@@ -4,7 +4,7 @@ import Chomsky.Classes.Unrestricted.ClosureProperties.Concatenation
 
 -- new nonterminal type
 private def nn (N : Type) : Type :=
-  Sum N (Fin 3)
+  N ⊕ (Fin 3)
 
 -- new symbol type
 private abbrev ns (T N : Type) : Type :=
@@ -85,7 +85,7 @@ private lemma short_induction {g : Grammar T} {w : List (List T)}
     (hwg : ∀ wᵢ ∈ w.reverse, wᵢ ∈ g.language) :
   g.star.Derives
     [Z]
-    (Z :: List.flatten ((w.reverse.map (List.map Symbol.terminal)).map (· ++ [H]))) ∧
+    (Z :: ((w.reverse.map (List.map Symbol.terminal)).map (· ++ [H])).flatten) ∧
   ∀ p ∈ w, ∀ t ∈ p, Symbol.terminal t ∈ (g.rules.map Grule.output).flatten :=
 by
   induction' w with v x ih
@@ -2297,7 +2297,9 @@ end hard_direction
 
 
 /-- The class of grammar-generated languages is closed under the Kleene star. -/
-theorem GG_of_star_GG (L : Language T) : L.IsGG → (KStar.kstar L).IsGG := by
+theorem GG_of_star_GG (L : Language T) :
+  L.IsGG → (KStar.kstar L).IsGG :=
+by
   intro ⟨g, hg⟩
   use g.star
   apply Set.eq_of_subset_of_subset
@@ -2382,7 +2384,7 @@ theorem GG_of_star_GG (L : Language T) : L.IsGG → (KStar.kstar L).IsGG := by
       · apply List.get_mem
       use [], ((v.reverse.map (List.map Symbol.terminal)).map (· ++ [H])).flatten
       constructor
-      · rw [List.reverse_reverse]
+      · rewrite [List.reverse_reverse]
         rfl
       · rfl
     rw [List.nil_append, v_reverse]

@@ -224,7 +224,7 @@ by
     convert sinked
     unfold sinkString
     rw [List.filterMap_map]
-    convert_to List.map Symbol.terminal w = List.filterMap (Option.some ∘ Symbol.terminal) w
+    convert_to w.map Symbol.terminal = w.filterMap (Option.some ∘ Symbol.terminal)
     rw [←List.filterMap_map, List.filterMap_some]
   · suffices True = False by contradiction
     rcases rin₁ with ⟨r₁, -, r_of_r₁⟩
@@ -266,7 +266,7 @@ by
   show
     lg₁.g.Derives
       (liftString lg₁.liftNt [Symbol.nonterminal g₁.initial])
-      (List.map Symbol.terminal w)
+      (w.map Symbol.terminal)
   convert lift_deri (@lg₁ T g₁ g₂) hwg
   unfold liftString
   rewrite [List.map_map]
@@ -288,7 +288,7 @@ by
   show
     lg₂.g.Derives
       (liftString lg₂.liftNt [Symbol.nonterminal g₂.initial])
-      (List.map Symbol.terminal w)
+      (w.map Symbol.terminal)
   convert lift_deri (@lg₂ T g₁ g₂) hwg
   unfold liftString
   rewrite [List.map_map]
@@ -298,7 +298,7 @@ by
 theorem GG_of_GG_u_GG (L₁ : Language T) (L₂ : Language T) :
   L₁.IsGG ∧ L₂.IsGG → (L₁ + L₂).IsGG :=
 by
-  rintro ⟨⟨g₁, eq_L₁⟩, ⟨g₂, eq_L₂⟩⟩
+  intro ⟨⟨g₁, eq_L₁⟩, ⟨g₂, eq_L₂⟩⟩
   use unionGrammar g₁ g₂
   apply Set.eq_of_subset_of_subset
   · intro w ass

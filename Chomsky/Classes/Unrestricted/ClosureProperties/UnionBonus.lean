@@ -3,21 +3,20 @@ import Chomsky.Classes.Unrestricted.ClosureProperties.Union
 
 variable {T : Type}
 
-
 private def liftCFR₁ {N₁ : Type} (N₂ : Type) (r : N₁ × List (Symbol T N₁)) :
   Option (N₁ ⊕ N₂) × List (Symbol T (Option (N₁ ⊕ N₂))) :=
-(some ◩r.fst, liftString (Option.some ∘ Sum.inl) r.snd)
+⟨some ◩r.fst, liftString (Option.some ∘ Sum.inl) r.snd⟩
 
 private def liftCFR₂ (N₁ : Type) {N₂ : Type} (r : N₂ × List (Symbol T N₂)) :
   Option (N₁ ⊕ N₂) × List (Symbol T (Option (N₁ ⊕ N₂))) :=
-(some ◪r.fst, liftString (Option.some ∘ Sum.inr) r.snd)
+⟨some ◪r.fst, liftString (Option.some ∘ Sum.inr) r.snd⟩
 
 private def unionCFG (g₁ g₂ : CFG T) : CFG T :=
   CFG.mk (Option (g₁.nt ⊕ g₂.nt)) none (
     (none, [Symbol.nonterminal (some ◩g₁.initial)]) ::
     (none, [Symbol.nonterminal (some ◪g₂.initial)]) ::
-    List.map (liftCFR₁ g₂.nt) g₁.rules ++
-    List.map (liftCFR₂ g₁.nt) g₂.rules)
+    g₁.rules.map (liftCFR₁ g₂.nt) ++
+    g₂.rules.map (liftCFR₂ g₁.nt) )
 
 private lemma unionCFG_language_eq_unionGrammar_language (g₁ g₂ : CFG T) :
   (unionCFG g₁ g₂).language = (unionGrammar g₁.toGeneral g₂.toGeneral).language :=
@@ -29,7 +28,7 @@ by
 private theorem bonus_CF_of_CF_u_CF (L₁ : Language T) (L₂ : Language T) :
   L₁.IsCF ∧ L₂.IsCF → (L₁ + L₂).IsCF :=
 by
-  rintro ⟨⟨g₁, eq_L₁⟩, ⟨g₂, eq_L₂⟩⟩
+  intro ⟨⟨g₁, eq_L₁⟩, ⟨g₂, eq_L₂⟩⟩
   rw [g₁.language_eq_toGeneral_language] at eq_L₁
   rw [g₂.language_eq_toGeneral_language] at eq_L₂
   use unionCFG g₁ g₂

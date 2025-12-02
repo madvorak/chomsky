@@ -37,7 +37,7 @@ by
     apply gr_deri_self
   apply gr_deri_of_deri_tran ih
   rcases orig with ⟨r, rin, x, y, bef, aft⟩
-  change r ∈ List.map _ g.rules at rin
+  change r ∈ g.rules.map _ at rin
   rw [List.mem_map] at rin
   rcases rin with ⟨r₀, rin₀, r_from_r₀⟩
   use r₀, rin₀, y.reverse, x.reverse
@@ -70,7 +70,7 @@ private lemma reversed_word_in_original_language {g : Grammar T} {w : List T}
   w.reverse ∈ g.language :=
 by
   unfold Grammar.language at *
-  have almost_done := derives_reversed g (List.map Symbol.terminal w) hwg
+  have almost_done := derives_reversed g (w.map Symbol.terminal) hwg
   rw [←List.map_reverse] at almost_done
   exact almost_done
 

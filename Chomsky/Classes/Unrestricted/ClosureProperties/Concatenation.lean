@@ -1867,7 +1867,7 @@ end hard_direction
 theorem GG_of_GG_c_GG (L₁ : Language T) (L₂ : Language T) :
   L₁.IsGG ∧ L₂.IsGG → (L₁ * L₂).IsGG :=
 by
-  rintro ⟨⟨g₁, eq_L₁⟩, ⟨g₂, eq_L₂⟩⟩
+  intro ⟨⟨g₁, eq_L₁⟩, ⟨g₂, eq_L₂⟩⟩
   use bigGrammar g₁ g₂
   apply Set.eq_of_subset_of_subset
   · -- prove `L₁ * L₂ ⊇` here

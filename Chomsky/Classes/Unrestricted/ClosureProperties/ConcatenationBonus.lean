@@ -7,7 +7,7 @@ private def wrapCFR₁ {N₁ : Type} (N₂ : Type) (r : N₁ × List (Symbol T N
   nnn T N₁ N₂ × List (nst T N₁ N₂) :=
 ⟨◩(some ◩r.fst), r.snd.map (wrapSymbol₁ N₂)⟩
 
-private def wrapCFR₂ {N₂ : Type} (N₁ : Type) (r : N₂ × List (Symbol T N₂)) :
+private def wrapCFR₂ (N₁ : Type) {N₂ : Type} (r : N₂ × List (Symbol T N₂)) :
   nnn T N₁ N₂ × List (nst T N₁ N₂) :=
 ⟨◩(some ◪r.fst), r.snd.map (wrapSymbol₂ N₁)⟩
 
@@ -49,10 +49,10 @@ by
     This lemma is proved by translation from general grammars.
     Compare to `classes.context_free.closure_properties.concatenation.lean` which uses
     a simpler and more effective construction (based on context-gree grammars only). -/
-private lemma bonus_CF_of_CF_c_CF (L₁ : Language T) (L₂ : Language T) :
+private theorem bonus_CF_of_CF_c_CF (L₁ : Language T) (L₂ : Language T) :
   L₁.IsCF ∧ L₂.IsCF → (L₁ * L₂).IsCF :=
 by
-  rintro ⟨⟨g₁, eq_L₁⟩, ⟨g₂, eq_L₂⟩⟩
+  intro ⟨⟨g₁, eq_L₁⟩, ⟨g₂, eq_L₂⟩⟩
   rw [g₁.language_eq_toGeneral_language] at eq_L₁
   rw [g₂.language_eq_toGeneral_language] at eq_L₂
   use bigCFG g₁ g₂

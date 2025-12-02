@@ -177,6 +177,6 @@ lemma sinkString_all_terminals {N₀ N : Type} (sinkN : N → Option N₀) (w : 
   | nil => rfl
   | cons t _ ih => exact congr_arg (Symbol.terminal t :: ·) ih
 
-lemma singletonGoodString {G : LiftedCFG T} {s : Symbol T G.g.nt} (hs : G.GoodLetter s) :
+lemma goodString_singleton {G : LiftedCFG T} {s : Symbol T G.g.nt} (hs : G.GoodLetter s) :
     G.GoodString [s] := by
   simpa [LiftedCFG.GoodString] using hs

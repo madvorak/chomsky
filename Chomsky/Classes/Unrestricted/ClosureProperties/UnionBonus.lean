@@ -13,10 +13,10 @@ private def liftCFR₂ (N₁ : Type) {N₂ : Type} (r : N₂ × List (Symbol T N
 
 private def unionCFG (g₁ g₂ : CFG T) : CFG T :=
   CFG.mk (Option (g₁.nt ⊕ g₂.nt)) none (
-    (none, [Symbol.nonterminal (some ◩g₁.initial)]) ::
-    (none, [Symbol.nonterminal (some ◪g₂.initial)]) ::
+    (none, [Symbol.nonterminal (some ◩g₁.initial)]) :: (
+    (none, [Symbol.nonterminal (some ◪g₂.initial)]) :: (
     g₁.rules.map (liftCFR₁ g₂.nt) ++
-    g₂.rules.map (liftCFR₂ g₁.nt) )
+    g₂.rules.map (liftCFR₂ g₁.nt))))
 
 private lemma unionCFG_language_eq_unionGrammar_language (g₁ g₂ : CFG T) :
   (unionCFG g₁ g₂).language = (unionGrammar g₁.toGeneral g₂.toGeneral).language :=
@@ -38,8 +38,4 @@ by
     rw [←eq_L₁, ←eq_L₂]
     exact in_L₁_or_L₂_of_in_union hw
   · intro w hw
-    cases' hw with case_1 case_2
-    · rw [←eq_L₁] at case_1
-      exact in_union_of_in_L₁ case_1
-    · rw [←eq_L₂] at case_2
-      exact in_union_of_in_L₂ case_2
+    exact hw.casesOn (in_union_of_in_L₁ <| eq_L₁ ▸ ·) (in_union_of_in_L₂ <| eq_L₂ ▸ ·)

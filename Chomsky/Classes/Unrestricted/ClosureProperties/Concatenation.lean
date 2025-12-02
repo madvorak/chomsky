@@ -230,11 +230,10 @@ by
         use v.map (wrapSymbol₁ g₂.nt)
         constructor
         · convert congr_arg (List.map (wrapSymbol₁ g₂.nt)) bef
-          rw [List.map_append_append]
-          rw [List.map_append_append]
+          rewrite [List.map_append_append, List.map_append_append]
           rfl
         · convert congr_arg (List.map (wrapSymbol₁ g₂.nt)) aft
-          rw [List.map_append_append]
+          rewrite [List.map_append_append]
           rfl
       have upgraded := upgrade_deri₁ _ hu
       rw [List.map_map] at upgraded
@@ -1443,9 +1442,7 @@ by
     have same_lengths := correspondingStrings_length ih_concat
     clear bef
     have ulen₁ : u.length < (x.map (wrapSymbol₁ g₂.nt) ++ y.map (wrapSymbol₂ g₁.nt)).length
-    · rw [List.length_append _ v] at same_lengths
-      rw [List.length_append u _] at same_lengths
-      rw [List.length_singleton] at same_lengths
+    · rw [List.length_append _ v, List.length_append u, List.length_singleton] at same_lengths
       clear * - same_lengths
       linarith
     rw [List.append_assoc] at ih_concat
@@ -1516,8 +1513,7 @@ by
       simp
     · rw [bef, List.append_nil, List.append_nil] at ih_concat
       have ul_lt_len_um : u.length < (u ++ [Symbol.nonterminal ◪◩t]).length
-      · rw [List.length_append]
-        rw [List.length_singleton]
+      · rw [List.length_append, List.length_singleton]
         apply lt_add_one
       have ul_lt_len_umv : u.length < (u ++ [Symbol.nonterminal ◪◩t] ++ v).length
       · rw [List.length_append]
@@ -1630,8 +1626,7 @@ by
         convert part_for_u
         · apply min_eq_left
           apply Nat.le_succ
-        rw [List.append_assoc]
-        rw [List.take_left]
+        rw [List.append_assoc, List.take_left]
       · convert_to
           correspondingStrings
             [(x.map (wrapSymbol₁ g₂.nt) ++ y.map (wrapSymbol₂ g₁.nt))[u.length]'ul_lt_len_xy]

@@ -183,7 +183,7 @@ private lemma in_left_of_in_union (hw :
       (List.map Symbol.terminal w)) :
     w ∈ g₁.language := by
   apply sinkString_all_terminals g₁g.sinkNT w ▸ g₁g.sink_derives hw
-  apply singletonGoodString
+  apply goodString_singleton
   constructor
   rfl
 
@@ -193,7 +193,7 @@ private lemma in_right_of_in_union (hw :
       (List.map Symbol.terminal w)) :
     w ∈ g₂.language := by
   apply sinkString_all_terminals g₂g.sinkNT w ▸ g₂g.sink_derives hw
-  apply singletonGoodString
+  apply goodString_singleton
   constructor
   rfl
 

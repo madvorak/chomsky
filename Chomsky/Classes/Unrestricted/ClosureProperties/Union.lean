@@ -262,15 +262,9 @@ by
     · apply List.mem_cons_self
     use [], []
     constructor <;> rfl
-  rw [List.nil_append, List.append_nil]
-  show
-    lg₁.g.Derives
-      (liftString lg₁.liftNt [Symbol.nonterminal g₁.initial])
-      (w.map Symbol.terminal)
-  convert lift_deri (@lg₁ T g₁ g₂) hwg
-  unfold liftString
-  rewrite [List.map_map]
-  rfl
+  convert lift_deri lg₁ hwg
+  symm
+  apply List.map_map
 
 lemma in_union_of_in_L₂ {w : List T} (hwg : w ∈ g₂.language) :
   w ∈ (unionGrammar g₁ g₂).language :=
@@ -284,15 +278,9 @@ by
       apply List.mem_cons_self
     use [], []
     constructor <;> rfl
-  rw [List.nil_append, List.append_nil]
-  show
-    lg₂.g.Derives
-      (liftString lg₂.liftNt [Symbol.nonterminal g₂.initial])
-      (w.map Symbol.terminal)
-  convert lift_deri (@lg₂ T g₁ g₂) hwg
-  unfold liftString
-  rewrite [List.map_map]
-  rfl
+  convert lift_deri lg₂ hwg
+  symm
+  apply List.map_map
 
 /-- The class of grammar-generated languages is closed under union. -/
 theorem GG_of_GG_u_GG (L₁ : Language T) (L₂ : Language T) :
@@ -301,15 +289,10 @@ by
   intro ⟨⟨g₁, eq_L₁⟩, ⟨g₂, eq_L₂⟩⟩
   use unionGrammar g₁ g₂
   apply Set.eq_of_subset_of_subset
-  · intro w ass
-    rw [Language.mem_add]
-    rw [←eq_L₁, ←eq_L₂]
-    exact in_L₁_or_L₂_of_in_union ass
-  · intro w ass
-    cases' ass with case₁ case₂
-    · rw [←eq_L₁] at case₁
-      exact in_union_of_in_L₁ case₁
-    · rw [←eq_L₂] at case₂
-      exact in_union_of_in_L₂ case₂
+  · intro w hw
+    rw [Language.mem_add, ←eq_L₁, ←eq_L₂]
+    exact in_L₁_or_L₂_of_in_union hw
+  · intro w hw
+    exact hw.casesOn (in_union_of_in_L₁ <| eq_L₁ ▸ ·) (in_union_of_in_L₂ <| eq_L₂ ▸ ·)
 
 #print axioms GG_of_GG_u_GG

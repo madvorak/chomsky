@@ -100,7 +100,7 @@ def rulesForTerminals₂ (N₁ : Type) (g : Grammar T) : List (Grule T (nnn T N�
 -- grammar for concatenation of `g₁.language` with `g₂.language`
 def bigGrammar (g₁ g₂ : Grammar T) : Grammar T :=
   Grammar.mk (nnn T g₁.nt g₂.nt) ◩none (
-    @Grule.mk T (nnn T g₁.nt g₂.nt) [] ◩none [] [
+    Grule.mk [] ◩none [] [
       Symbol.nonterminal ◩(some ◩g₁.initial),
       Symbol.nonterminal ◩(some ◪g₂.initial)
     ] :: ((

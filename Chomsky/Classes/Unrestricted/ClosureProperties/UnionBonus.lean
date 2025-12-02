@@ -4,11 +4,11 @@ import Chomsky.Classes.Unrestricted.ClosureProperties.Union
 variable {T : Type}
 
 
-private def liftCFrule₁ {N₁ : Type} (N₂ : Type) (r : N₁ × List (Symbol T N₁)) :
+private def liftCFR₁ {N₁ : Type} (N₂ : Type) (r : N₁ × List (Symbol T N₁)) :
   Option (N₁ ⊕ N₂) × List (Symbol T (Option (N₁ ⊕ N₂))) :=
 (some ◩r.fst, liftString (Option.some ∘ Sum.inl) r.snd)
 
-private def liftCFrule₂ (N₁ : Type) {N₂ : Type} (r : N₂ × List (Symbol T N₂)) :
+private def liftCFR₂ (N₁ : Type) {N₂ : Type} (r : N₂ × List (Symbol T N₂)) :
   Option (N₁ ⊕ N₂) × List (Symbol T (Option (N₁ ⊕ N₂))) :=
 (some ◪r.fst, liftString (Option.some ∘ Sum.inr) r.snd)
 
@@ -16,31 +16,30 @@ private def unionCFG (g₁ g₂ : CFG T) : CFG T :=
   CFG.mk (Option (g₁.nt ⊕ g₂.nt)) none (
     (none, [Symbol.nonterminal (some ◩g₁.initial)]) ::
     (none, [Symbol.nonterminal (some ◪g₂.initial)]) ::
-    List.map (liftCFrule₁ g₂.nt) g₁.rules ++
-    List.map (liftCFrule₂ g₁.nt) g₂.rules)
+    List.map (liftCFR₁ g₂.nt) g₁.rules ++
+    List.map (liftCFR₂ g₁.nt) g₂.rules)
 
-private lemma unionCFG_same_language (g₁ g₂ : CFG T) :
-  (unionCFG g₁ g₂).language =
-  (unionGrammar (grammar_of_cfg g₁) (grammar_of_cfg g₂)).language :=
+private lemma unionCFG_language_eq_unionGrammar_language (g₁ g₂ : CFG T) :
+  (unionCFG g₁ g₂).language = (unionGrammar g₁.toGeneral g₂.toGeneral).language :=
 by
-  rw [cfLanguage_eq_grammarLanguage]
-  simp only [unionCFG, grammar_of_cfg, unionGrammar, List.cons_append, List.map_cons, List.map_append, List.map_map]
+  rw [CFG.language_eq_toGeneral_language]
+  simp only [unionCFG, unionGrammar, CFG.toGeneral, List.cons_append, List.map_cons, List.map_append, List.map_map]
   rfl
 
 private theorem bonus_CF_of_CF_u_CF (L₁ : Language T) (L₂ : Language T) :
   L₁.IsCF ∧ L₂.IsCF → (L₁ + L₂).IsCF :=
 by
   rintro ⟨⟨g₁, eq_L₁⟩, ⟨g₂, eq_L₂⟩⟩
-  rw [cfLanguage_eq_grammarLanguage g₁] at eq_L₁
-  rw [cfLanguage_eq_grammarLanguage g₂] at eq_L₂
+  rw [g₁.language_eq_toGeneral_language] at eq_L₁
+  rw [g₂.language_eq_toGeneral_language] at eq_L₂
   use unionCFG g₁ g₂
-  rw [unionCFG_same_language]
+  rw [unionCFG_language_eq_unionGrammar_language]
   apply Set.eq_of_subset_of_subset
-  · intro w hyp
+  · intro w hw
     rw [←eq_L₁, ←eq_L₂]
-    exact in_L₁_or_L₂_of_in_union hyp
-  · intro w hyp
-    cases' hyp with case_1 case_2
+    exact in_L₁_or_L₂_of_in_union hw
+  · intro w hw
+    cases' hw with case_1 case_2
     · rw [←eq_L₁] at case_1
       exact in_union_of_in_L₁ case_1
     · rw [←eq_L₂] at case_2

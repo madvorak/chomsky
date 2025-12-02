@@ -78,3 +78,5 @@ by
     rw [dual_of_reversalGrammar]
     rw [List.reverse_reverse] at finished_modulo_reverses
     exact finished_modulo_reverses
+
+#print axioms CF_of_reverse_CF

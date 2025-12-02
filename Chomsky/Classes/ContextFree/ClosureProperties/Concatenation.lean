@@ -45,11 +45,8 @@ by
   · simp only [rulesForTerminals₂, CFG.terminalsRules₂, List.map_map]
     rfl
 
-/-- The class of context-free languages is closed under concatenation.
-    This lemma is proved by translation from general grammars.
-    Compare to `classes.context_free.closure_properties.concatenation.lean` which uses
-    a simpler and more effective construction (based on context-gree grammars only). -/
-private theorem bonus_CF_of_CF_c_CF (L₁ : Language T) (L₂ : Language T) :
+/-- The class of context-free languages is closed under concatenation. -/
+theorem CF_of_CF_c_CF (L₁ : Language T) (L₂ : Language T) :
   L₁.IsCF ∧ L₂.IsCF → (L₁ * L₂).IsCF :=
 by
   intro ⟨⟨g₁, eq_L₁⟩, ⟨g₂, eq_L₂⟩⟩
@@ -66,3 +63,5 @@ by
     rw [←eq_L₁] at hw
     rw [←eq_L₂] at hw
     exact in_big_of_in_concatenated hw
+
+#print axioms CF_of_CF_c_CF

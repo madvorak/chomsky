@@ -44,13 +44,9 @@ lemma gr_append_deri {w₁ w₂ : List (Symbol T g.nt)}
 by
   induction' hgww with x y _ hgxy ih
   · apply gr_deri_self
-  apply gr_deri_of_deri_tran
-  · exact ih
+  apply gr_deri_of_deri_tran ih
   rcases hgxy with ⟨r, rin, u, v, bef, aft⟩
-  use r
-  constructor
-  · exact rin
-  use pᵣ ++ u, v
+  use r, rin, pᵣ ++ u, v
   rw [bef, aft]
   constructor <;> simp only [List.append_assoc]
 
@@ -60,13 +56,9 @@ lemma gr_deri_append {w₁ w₂ : List (Symbol T g.nt)}
 by
   induction' hgww with x y _ hgxy ih
   · apply gr_deri_self
-  apply gr_deri_of_deri_tran
-  · exact ih
+  apply gr_deri_of_deri_tran ih
   rcases hgxy with ⟨r, rin, u, v, bef, aft⟩
-  use r
-  constructor
-  · exact rin
-  use u, v ++ pₒ
+  use r, rin, u, v ++ pₒ
   rw [bef, aft]
   constructor <;> simp only [List.append_assoc]
 

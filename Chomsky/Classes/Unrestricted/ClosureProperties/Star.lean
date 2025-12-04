@@ -178,9 +178,8 @@ by
                       rw [←r_of_tg] at nrn
                       exact Sum.noConfusion nrn)
       convert_to G.g.Derives [Symbol.nonterminal ◩g.initial] (liftString G.liftNt (v.map Symbol.terminal))
-      · unfold liftString
-        rw [List.map_map]
-        congr
+      · symm
+        apply List.map_map
       exact lift_deri G hwg
     have ass_postf := gr_deri_append [H] hgSv
     simp only [vx_reverse, ←List.cons_append,
@@ -300,9 +299,7 @@ by
       · simp
         constructor
         · rfl
-        · rw [←List.map_drop]
-          rw [←(((w[w.length - k.succ]'lt_wl).drop n).map Symbol.terminal).take_append_drop 1]
-          rw [←List.singleton_append]
+        · rw [←List.map_drop, ←(((w[w.length - k.succ]'lt_wl).drop n).map Symbol.terminal).take_append_drop 1, ←List.singleton_append]
           apply congr_arg₂
           · rewrite [←List.map_take, List.take_one_drop_eq_of_lt_length small]
             rfl
@@ -1087,7 +1084,6 @@ by
     rcases original with ⟨r₀, orig_in, wrap_orig⟩
     unfold wrapGr at wrap_orig
     rw [cat, ←wrap_orig] at bef
-    change R :: H :: List.flatten _ = _ at bef
     rcases case_2_match_rule bef with ⟨m, u₁, v₁, u_eq, xm_eq, v_eq⟩
     clear bef
     rw [u_eq, v_eq] at aft

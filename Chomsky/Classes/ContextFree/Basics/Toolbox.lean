@@ -43,16 +43,10 @@ lemma cf_append_deri {w₁ w₂ : List (Symbol T g.nt)}
 by
   induction' hgww with a b _ hgab ih
   · apply cf_deri_self
-  apply cf_deri_of_deri_tran
-  · exact ih
+  apply cf_deri_of_deri_tran ih
   rcases hgab with ⟨r, r_in, v, w, bef, aft⟩
-  use r
-  constructor
-  · exact r_in
-  use pᵣ ++ v
-  use w
-  rw [bef]
-  rw [aft]
+  use r, r_in, pᵣ ++ v, w
+  rw [bef, aft]
   constructor <;> simp only [List.append_assoc]
 
 lemma cf_deri_append {w₁ w₂ : List (Symbol T g.nt)}
@@ -61,14 +55,8 @@ lemma cf_deri_append {w₁ w₂ : List (Symbol T g.nt)}
 by
   induction' hgww with a b _ hgab ih
   · apply cf_deri_self
-  apply cf_deri_of_deri_tran
-  · exact ih
+  apply cf_deri_of_deri_tran ih
   rcases hgab with ⟨r, r_in, v, w, bef, aft⟩
-  use r
-  constructor
-  · exact r_in
-  use v
-  use w ++ pₒ
-  rw [bef]
-  rw [aft]
+  use r, r_in, v, w ++ pₒ
+  rw [bef, aft]
   constructor <;> simp only [List.append_assoc]

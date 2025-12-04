@@ -192,7 +192,7 @@ by
       rw [rl_first, rl_third] at bef
       exact bef
     exact Symbol.nonterminal.inj (List.head_eq_of_cons_eq elemeq)
-  simp [unionGrammar] at rin
+  simp only [unionGrammar, List.mem_cons, List.mem_append, List.mem_map] at rin
   rcases rin with req₁ | req₂ | rin₁ | rin₂
   · rw [req₁] at aft
     dsimp only at aft
@@ -201,8 +201,7 @@ by
     have sinked := sink_deri lg₁ deri
     clear * - sinked
     specialize sinked (by
-        unfold GoodString
-        simp only [List.mem_singleton, forall_eq]
+        simp only [GoodString, List.mem_singleton, forall_eq]
         use g₁.initial
         rfl)
     convert sinked
@@ -217,8 +216,7 @@ by
     have sinked := sink_deri lg₂ deri
     clear * - sinked
     specialize sinked (by
-        unfold GoodString
-        simp only [List.mem_singleton, forall_eq]
+        simp only [GoodString, List.mem_singleton, forall_eq]
         use g₂.initial
         rfl)
     convert sinked

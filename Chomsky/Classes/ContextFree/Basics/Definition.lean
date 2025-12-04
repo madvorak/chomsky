@@ -1,4 +1,4 @@
-import Chomsky.Classes.ContextSensitive.Basics.Definition
+import Chomsky.Classes.Unrestricted.Basics.Definition
 
 
 /-- Context-free grammar that generates words over the alphabet `T` (a type of terminals). -/

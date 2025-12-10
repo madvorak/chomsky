@@ -41,7 +41,7 @@ by
   intro
   apply g.deri_iff_toGeneral_deri
 
-theorem CF_subclass_RE {L : Language T} :
+theorem CF_subclass_GG (L : Language T) :
   L.IsCF → L.IsGG :=
 by
   rintro ⟨g, rfl⟩

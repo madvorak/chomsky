@@ -13,11 +13,11 @@ private def wrapCFR₂ (N₁ : Type) {N₂ : Type} (r : N₂ × List (Symbol T N
 
 private def CFG.terminalsRules₁ (g : CFG T) (N₂ : Type) :
   List (nnn T g.nt N₂ × List (nst T g.nt N₂)) :=
-(allUsedTerminals g.toGeneral).map (fun t => ⟨◪◩t, [Symbol.terminal t]⟩)
+(allUsedTerminals g.toGeneral).map (fun t : T => ⟨◪◩t, [Symbol.terminal t]⟩)
 
 private def CFG.terminalsRules₂ (g : CFG T) (N₁ : Type) :
   List (nnn T N₁ g.nt × List (nst T N₁ g.nt)) :=
-(allUsedTerminals g.toGeneral).map (fun t => ⟨◪◪t, [Symbol.terminal t]⟩)
+(allUsedTerminals g.toGeneral).map (fun t : T => ⟨◪◪t, [Symbol.terminal t]⟩)
 
 private def bigCFG (g₁ g₂ : CFG T) : CFG T :=
   CFG.mk (nnn T g₁.nt g₂.nt) ◩none (

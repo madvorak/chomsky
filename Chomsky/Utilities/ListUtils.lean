@@ -182,7 +182,7 @@ variable [DecidableEq α]
 section ListCountIn
 
 def countIn (l : List α) (a : α) : ℕ :=
-  List.sum (List.map (fun s => if s = a then 1 else 0) l)
+  List.sum (List.map (if · = a then 1 else 0) l)
 
 lemma countIn_nil (a : α) :
   countIn [] a = 0 :=
@@ -236,8 +236,7 @@ by
     rw [List.mem_nil_iff] at hax
     exact hax
   by_contra contr
-  rw [not_lt] at contr
-  rw [Nat.le_zero] at contr
+  rw [not_lt, Nat.le_zero] at contr
   rw [mem_cons] at hax
   unfold countIn List.map at contr
   simp at contr
@@ -263,7 +262,7 @@ by
   · exact ih (List.not_mem_of_not_mem_cons hax)
 
 lemma countIn_flatten (L : List (List α)) (a : α) :
-  countIn L.flatten a = List.sum (List.map (fun w => countIn w a) L) :=
+  countIn L.flatten a = sum (map (countIn · a) L) :=
 by
   induction' L with d l ih
   · rfl

@@ -206,7 +206,7 @@ private lemma terminal_scan_ind {g : Grammar T} {w : List (List T)} (n : ℕ)
     (terminals : ∀ v ∈ w, ∀ t ∈ v, Symbol.terminal t ∈ (g.rules.map Grule.output).flatten) :
   g.star.Derives
     (((w.take (w.length - n)).map (List.map Symbol.terminal)).flatten ++ [R] ++
-     ((w.drop (w.length - n)).map (fun v => [H] ++ v.map Symbol.terminal)).flatten ++ [H])
+     ((w.drop (w.length - n)).map ([H] ++ ·.map Symbol.terminal)).flatten ++ [H])
     (w.flatten.map Symbol.terminal ++ [R, H]) :=
 by
   induction' n with k ih
@@ -1128,7 +1128,7 @@ by
       repeat rw [List.cons_append] at bef
       rw [List.nil_append] at bef
       have btail := List.tail_eq_of_cons_eq bef
-      have imposs := congr_arg (fun l => R ∈ l) btail
+      have imposs := congr_arg (R ∈ ·) btail
       dsimp only at imposs
       apply false_of_true_eq_false
       convert imposs.symm
@@ -1823,7 +1823,7 @@ by
   | head =>
     exfalso
     simp only [List.append_nil] at bef
-    have imposs := congr_arg (fun l => Z ∈ l) bef
+    have imposs := congr_arg (Z ∈ ·) bef
     simp only [List.mem_append] at imposs
     rw [List.mem_singleton] at imposs
     rw [List.mem_singleton] at imposs
@@ -1881,7 +1881,7 @@ by
         | cons d l =>
           rw [hv] at rev
           have tails := List.tail_eq_of_cons_eq rev
-          have H_in_tails := congr_arg (fun l => H ∈ l) tails
+          have H_in_tails := congr_arg (H ∈ ·) tails
           dsimp only at H_in_tails
           rw [List.mem_reverse] at H_in_tails
           apply false_of_true_eq_false
@@ -1922,7 +1922,7 @@ by
           | cons d l =>
             rw [hv] at rev
             have tails := List.tail_eq_of_cons_eq rev
-            have H_in_tails := congr_arg (fun l => H ∈ l) tails
+            have H_in_tails := congr_arg (H ∈ ·) tails
             dsimp only at H_in_tails
             rw [List.mem_reverse] at H_in_tails
             apply false_of_true_eq_false

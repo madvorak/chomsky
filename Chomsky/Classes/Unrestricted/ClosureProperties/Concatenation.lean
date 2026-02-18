@@ -91,10 +91,10 @@ def wrapGrule₂ {N₂ : Type} (N₁ : Type) (r : Grule T N₂) : Grule T (nnn T
     (r.output.map (wrapSymbol₂ N₁))
 
 def rulesForTerminals₁ (N₂ : Type) (g : Grammar T) : List (Grule T (nnn T g.nt N₂)) :=
-  (allUsedTerminals g).map (fun t => Grule.mk [] ◪◩t [] [Symbol.terminal t])
+  (allUsedTerminals g).map (fun t : T => Grule.mk [] ◪◩t [] [Symbol.terminal t])
 
 def rulesForTerminals₂ (N₁ : Type) (g : Grammar T) : List (Grule T (nnn T N₁ g.nt)) :=
-  (allUsedTerminals g).map (fun t => Grule.mk [] ◪◪t [] [Symbol.terminal t])
+  (allUsedTerminals g).map (fun t : T => Grule.mk [] ◪◪t [] [Symbol.terminal t])
 
 
 -- grammar for concatenation of `g₁.language` with `g₂.language`

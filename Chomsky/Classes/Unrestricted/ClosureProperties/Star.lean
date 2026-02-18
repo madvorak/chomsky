@@ -491,7 +491,7 @@ by
   · by_contra v_nil
     rw [v_nil, List.append_nil] at hypp
     clear * - hypp xnn
-    have hlast := congr_arg (fun l : List (ns T g.nt) => l.reverse[0]?) hypp
+    have hlast := congr_arg (·.reverse[0]?) hypp
     dsimp only at hlast
     rw [List.reverse_flatten, List.reverse_append, List.reverse_append_append, List.reverse_singleton] at hlast
     have hH : some H =
@@ -500,7 +500,7 @@ by
       rw [List.map_map]
       show
         some H =
-        ((x.map (List.map wrapSym)).map (fun l : List (ns T g.nt) => List.reverse (l ++ [H]))).reverse.flatten[0]?
+        ((x.map (List.map wrapSym)).map (· ++ [H] |>.reverse)).reverse.flatten[0]?
       simp_rw [List.reverse_append]
       rw [List.map_map]
       show
@@ -575,9 +575,9 @@ by
     · rw [←List.map_drop, inside_wrap, List.countIn_singleton_eq (@H T g.nt)]
     have counted_Hs : x.length = (m + 0) + (1 + (x.length - m'.succ))
     · convert count_Hs using 3
-      · show x.length = (x.map (fun l : List (Symbol T g.nt) => (l.map wrapSym ++ [H]).countIn H)).sum
+      · show x.length = (x.map (·.map wrapSym ++ [H] |>.countIn H)).sum
         simp [List.countIn_append, inside_one]
-      · show m = ((x.map (fun l : List (Symbol T g.nt) => (l.map wrapSym ++ [H]).countIn H)).take m).sum
+      · show m = ((x.map (·.map wrapSym ++ [H] |>.countIn H)).take m).sum
         simp [List.countIn_append, inside_one, Nat.le_of_succ_le mxl]
       · rw [List.take_append_of_le_length, inside_take]
         apply Nat.le_of_lt_succ
@@ -585,7 +585,7 @@ by
       · rw [List.drop_append_of_le_length, List.countIn_append, inside_drop]
         apply Nat.le_of_lt_succ
         simpa using klt'
-      · show x.length - m'.succ = ((x.map (fun l : List (Symbol T g.nt) => (l.map wrapSym ++ [H]).countIn H)).drop m'.succ).sum
+      · show x.length - m'.succ = ((x.map (·.map wrapSym ++ [H] |>.countIn H)).drop m'.succ).sum
         simp [List.countIn_append, inside_one]
     omega
   constructor
@@ -882,7 +882,7 @@ by
   by_cases hdR : d = R
   · rw [H] at ass
     classical
-    have imposs := congr_arg (fun c : List (ns T g.nt) => c.countIn R) ass
+    have imposs := congr_arg (·.countIn R) ass
     simp only [List.countIn_append, List.countIn_cons, List.countIn_nil, hdR, ite_true] at imposs
     have h0 : 0 = if Symbol.nonterminal ◪1 = @R T g.nt then 1 else 0
     · rfl

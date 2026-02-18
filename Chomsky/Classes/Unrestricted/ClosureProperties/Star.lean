@@ -1502,7 +1502,7 @@ by
         conv_lhs => rw [←left_part]
         rw [List.map_take, List.take_append_of_le_length]
         have left_part := congr_arg (List.length) left_half
-        conv_lhs at left_part => rw [List.length_append]; congr; rfl; rw [List.length_append, List.length_singleton];
+        conv_lhs at left_part => rw [List.length_append]; congr; rfl; rw [List.length_append, List.length_singleton]
         conv_rhs at left_part => rw [List.length_append]
         omega
       constructor

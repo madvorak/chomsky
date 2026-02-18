@@ -1,67 +1,66 @@
 import Mathlib.Data.List.Flatten
 import Mathlib.Data.List.Lemmas
-import Mathlib.Data.Nat.Find
 import Mathlib.Tactic
 
 namespace List
 
-variable {α β : Type _} {x y z : List α}
+variable {α β : Type*} {x y z : List α}
 
-section ListAppendAppend
+section append_append
 
 lemma length_append_append :
   (x ++ y ++ z).length = x.length + y.length + z.length :=
 by
-  rw [List.length_append, List.length_append]
+  rw [length_append, length_append]
 
 lemma map_append_append {f : α → β} :
   (x ++ y ++ z).map f = x.map f ++ y.map f ++ z.map f :=
 by
-  rw [List.map_append, List.map_append]
+  rw [map_append, map_append]
 
 lemma filterMap_append_append {f : α → Option β} :
   (x ++ y ++ z).filterMap f = x.filterMap f ++ y.filterMap f ++ z.filterMap f :=
 by
-  rw [List.filterMap_append, List.filterMap_append]
+  rw [filterMap_append, filterMap_append]
 
 lemma reverse_append_append :
   (x ++ y ++ z).reverse = z.reverse ++ y.reverse ++ x.reverse :=
 by
-  rw [List.reverse_append, List.reverse_append, List.append_assoc]
+  rw [reverse_append, reverse_append, append_assoc]
 
 lemma mem_append_append {a : α} :
   a ∈ x ++ y ++ z ↔ a ∈ x ∨ a ∈ y ∨ a ∈ z :=
 by
-  rw [List.mem_append, List.mem_append, or_assoc]
+  rw [mem_append, mem_append, or_assoc]
 
 lemma forall_mem_append_append {p : α → Prop} :
   (∀ a ∈ x ++ y ++ z, p a) ↔ (∀ a ∈ x, p a) ∧ (∀ a ∈ y, p a) ∧ (∀ a ∈ z, p a) :=
 by
-  rw [List.forall_mem_append, List.forall_mem_append, and_assoc]
+  rw [forall_mem_append, forall_mem_append, and_assoc]
 
 lemma flatten_append_append {X Y Z : List (List α)} :
   (X ++ Y ++ Z).flatten = X.flatten ++ Y.flatten ++ Z.flatten :=
 by
-  rw [List.flatten_append, List.flatten_append]
+  rw [flatten_append, flatten_append]
 
-end ListAppendAppend
+end append_append
 
-section ListReplicate
+section replicating_succ
 
 lemma replicate_succ_eq_singleton_append (s : α) (n : ℕ) :
-  List.replicate n.succ s = [s] ++ List.replicate n s :=
+  replicate n.succ s = [s] ++ replicate n s :=
 rfl
 
 lemma replicate_succ_eq_append_singleton (s : α) (n : ℕ) :
-  List.replicate n.succ s = List.replicate n s ++ [s] :=
+  replicate n.succ s = replicate n s ++ [s] :=
 by
-  change List.replicate (n + 1) s = List.replicate n s ++ [s]
-  rw [List.replicate_add]
+  change replicate (n + 1) s = replicate n s ++ [s]
+  rw [replicate_add]
   rfl
 
-end ListReplicate
+end replicating_succ
 
-section ListFlatten
+section joining
 
 private lemma cons_drop_succ {m : ℕ} (mlt : m < x.length) :
   x.drop m = x.get ⟨m, mlt⟩ :: x.drop m.succ :=
@@ -138,34 +137,34 @@ lemma drop_flatten_of_lt {L : List (List α)} {n : ℕ} (notall : n < L.flatten.
 by
   obtain ⟨m, k, mlt, klt, left_half⟩ := take_flatten_of_lt notall
   use m, k, mlt, klt
-  have L_two_parts := congr_arg List.flatten (List.take_append_drop m L)
-  rw [List.flatten_append] at L_two_parts
-  have whole := List.take_append_drop n L.flatten
+  have L_two_parts := congr_arg flatten (take_append_drop m L)
+  rw [flatten_append] at L_two_parts
+  have whole := take_append_drop n L.flatten
   rw [left_half] at whole
   have important := Eq.trans whole L_two_parts.symm
   rw [append_assoc] at important
-  have right_side := List.append_cancel_left important
+  have right_side := append_cancel_left important
   have auxi : (drop m L).flatten = (L.get ⟨m, mlt⟩ :: drop m.succ L).flatten
   · apply congr_arg
     apply cons_drop_succ
-  rw [List.flatten] at auxi
+  rw [flatten] at auxi
   rw [auxi] at right_side
   have near_result :
     take k (L.get ⟨m, mlt⟩) ++ drop n L.flatten =
     take k (L.get ⟨m, mlt⟩) ++ drop k (L.get ⟨m, mlt⟩) ++ (drop m.succ L).flatten
   · convert right_side
-    rw [List.take_append_drop]
+    rw [take_append_drop]
   rw [append_assoc] at near_result
-  exact List.append_cancel_left near_result
+  exact append_cancel_left near_result
 
 def nTimes (l : List α) (n : ℕ) : List α :=
-  (List.replicate n l).flatten
+  (replicate n l).flatten
 
 infixl:100 " ^^ " => nTimes
 
-end ListFlatten
+end joining
 
-section ListGet
+section indexing
 
 lemma get_map (f : α → β) (l : List α) (i : Fin (l.map f).length) :
   (l.map f).get i = f (l.get (congr_arg Fin (l.length_map f) ▸ i)) :=
@@ -175,14 +174,14 @@ by
   · simp
   · simp
 
-end ListGet
+end indexing
 
 variable [DecidableEq α]
 
-section ListCountIn
+section counting
 
 def countIn (l : List α) (a : α) : ℕ :=
-  List.sum (List.map (if · = a then 1 else 0) l)
+  sum (map (if · = a then 1 else 0) l)
 
 lemma countIn_nil (a : α) :
   countIn [] a = 0 :=
@@ -192,53 +191,53 @@ lemma countIn_cons (a b : α) :
   countIn (b::x) a = (if b = a then 1 else 0) + countIn x a :=
 by
   unfold countIn
-  rw [List.map_cons, List.sum_cons]
+  rw [map_cons, sum_cons]
 
 lemma countIn_append (a : α) :
   countIn (x ++ y) a = countIn x a + countIn y a :=
 by
   unfold countIn
-  rw [List.map_append, List.sum_append]
+  rw [map_append, sum_append]
 
 lemma countIn_replicate_eq (a : α) (n : ℕ) :
-  countIn (List.replicate n a) a = n :=
+  countIn (replicate n a) a = n :=
 by
   unfold countIn
   induction' n with m ih
   · rfl
-  rw [List.replicate_succ, List.map_cons, List.sum_cons, ih, if_pos rfl]
+  rw [replicate_succ, map_cons, sum_cons, ih, if_pos rfl]
   apply Nat.one_add
 
 lemma countIn_replicate_neq {a b : α} (hab : a ≠ b) (n : ℕ) :
-  countIn (List.replicate n a) b = 0 :=
+  countIn (replicate n a) b = 0 :=
 by
   unfold countIn
   induction' n with m ih
   · rfl
-  rw [List.replicate_succ, List.map_cons, List.sum_cons, ih, Nat.add_zero, ite_eq_right_iff]
+  rw [replicate_succ, map_cons, sum_cons, ih, Nat.add_zero, ite_eq_right_iff]
   intro impos
   exfalso
   exact hab impos
 
 lemma countIn_singleton_eq (a : α) :
   countIn [a] a = 1 :=
-List.countIn_replicate_eq a 1
+countIn_replicate_eq a 1
 
 lemma countIn_singleton_neq {a b : α} (hab : a ≠ b) :
   countIn [a] b = 0 :=
-List.countIn_replicate_neq hab 1
+countIn_replicate_neq hab 1
 
 lemma countIn_pos_of_in {a : α} (hax : a ∈ x) :
   countIn x a > 0 :=
 by
   induction' x with d l ih
   · exfalso
-    rw [List.mem_nil_iff] at hax
+    rw [mem_nil_iff] at hax
     exact hax
   by_contra contr
   rw [not_lt, Nat.le_zero] at contr
   rw [mem_cons] at hax
-  unfold countIn List.map at contr
+  unfold countIn map at contr
   simp at contr
   cases' hax with a_eq_d a_in_l
   · exact contr.left a_eq_d.symm
@@ -255,19 +254,19 @@ by
   induction' x with d l ih
   · rfl
   unfold countIn
-  rw [List.map_cons, List.sum_cons, Nat.add_eq_zero_iff, ite_eq_right_iff]
+  rw [map_cons, sum_cons, Nat.add_eq_zero_iff, ite_eq_right_iff]
   constructor
   · simp only [Nat.one_ne_zero]
-    exact (List.ne_of_not_mem_cons hax).symm
-  · exact ih (List.not_mem_of_not_mem_cons hax)
+    exact (ne_of_not_mem_cons hax).symm
+  · exact ih (not_mem_of_not_mem_cons hax)
 
 lemma countIn_flatten (L : List (List α)) (a : α) :
   countIn L.flatten a = sum (map (countIn · a) L) :=
 by
   induction' L with d l ih
   · rfl
-  · rw [List.flatten, List.countIn_append, List.map, List.sum_cons, ih]
+  · rw [flatten, countIn_append, map, sum_cons, ih]
 
-end ListCountIn
+end counting
 
 end List

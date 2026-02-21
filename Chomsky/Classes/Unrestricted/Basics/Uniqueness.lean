@@ -24,13 +24,12 @@ private def myGran : Grammar Ter := ⟨Non, ._A, [myRulf]⟩
 
 example (u v : List (Symbol Ter Non)) : myGram.Transforms u v ↔ myGran.Transforms u v := by
   constructor
-  · intro ⟨r, rin, p, q, bef, aft⟩
-    simp [myGram] at rin
+   <;> intro ⟨r, rin, p, q, bef, aft⟩
+  · simp [myGram] at rin
     simp only [rin, myRule] at bef aft
     use myRulf, List.mem_of_mem_head? rfl, p, q
     simp [bef, aft, myRulf, A, B]
-  · intro ⟨r, rin, p, q, bef, aft⟩
-    simp [myGran] at rin
+  · simp [myGran] at rin
     simp only [rin, myRulf] at bef aft
     use myRule, List.mem_of_mem_head? rfl, p, q
     simp [bef, aft, myRule, A, B]

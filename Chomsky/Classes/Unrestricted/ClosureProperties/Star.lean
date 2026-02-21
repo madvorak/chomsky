@@ -223,9 +223,7 @@ by
   · rw [wlk_succ]
     generalize substit : w.length - k.succ = q
     rw [substit] at lt_wl
-    rw [←List.take_append_drop q w]
-    rw [List.getElem?_append_right]
-    swap; · apply List.length_take_le
+    rw [←List.take_append_drop q w, List.getElem?_append_right (List.length_take_le ..)]
     have eq_q : (w.take q).length = q
     · rw [List.length_take]
       exact min_eq_left_of_lt lt_wl
@@ -246,8 +244,7 @@ by
   apply gr_deri_append
   rw [split_ldw, List.map_append, List.flatten_append, ←List.append_assoc]
   apply gr_deri_append
-  rw [wlk_succ, List.take_succ, List.map_append, List.flatten_append, List.append_assoc,
-    List.append_assoc]
+  rw [wlk_succ, List.take_succ, List.map_append, List.flatten_append, List.append_assoc, List.append_assoc]
   apply gr_append_deri
   clear * - terminals lt_wl
   specialize terminals (w.get ⟨w.length - k.succ, lt_wl⟩) (w.get_mem ⟨w.length - k.succ, lt_wl⟩)
@@ -595,7 +592,7 @@ by
   constructor
   · have x_eq : x = x.take m ++ [x[m]'mxl] ++ x.drop m.succ
     · simp
-    have hyppp :
+    have hxmxmxm :
       (((x.take m ++ [x[m]'mxl] ++ x.drop m.succ).map (List.map wrapSym)).map (· ++ [H])).flatten =
       (((x.map (List.map wrapSym)).map (· ++ [H])).take m).flatten ++
         ((x.map (List.map wrapSym))[m]'mxlmm).take k ++
@@ -619,11 +616,11 @@ by
         List.map_take, List.map_take, List.append_right_inj, ←List.append_assoc, ←List.append_assoc,
         ←List.append_assoc, ←List.append_assoc, ←List.append_assoc, List.map_drop, List.map_drop,
         List.append_left_inj, List.map_singleton, List.map_singleton, List.flatten_singleton,
-        List.append_left_inj] at hyppp
+        List.append_left_inj] at hxmxmxm
     rw [List.get?_eq_some]
     use mxl
     apply map_wrapSym_inj
-    rw [hyppp]
+    rw [hxmxmxm]
     simp [hmm]
     rfl
   · convert hyp_v.symm using 1
@@ -2356,7 +2353,6 @@ by
         cases hw : w.reverse <;> aesop
   · -- prove `L.star ⊆` here
     intro p ass
-    unfold KStar.kstar at ass
     rcases ass with ⟨w, w_join, parts_in_L⟩
     let v := w.reverse
     have v_reverse : v.reverse = w

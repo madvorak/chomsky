@@ -1162,9 +1162,8 @@ by
     rw [List.length_map]
     rw [List.take_append_eq_append_take]
     rw [List.drop_append_eq_append_drop]
-    have tul_lt : (u.take x.length).length ≤ u.length + m :=
-      by
-      rw [List.length_take]
+    have tul_lt : (u.take x.length).length ≤ u.length + m
+    · rw [List.length_take]
       calc
         min x.length u.length ≤ u.length := min_le_right _ _
         _ ≤ u.length + m := le_self_add
@@ -1329,8 +1328,7 @@ by
         rw [←List.map_drop] at seg2
         rw [←List.map_take] at seg2
         have fmu2 := filterMap_unwrap_of_correspondingStrings₂ seg2
-        rw [List.length_map] at fmu2
-        rw [List.length_map]
+        rw [List.length_map] at fmu2 ⊢
         rw [unwrap_wrap₂_string] at fmu2
         rw [fml]
         exact fmu2.symm
@@ -1368,9 +1366,8 @@ by
       have tak := correspondingStrings_take v.reverse.length rev
       rw [List.take_left] at tak
       have rtr := correspondingStrings_reverse tak
-      have nec : v.reverse.length ≤ (y.map (wrapSymbol₂ g₁.nt)).reverse.length :=
-        by
-        clear * - matched_right total_len
+      have nec : v.reverse.length ≤ (y.map (wrapSymbol₂ g₁.nt)).reverse.length
+      · clear * - matched_right total_len
         rw [List.length_reverse, List.length_reverse, List.length_map]
         linarith
       rw [List.reverse_reverse, List.reverse_append, List.take_append_of_le_length nec, List.reverse_take, List.reverse_reverse, ←List.map_drop] at rtr
@@ -1382,26 +1379,13 @@ by
         convert almost
         have xl_eq : x.length = (x.map (wrapSymbol₁ g₂.nt)).length
         · rw [List.length_map]
-        rw [xl_eq]
-        rw [List.take_left]
+        rw [xl_eq, List.take_left]
       · rw [List.take_append_drop]
         apply correspondingStrings_after_wrap_unwrap_self₂
         have tdc := correspondingStrings_drop x.length (correspondingStrings_take u.length ih_concat)
-        rw [List.take_left] at tdc
-        have ul_eq : u.length = x.length + (u.length - x.length) :=
-          by
-          rw [←Nat.add_sub_assoc matched_right]
-          rw [add_comm]
-          rw [Nat.add_sub_assoc]; swap
-          · rfl
-          rw [Nat.sub_self]
-          rw [add_zero]
-        rw [ul_eq] at tdc
-        clear * - tdc
-        rw [List.drop_take] at tdc
-        rw [List.drop_left'] at tdc ; swap
-        · apply List.length_map
-        rw [←List.map_take] at tdc
+        have ul_eq : u.length = x.length + (u.length - x.length)
+        · rw [←Nat.add_sub_assoc matched_right, add_comm, Nat.add_sub_assoc (by rfl), Nat.sub_self, add_zero]
+        rw [List.take_left, ul_eq, List.drop_take, List.drop_left' (List.length_map ..), ←List.map_take] at tdc
         exact ⟨_, tdc⟩
 
 private lemma big_induction {g₁ g₂ : Grammar T} {w : List (nst T g₁.nt g₂.nt)}
@@ -1763,8 +1747,7 @@ by
     rw [List.length_append] at xylen
     repeat rw [List.length_map] at xylen
     apply List.ext_getElem
-    · simp
-      exact Nat.le.intro xylen
+    · simpa using Nat.le.intro xylen
     intros i iltwl iltxl
     have i_lt_lenl : i < (x.map (wrapSymbol₁ g₂.nt) ++ y.map (wrapSymbol₂ g₁.nt)).length
     · rw [List.length_append, List.length_map]
@@ -1791,8 +1774,7 @@ by
       · convert_to none = none
         · have ylen : y.length = ((w.drop x.length).map (@Symbol.terminal T g₂.nt)).length
           · clear * - xylen
-            rw [List.length_map]
-            rw [List.length_drop]
+            rw [List.length_map, List.length_drop]
             simp at xylen
             exact Nat.eq_sub_of_add_eq' xylen
           rw [ylen] at hiy

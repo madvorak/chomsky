@@ -1775,13 +1775,7 @@ by
     have hxyg₂ : (x.map (wrapSymbol₁ g₂.nt) ++ y.map (wrapSymbol₂ g₁.nt))[i]'i_lt_lenl = wrapSymbol₁ g₂.nt (x[i]'iltxl)
     · simp_all
     rw [hxyg₂, List.getElem_map] at equivalent_ith
-    symm
-    -- TODO refactor!
-    simp [wrapSymbol₁, correspondingSymbols] at equivalent_ith
-    aesop
-    exact Sum.inl.inj (Sum.inr.inj heq)
-    exfalso
-    simpa using Sum.inr.inj heq
+    aesop (add simp nnn) (add simp wrapSymbol₁) (add simp correspondingSymbols)
   use w.drop x.length
   constructor
   · clear deri_x
@@ -1828,17 +1822,7 @@ by
           simpa using i_lt_len_dxw
         have eqiv_symb := correspondingStrings_getElem i_lt_len_lwy (by simpa using i_lt_len_dxw) equivalent_second_parts
         simp only [correspondingSymbols] at eqiv_symb
-        -- TODO refactor!
-        aesop
-        --aesop (add norm wrapSymbol₂) (add unsafe 90% apply Sum.inr.inj) (config := { maxRuleApplicationDepth := 100 })
-        simp [wrapSymbol₂] at heq
-        aesop
-        simp [wrapSymbol₂] at heq
-        aesop
-        simpa using Sum.inr.inj heq
-        simp [wrapSymbol₂] at heq
-        aesop
-        exact Sum.inr.inj (Sum.inr.inj heq)
+        split at eqiv_symb <;> aesop (add simp nnn) (add simp wrapSymbol₂)
       have goal_as_some_ith : some (y[i]'hiy) = some (((w.drop x.length).map Symbol.terminal)[i]'i_lt_len_mtw)
       · rw [goal_as_ith_drop]
         congr

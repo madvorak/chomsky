@@ -8,17 +8,14 @@ private def CFG.reverse (g : CFG T) : CFG T :=
   CFG.mk
     g.nt
     g.initial
-    (List.map (fun r : g.nt × List (Symbol T g.nt) => (r.fst, List.reverse r.snd)) g.rules)
+    (g.rules.map (fun r : g.nt × List (Symbol T g.nt) => (r.fst, List.reverse r.snd)))
 
 private lemma dual_of_reversalGrammar (g : CFG T) :
   g.reverse.reverse = g :=
 by
-  cases' g with g_nt g_initial g_rules
-  simp only [CFG.reverse, List.map_map, CFG.mk.injEq, heq_eq_eq, true_and]
-  convert_to
-    List.map (fun r : g_nt × List (Symbol T g_nt) => (r.fst, r.snd.reverse.reverse)) g_rules =
-    g_rules
-  simp [List.reverse_reverse]
+  obtain ⟨_, _, _⟩ := g
+  unfold CFG.reverse
+  aesop
 
 private lemma derives_reversed (g : CFG T) (v : List (Symbol T g.nt)) :
   g.reverse.Derives [Symbol.nonterminal g.reverse.initial] v →

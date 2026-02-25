@@ -18,7 +18,7 @@ lemma list_forall₂_get {R : α → β → Prop} :
   ∀ x : List α, ∀ y : List β, List.Forall₂ R x y →
     ∀ i : ℕ, ∀ hix : i < x.length, ∀ hiy : i < y.length,
       R (x.get ⟨i, hix⟩) (y.get ⟨i, hiy⟩)
-| [], [] => by intro _ i hx; exfalso; apply Nat.not_lt_zero; exact hx
+| [], [] => by intro _ _ hx; exfalso; apply Nat.not_lt_zero; exact hx
 | [], _::_ => by simp
 | _::_, [] => by simp
 | _::_, _::_ => by

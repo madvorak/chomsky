@@ -87,7 +87,7 @@ by
     exact reversed_word_in_original_language
   · intro w hwL
     change w.reverse ∈ g.language at hwL
-    obtain ⟨g₀, pre_reversal⟩ : ∃ g₀, g = reversalGrammar g₀
+    obtain ⟨g₀, pre_reversal⟩ : ∃ g₀ : Grammar T, g = reversalGrammar g₀
     · use reversalGrammar g
       rw [dual_of_reversalGrammar]
     rw [pre_reversal] at hwL ⊢

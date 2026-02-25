@@ -38,7 +38,7 @@ structure LiftedGrammar (T : Type) where
   liftNt : g₀.nt → g.nt
   sinkNt : g.nt → Option g₀.nt
   lift_inj : liftNt.Injective
-  sink_inj : ∀ x y, sinkNt x = sinkNt y → x = y ∨ sinkNt x = none
+  sink_inj : ∀ x y : g.nt, sinkNt x = sinkNt y → x = y ∨ sinkNt x = none
   sinkNt_liftNt : ∀ n₀ : g₀.nt, sinkNt (liftNt n₀) = some n₀
   corresponding_rules : ∀ r : Grule T g₀.nt, r ∈ g₀.rules → liftRule liftNt r ∈ g.rules
   preimage_of_rules :
@@ -49,17 +49,16 @@ structure LiftedGrammar (T : Type) where
 private lemma lifted_grammar_inverse {T : Type} (G : LiftedGrammar T) :
   ∀ x : G.g.nt, (∃ n₀, G.sinkNt x = some n₀) → (Option.map G.liftNt (G.sinkNt x) = x) :=
 by
-  intro x h
-  cases' h with n₀ ass
-  rw [ass, Option.map_some']
+  intro x ⟨n₀, hxn₀⟩
+  rw [hxn₀, Option.map_some']
   apply congr_arg
   symm
   by_contra x_neq
   have inje := G.sink_inj x (G.liftNt n₀)
   rw [G.sinkNt_liftNt] at inje
-  cases' inje ass with case_valu case_none
+  cases' inje hxn₀ with case_valu case_none
   · exact x_neq case_valu
-  rw [ass] at case_none
+  rw [hxn₀] at case_none
   exact Option.noConfusion case_none
 
 end lifting_conditions
@@ -115,18 +114,15 @@ by
       constructor
       · exact rin
       rw [bef] at hw₁
-      have good_matched_nonterminal : GoodLetter (Symbol.nonterminal r.inputN)
+      obtain ⟨n₀, hn₀⟩ : GoodLetter (Symbol.nonterminal r.inputN)
       · apply hw₁ (Symbol.nonterminal r.inputN)
         apply List.mem_append_left
         apply List.mem_append_left
         apply List.mem_append_right
         rw [List.mem_singleton]
-      change ∃ n₀ : G.g₀.nt, G.sinkNt r.inputN = some n₀ at good_matched_nonterminal
-      cases' good_matched_nonterminal with n₀ hn₀
       use n₀
       have almost := congr_arg (Option.map G.liftNt) hn₀
-      rw [lifted_grammar_inverse G r.inputN ⟨n₀, hn₀⟩] at almost
-      rw [Option.map_some'] at almost
+      rw [lifted_grammar_inverse G r.inputN ⟨n₀, hn₀⟩, Option.map_some'] at almost
       apply Option.some_injective
       exact almost.symm
     )

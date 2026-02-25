@@ -46,19 +46,19 @@ structure LiftedGrammar (T : Type) where
       (r ∈ g.rules ∧ ∃ n₀ : g₀.nt, liftNt n₀ = r.inputN) →
         (∃ r₀ ∈ g₀.rules, liftRule liftNt r₀ = r)
 
-private lemma lifted_grammar_inverse {T : Type} (G : LiftedGrammar T) :
-  ∀ x : G.g.nt, (∃ n₀, G.sinkNt x = some n₀) → (Option.map G.liftNt (G.sinkNt x) = x) :=
+private lemma lifted_grammar_inverse {T : Type} {G : LiftedGrammar T} {x : G.g.nt} {n₀ : G.g₀.nt}
+    (hGxn₀ : G.sinkNt x = some n₀) :
+  (Option.map G.liftNt (G.sinkNt x) = x) :=
 by
-  intro x ⟨n₀, hxn₀⟩
-  rw [hxn₀, Option.map_some']
+  rw [hGxn₀, Option.map_some']
   apply congr_arg
   symm
   by_contra x_neq
   have inje := G.sink_inj x (G.liftNt n₀)
   rw [G.sinkNt_liftNt] at inje
-  cases' inje hxn₀ with case_valu case_none
+  cases' inje hGxn₀ with case_valu case_none
   · exact x_neq case_valu
-  rw [hxn₀] at case_none
+  rw [hGxn₀] at case_none
   exact Option.noConfusion case_none
 
 end lifting_conditions
@@ -122,7 +122,7 @@ by
         rw [List.mem_singleton]
       use n₀
       have almost := congr_arg (Option.map G.liftNt) hn₀
-      rw [lifted_grammar_inverse G r.inputN ⟨n₀, hn₀⟩, Option.map_some'] at almost
+      rw [lifted_grammar_inverse hn₀, Option.map_some'] at almost
       apply Option.some_injective
       exact almost.symm
     )

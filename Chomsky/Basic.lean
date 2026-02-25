@@ -16,6 +16,9 @@ prefix:max "◩" => Sum.inl
 /-- The "right" or "bottom" variant. -/
 prefix:max "◪" => Sum.inr
 
+/-- Writing `↓t` is slightly more general than writing `Function.const _ t`. -/
+notation:max "↓"t:arg => (fun _ => t)
+
 end notations
 
 

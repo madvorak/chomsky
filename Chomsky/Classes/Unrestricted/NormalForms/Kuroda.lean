@@ -183,7 +183,6 @@ theorem GG_iff_kurodaGrammar_exists (L : Language T) :
 by
   constructor
   · sorry -- this direction will be very hard
-  · rintro ⟨k, eq_L⟩
+  · rintro ⟨k, rfl⟩
     use grammar_of_kurodaGrammar k
-    rw [←k.lang_eq]
-    exact eq_L
+    rw [k.lang_eq]

@@ -141,7 +141,7 @@ by
   rw [flatten_append] at L_two_parts
   have whole := take_append_drop n L.flatten
   rw [left_half] at whole
-  have important := Eq.trans whole L_two_parts.symm
+  have important := whole.trans L_two_parts.symm
   rw [append_assoc] at important
   have right_side := append_cancel_left important
   have auxi : (drop m L).flatten = (L.get ⟨m, mlt⟩ :: drop m.succ L).flatten

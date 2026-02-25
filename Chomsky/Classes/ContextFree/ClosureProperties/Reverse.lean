@@ -59,21 +59,19 @@ by
 theorem CF_of_reverse_CF (L : Language T) :
   L.IsCF → L.reverse.IsCF :=
 by
-  rintro ⟨g, hgL⟩
+  intro ⟨g, hgL⟩
   rw [←hgL]
   use g.reverse
-  apply Set.eq_of_subset_of_subset
-  · intro
-    exact reversed_word_in_original_language
-  · intro w hwL
-    have pre_reversal : ∃ g₀ : CFG T, g = g₀.reverse
-    · use g.reverse
-      rw [dual_of_reversalGrammar]
-    cases' pre_reversal with g₀ pre_rev
-    rw [pre_rev] at hwL ⊢
-    have finished_modulo_reverses := reversed_word_in_original_language hwL
+  apply Set.eq_of_subset_of_subset ↓reversed_word_in_original_language
+  intro w hwL
+  have pre_reversal : ∃ g₀ : CFG T, g = g₀.reverse
+  · use g.reverse
     rw [dual_of_reversalGrammar]
-    rw [List.reverse_reverse] at finished_modulo_reverses
-    exact finished_modulo_reverses
+  cases' pre_reversal with g₀ pre_rev
+  rw [pre_rev] at hwL ⊢
+  have finished_modulo_reverses := reversed_word_in_original_language hwL
+  rw [dual_of_reversalGrammar]
+  rw [List.reverse_reverse] at finished_modulo_reverses
+  exact finished_modulo_reverses
 
 #print axioms CF_of_reverse_CF

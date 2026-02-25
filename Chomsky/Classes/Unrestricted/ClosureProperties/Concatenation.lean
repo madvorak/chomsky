@@ -33,7 +33,7 @@ lemma list_forall₂_get {R : α → β → Prop} :
 lemma list_filterMap_eq_of_map_eq_map_some {f : α → Option β} :
   ∀ x : List α, ∀ y : List β,
     x.map f = y.map Option.some → x.filterMap f = y
-| [], [] => fun _ => rfl
+| [], [] => ↓rfl
 | _::_, [] => by simp
 | [], _::_ => by simp
 | a::_, _::_ => by

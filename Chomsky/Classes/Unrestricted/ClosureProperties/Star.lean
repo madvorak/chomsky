@@ -1042,24 +1042,15 @@ by
       · rw [RH_nil] at bef
         exact uv_nil_of_RH_eq bef
       rw [empty_string.left, List.nil_append, empty_string.right, List.append_nil] at aft
-      use []
-      constructor
-      · use []
-        constructor
-        · rfl
-        · intro y imposs
-          exfalso
-          exact List.not_mem_nil y imposs
-      · rw [aft]
-        rw [List.map_nil]
-        rw [RH_nil]
+      use [], ⟨[], rfl, (List.not_mem_nil · · |>.elim)⟩
+      rw [aft, List.map_nil, RH_nil]
     | cons x₀ L =>
       right; right; right; right
       rw [cat, RH_nil] at bef
       dsimp only at bef
       have u_nil := u_nil_when_RH bef
       rw [u_nil, List.nil_append] at bef
-      have v_eq := Eq.symm (List.append_inj_right bef (by rfl))
+      have v_eq := (List.append_inj_right bef (by rfl)).symm
       rw [u_nil, List.nil_append, v_eq, RH_nil, List.nil_append, hx, List.map_cons, List.map_cons,
           List.flatten, List.append_assoc, List.append_flatten_map_append, ←List.append_assoc] at aft
       constructor

@@ -79,20 +79,18 @@ by
 theorem GG_of_reverse_GG (L : Language T) :
   L.IsGG → L.reverse.IsGG :=
 by
-  rintro ⟨g, hgL⟩
+  intro ⟨g, hgL⟩
   rw [←hgL]
   use reversalGrammar g
-  apply Set.eq_of_subset_of_subset
-  · intro
-    exact reversed_word_in_original_language
-  · intro w hwL
-    change w.reverse ∈ g.language at hwL
-    obtain ⟨g₀, pre_reversal⟩ : ∃ g₀ : Grammar T, g = reversalGrammar g₀
-    · use reversalGrammar g
-      rw [dual_of_reversalGrammar]
-    rw [pre_reversal] at hwL ⊢
-    have finished_up_to_reverses := reversed_word_in_original_language hwL
+  apply Set.eq_of_subset_of_subset ↓reversed_word_in_original_language
+  intro w hwL
+  change w.reverse ∈ g.language at hwL
+  obtain ⟨g₀, pre_reversal⟩ : ∃ g₀ : Grammar T, g = reversalGrammar g₀
+  · use reversalGrammar g
     rw [dual_of_reversalGrammar]
-    rwa [List.reverse_reverse] at finished_up_to_reverses
+  rw [pre_reversal] at hwL ⊢
+  have finished_up_to_reverses := reversed_word_in_original_language hwL
+  rw [dual_of_reversalGrammar]
+  rwa [List.reverse_reverse] at finished_up_to_reverses
 
 #print axioms GG_of_reverse_GG

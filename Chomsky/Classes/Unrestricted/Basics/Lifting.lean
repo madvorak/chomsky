@@ -71,32 +71,22 @@ variable {T : Type}
 lemma lift_tran {G : LiftedGrammar T} {w₁ w₂ : List (Symbol T G.g₀.nt)}
     (hGww : G.g₀.Transforms w₁ w₂) :
   G.g.Transforms (liftString G.liftNt w₁) (liftString G.liftNt w₂) :=
-by
-  rcases hGww with ⟨r, rin, u, v, bef, aft⟩
-  use liftRule G.liftNt r
-  constructor
-  · exact G.corresponding_rules r rin
-  use liftString G.liftNt u
-  use liftString G.liftNt v
-  constructor
-  · have lift_bef := congr_arg (liftString G.liftNt) bef
-    unfold liftString at *
-    rw [List.map_append_append, List.map_append_append] at lift_bef
-    exact lift_bef
-  · have lift_aft := congr_arg (liftString G.liftNt) aft
-    unfold liftString at *
-    rw [List.map_append_append] at lift_aft
-    exact lift_aft
+match hGww with
+  | ⟨r, rin, u, v, bef, aft⟩ => ⟨
+    liftRule G.liftNt r,
+    G.corresponding_rules r rin,
+    liftString G.liftNt u,
+    liftString G.liftNt v,
+    by simpa [liftString] using congr_arg (liftString G.liftNt) bef,
+    by simpa [liftString] using congr_arg (liftString G.liftNt) aft⟩
 
 lemma lift_deri (G : LiftedGrammar T) {w₁ w₂ : List (Symbol T G.g₀.nt)}
     (hGww : G.g₀.Derives w₁ w₂) :
   G.g.Derives (liftString G.liftNt w₁) (liftString G.liftNt w₂) :=
 by
   induction' hGww with u v _ orig ih
-  · apply gr_deri_self
-  apply gr_deri_of_deri_tran
-  · exact ih
-  exact lift_tran orig
+  · exact gr_deri_self
+  · exact gr_deri_of_deri_tran ih (lift_tran orig)
 
 def GoodLetter {G : LiftedGrammar T} : Symbol T G.g.nt → Prop
   | Symbol.terminal _ => True
@@ -142,11 +132,9 @@ by
     intro a a_in_ros
     cases a
     · simp [GoodLetter]
-    unfold liftRule at a_in_ros
-    dsimp only at a_in_ros
-    unfold liftString at a_in_ros
+    dsimp only [liftRule, liftString] at a_in_ros
     rw [List.mem_map] at a_in_ros
-    rcases a_in_ros with ⟨s, trash, a_from_s⟩
+    rcases a_in_ros with ⟨s, -, a_from_s⟩
     rw [←a_from_s]
     cases' s with s' s''
     · exfalso
@@ -189,8 +177,7 @@ by
     convert sink_aft
     rw [←preimage]
     clear * - correct_inverse
-    unfold liftRule
-    dsimp only [liftString]
+    dsimp only [liftRule, liftString]
     rw [List.filterMap_map, correct_inverse, List.filterMap_some]
 
 private lemma sink_deri_aux {G : LiftedGrammar T} {w₁ w₂ : List (Symbol T G.g.nt)}
@@ -198,15 +185,9 @@ private lemma sink_deri_aux {G : LiftedGrammar T} {w₁ w₂ : List (Symbol T G.
   G.g₀.Derives (sinkString G.sinkNt w₁) (sinkString G.sinkNt w₂) ∧ GoodString w₂ :=
 by
   induction' hGww with u v _ orig ih
-  · constructor
-    · apply gr_deri_self
-    · exact hw₁
+  · exact ⟨gr_deri_self, hw₁⟩
   have both := sink_tran orig ih.right
-  constructor; swap
-  · exact both.right
-  apply gr_deri_of_deri_tran
-  · exact ih.left
-  · exact both.left
+  exact ⟨gr_deri_of_deri_tran ih.left both.left, both.right⟩
 
 lemma sink_deri (G : LiftedGrammar T) {w₁ w₂ : List (Symbol T G.g.nt)}
     (hGww : G.g.Derives w₁ w₂) (hw₁ : GoodString w₁) :

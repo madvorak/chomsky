@@ -2113,15 +2113,12 @@ by
               · by_contra contra
                 have v_nil := zero_of_not_ge_one contra
                 rw [List.length_eq_zero_iff] at v_nil
-                rw [v_nil] at bef
-                rw [←r_of_r₀] at bef
-                rw [List.append_nil] at bef
+                rw [v_nil, ←r_of_r₀, List.append_nil] at bef
                 unfold wrapGr liftRule liftString at bef
                 have rev := congr_arg List.reverse bef
                 clear * - rev
                 repeat rw [List.reverse_append] at rev
-                rw [←List.map_reverse _ r₀.inputR] at rev
-                rw [List.reverse_singleton] at rev
+                rw [←List.map_reverse _ r₀.inputR, List.reverse_singleton] at rev
                 cases hr₀ : r₀.inputR.reverse with
                 | nil =>
                   have H_eq_N : H = Symbol.nonterminal ◩r₀.inputN
@@ -2243,7 +2240,7 @@ private lemma star_induction {g : Grammar T} {α : List (ns T g.nt)}
   (∃ σ : List (Symbol T g.nt), α = σ.map wrapSym ++ [R]) ∨
   (∃ ω : List (ns T g.nt), α = ω ++ [H]) ∧ Z ∉ α ∧ R ∉ α :=
 by
-  induction' ass with a b trash orig ih
+  induction' ass with a b _ orig ih
   · left
     use []
     constructor

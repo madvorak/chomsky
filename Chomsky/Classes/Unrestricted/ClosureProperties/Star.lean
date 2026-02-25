@@ -469,7 +469,7 @@ by
     ∀ u' v' : List (Symbol T g.nt),
       u' ++  r₀.inputL ++ [Symbol.nonterminal r₀.inputN] ++ r₀.inputR  ++ v' =
       u' ++ (r₀.inputL ++ [Symbol.nonterminal r₀.inputN] ++ r₀.inputR) ++ v'
-  · intro _ _
+  · intros
     simp only [List.append_assoc]
   simp_rw [mid_brack]
   clear hyp mid_brack

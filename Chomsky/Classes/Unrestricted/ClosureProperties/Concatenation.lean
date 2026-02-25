@@ -586,7 +586,7 @@ private lemma map_unwrap_eq_map_some_of_correspondingStrings₁ {N₁ N₂ : Typ
     correspondingStrings (v.map (wrapSymbol₁ N₂)) w →
       w.map unwrapSymbol₁ = v.map Option.some
   | [], [] => by
-      intro _
+      intro
       rw [List.map_nil, List.map_nil]
   | [], b::y => by
       simp [correspondingStrings]
@@ -607,7 +607,7 @@ private lemma map_unwrap_eq_map_some_of_correspondingStrings₂ {N₁ N₂ : Typ
     correspondingStrings (v.map (wrapSymbol₂ N₁)) w →
       w.map unwrapSymbol₂ = v.map Option.some
   | [], [] => by
-      intro _
+      intro
       rw [List.map_nil, List.map_nil]
   | [], b::y => by
       simp [correspondingStrings]

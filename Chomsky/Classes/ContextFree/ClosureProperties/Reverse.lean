@@ -63,7 +63,7 @@ by
   rw [←hgL]
   use g.reverse
   apply Set.eq_of_subset_of_subset
-  · intro _
+  · intro
     exact reversed_word_in_original_language
   · intro w hwL
     have pre_reversal : ∃ g₀ : CFG T, g = g₀.reverse

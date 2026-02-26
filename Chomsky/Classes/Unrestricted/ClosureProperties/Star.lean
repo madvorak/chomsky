@@ -525,9 +525,7 @@ by
       ((x.map (List.map wrapSym)).map (· ++ [H])).flatten.length
   · have vl_pos : v.length > 0 := List.length_pos_of_ne_nil vnn
     clear * - lens vl_pos
-    rw [List.length_append]
-    rw [List.length_append_append]
-    rw [List.length_singleton]
+    rw [List.length_append, List.length_append_append, List.length_singleton]
     linarith
   rcases List.drop_flatten_of_lt urrrl_lt with ⟨m', k', mlt', klt', last_vl⟩
   have mxl : m < x.length
@@ -900,7 +898,7 @@ private lemma case_2_match_rule {g : Grammar T} {r₀ : Grule T g.nt}
       R :: H :: ((x.map (List.map wrapSym)).map (· ++ [H])).flatten =
       u ++ r₀.inputL.map wrapSym ++ [Symbol.nonterminal ◩r₀.inputN] ++ r₀.inputR.map wrapSym ++ v) :
   ∃ m : ℕ, ∃ u₁ v₁ : List (Symbol T g.nt),
-    u = (R :: H :: (((x.map (List.map wrapSym)).take m).map (· ++ [H])).flatten) ++ List.map wrapSym u₁ ∧
+    u = (R :: H :: (((x.map (List.map wrapSym)).take m).map (· ++ [H])).flatten) ++ u₁.map wrapSym ∧
     x[m]? = some (u₁ ++ r₀.inputL ++ [Symbol.nonterminal r₀.inputN] ++ r₀.inputR ++ v₁) ∧
     v = v₁.map wrapSym ++ [H] ++ (((x.map (List.map wrapSym)).drop m.succ).map (· ++ [H])).flatten :=
 by
@@ -1005,7 +1003,7 @@ by
       apply no_Z_in_alpha
       rw [bef, rinputZ, List.mem_append_append, List.mem_append_append]
       left; right; right
-      rw [List.mem_singleton]
+      rewrite [List.mem_singleton]
       rfl
   · cases' x with x₀ L
     · right; right; right; left
@@ -1162,7 +1160,7 @@ private lemma case_3_ni_u {g : Grammar T} {w : List (List T)} {β : List T}
     {γ : List (Symbol T g.nt)} {x : List (List (Symbol T g.nt))} {u v : List (ns T g.nt)} {s : ns T g.nt}
     (ass :
       w.flatten.map Symbol.terminal ++ β.map Symbol.terminal ++ [R] ++ γ.map wrapSym ++ [H] ++
-        (List.map (· ++ [H]) (x.map (List.map wrapSym))).flatten =
+        ((x.map (List.map wrapSym)).map (· ++ [H])).flatten =
       u ++ [R] ++ [s] ++ v) :
   R ∉ u :=
 by
@@ -1331,7 +1329,7 @@ private lemma case_3_match_rule {g : Grammar T} {r₀ : Grule T g.nt}
       u ++ r₀.inputL.map wrapSym ++ [Symbol.nonterminal ◩r₀.inputN] ++ r₀.inputR.map wrapSym ++ v) :
   (∃ m : ℕ, ∃ u₁ v₁ : List (Symbol T g.nt),
     u = w.flatten.map Symbol.terminal ++ β.map Symbol.terminal ++ [R] ++ γ.map wrapSym ++ [H] ++
-        (List.map (· ++ [H]) ((x.map (List.map wrapSym)).take m)).flatten ++ u₁.map wrapSym ∧
+        (((x.map (List.map wrapSym)).take m).map (· ++ [H])).flatten ++ u₁.map wrapSym ∧
     x[m]? = some (u₁ ++ r₀.inputL ++ [Symbol.nonterminal r₀.inputN] ++ r₀.inputR ++ v₁) ∧
     v = v₁.map wrapSym ++ [H] ++ (((x.map (List.map wrapSym)).drop m.succ).map (· ++ [H])).flatten) ∨
   (∃ u₁ v₁ : List (Symbol T g.nt),
@@ -1702,7 +1700,7 @@ by
             rw [List.append_nil, cat] at bef
             have u_matches : u = w.flatten.map (@Symbol.terminal T (nn g.nt)) ++ β.map Symbol.terminal :=
               case_3_u_eq_left_side bef
-            have tv_matches : [Symbol.terminal t] ++ v = γ.map wrapSym ++ [H] ++ (List.map (· ++ [H]) (x.map (List.map wrapSym))).flatten
+            have tv_matches : [Symbol.terminal t] ++ v = γ.map wrapSym ++ [H] ++ ((x.map (List.map wrapSym)).map (· ++ [H])).flatten
             · rw [u_matches] at bef
               repeat rw [List.append_assoc] at bef
               rw [List.append_cancel_left_eq, List.append_cancel_left_eq, R, List.append_cancel_left_eq, ←List.append_assoc] at bef
@@ -2274,7 +2272,7 @@ end hard_direction
 theorem GG_of_star_GG (L : Language T) :
   L.IsGG → (KStar.kstar L).IsGG :=
 by
-  intro ⟨g, hg⟩
+  rintro ⟨g, rfl⟩
   use g.star
   apply Set.eq_of_subset_of_subset
   · -- prove `L.star ⊇` here
@@ -2312,13 +2310,12 @@ by
       exact Symbol.noConfusion terminal_eq_R
     cases' result with result result
     · rcases result with ⟨u, win, map_eq_map⟩
-      have w_eq_u : w = u :=
-        by
-        have st_inj : Function.Injective (@Symbol.terminal T g.star.nt)
+      have w_eq_u : w = u
+      · have st_inj : Function.Injective (@Symbol.terminal T g.star.nt)
         · apply Symbol.terminal.inj
         rw [←List.map_injective_iff] at st_inj
         exact st_inj map_eq_map
-      rw [w_eq_u, ←hg]
+      rw [w_eq_u]
       exact win
     cases' result with result result
     · exfalso
@@ -2348,7 +2345,6 @@ by
     rw [←v_reverse] at w_join parts_in_L
     rw [w_join]
     clear w_join p
-    rw [←hg] at parts_in_L
     cases' short_induction parts_in_L with derived terminated
     apply gr_deri_of_deri_deri derived
     apply gr_deri_of_tran_deri

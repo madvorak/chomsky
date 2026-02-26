@@ -301,11 +301,10 @@ by
         use v.map (wrapSymbol₂ g₁.nt)
         constructor
         · convert congr_arg (List.map (wrapSymbol₂ g₁.nt)) bef
-          rw [List.map_append_append]
-          rw [List.map_append_append]
+          rewrite [List.map_append_append, List.map_append_append]
           rfl
         · convert congr_arg (List.map (wrapSymbol₂ g₁.nt)) aft
-          rw [List.map_append_append]
+          rewrite [List.map_append_append]
           rfl
       have upgraded := upgrade_deri₂ _ hv
       rw [List.map_map] at upgraded
@@ -1828,18 +1827,8 @@ end hard_direction
 theorem GG_of_GG_c_GG (L₁ : Language T) (L₂ : Language T) :
   L₁.IsGG ∧ L₂.IsGG → (L₁ * L₂).IsGG :=
 by
-  intro ⟨⟨g₁, eq_L₁⟩, ⟨g₂, eq_L₂⟩⟩
+  rintro ⟨⟨g₁, rfl⟩, ⟨g₂, rfl⟩⟩
   use bigGrammar g₁ g₂
-  apply Set.eq_of_subset_of_subset
-  · -- prove `L₁ * L₂ ⊇` here
-    intro w hyp
-    rw [←eq_L₁]
-    rw [←eq_L₂]
-    exact in_concatenated_of_in_big hyp
-  · -- prove `L₁ * L₂ ⊆` here
-    intro w hyp
-    rw [←eq_L₁] at hyp
-    rw [←eq_L₂] at hyp
-    exact in_big_of_in_concatenated hyp
+  exact Set.eq_of_subset_of_subset ↓in_concatenated_of_in_big ↓in_big_of_in_concatenated
 
 #print axioms GG_of_GG_c_GG

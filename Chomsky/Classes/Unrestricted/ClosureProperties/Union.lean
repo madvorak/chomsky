@@ -189,8 +189,7 @@ by
       · clear * - bef_len
         linarith
       rw [List.length_eq_zero_iff] at rl_first rl_third
-      rw [rl_first, rl_third] at bef
-      exact bef
+      rwa [rl_first, rl_third] at bef
     exact Symbol.nonterminal.inj (List.head_eq_of_cons_eq elemeq)
   simp only [unionGrammar, List.mem_cons, List.mem_append, List.mem_map] at rin
   rcases rin with req₁ | req₂ | rin₁ | rin₂
@@ -255,11 +254,8 @@ by
   unfold Grammar.language at hwg ⊢
   rw [Set.mem_setOf_eq] at hwg ⊢
   apply gr_deri_of_tran_deri
-  · use ⟨[], none, [], [Symbol.nonterminal (some ◩g₁.initial)]⟩
-    constructor
-    · apply List.mem_cons_self
-    use [], []
-    constructor <;> rfl
+  · refine ⟨⟨[], none, [], [Symbol.nonterminal (some ◩g₁.initial)]⟩, ?_, [], [], rfl, rfl⟩
+    apply List.mem_cons_self
   convert lift_deri lg₁ hwg
   symm
   apply List.map_map
@@ -267,15 +263,10 @@ by
 lemma in_union_of_in_L₂ {w : List T} (hwg : w ∈ g₂.language) :
   w ∈ (unionGrammar g₁ g₂).language :=
 by
-  unfold Grammar.language at hwg ⊢
-  rw [Set.mem_setOf_eq] at hwg ⊢
   apply gr_deri_of_tran_deri
-  · use ⟨[], none, [], [Symbol.nonterminal (some ◪g₂.initial)]⟩
-    constructor
-    · apply List.mem_cons_of_mem
-      apply List.mem_cons_self
-    use [], []
-    constructor <;> rfl
+  · refine ⟨⟨[], none, [], [Symbol.nonterminal (some ◪g₂.initial)]⟩, ?_, [], [], rfl, rfl⟩
+    apply List.mem_cons_of_mem
+    apply List.mem_cons_self
   convert lift_deri lg₂ hwg
   symm
   apply List.map_map
@@ -284,13 +275,8 @@ by
 theorem GG_of_GG_u_GG (L₁ : Language T) (L₂ : Language T) :
   L₁.IsGG ∧ L₂.IsGG → (L₁ + L₂).IsGG :=
 by
-  intro ⟨⟨g₁, eq_L₁⟩, ⟨g₂, eq_L₂⟩⟩
+  rintro ⟨⟨g₁, rfl⟩, ⟨g₂, rfl⟩⟩
   use unionGrammar g₁ g₂
-  apply Set.eq_of_subset_of_subset
-  · intro w hw
-    rw [Language.mem_add, ←eq_L₁, ←eq_L₂]
-    exact in_L₁_or_L₂_of_in_union hw
-  · intro w hw
-    exact hw.casesOn (in_union_of_in_L₁ <| eq_L₁ ▸ ·) (in_union_of_in_L₂ <| eq_L₂ ▸ ·)
+  exact Set.eq_of_subset_of_subset ↓in_L₁_or_L₂_of_in_union ↓(·.casesOn in_union_of_in_L₁ in_union_of_in_L₂)
 
 #print axioms GG_of_GG_u_GG

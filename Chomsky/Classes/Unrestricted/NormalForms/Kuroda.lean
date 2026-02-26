@@ -53,7 +53,7 @@ def grule_of_kurodaRule {N : Type} : KurodaRule T N → Grule T N
   | KurodaRule.one_nil A => Grule.mk [] A [] []
 
 def grammar_of_kurodaGrammar (k : KurodaGrammar T) : Grammar T :=
-  Grammar.mk k.nt k.initial (List.map grule_of_kurodaRule k.rules)
+  Grammar.mk k.nt k.initial (k.rules.map grule_of_kurodaRule)
 
 lemma KurodaGrammar.tran_iff (k : KurodaGrammar T) (w₁ w₂ : List (Symbol T k.nt)) :
   k.Transforms w₁ w₂ ↔ (grammar_of_kurodaGrammar k).Transforms w₁ w₂ :=

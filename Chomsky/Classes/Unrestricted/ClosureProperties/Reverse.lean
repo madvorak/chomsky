@@ -27,12 +27,11 @@ private lemma dual_of_reversalGrammar (g : Grammar T) :
 by
   simp [reversalGrammar, reversal_grule_reversal_grule]
 
-private lemma derives_reversed (g : Grammar T) (v : List (Symbol T g.nt)) :
-  (reversalGrammar g).Derives [Symbol.nonterminal (reversalGrammar g).initial] v →
-    g.Derives [Symbol.nonterminal g.initial] v.reverse :=
+private lemma derives_reversed {g : Grammar T} {v : List (Symbol T g.nt)}
+    (hgv : (reversalGrammar g).Derives [Symbol.nonterminal (reversalGrammar g).initial] v) :
+  g.Derives [Symbol.nonterminal g.initial] v.reverse :=
 by
-  intro hv
-  induction' hv with u w _ orig ih
+  induction' hgv with u w _ orig ih
   · rw [List.reverse_singleton]
     apply gr_deri_self
   apply gr_deri_of_deri_tran ih
@@ -47,16 +46,13 @@ by
       unfold reversalGrule
       rw [List.reverse_reverse]
     have rid₂ : [Symbol.nonterminal r₀.inputN] = [Symbol.nonterminal r.inputN].reverse
-    · rw [←r_from_r₀]
-      rw [List.reverse_singleton]
+    · rewrite [←r_from_r₀, @List.reverse_singleton]
       rfl
-      exact T
     have rid₃ : r₀.inputR = r.inputL.reverse
     · rw [←r_from_r₀]
       unfold reversalGrule
       rw [List.reverse_reverse]
-    rw [rid₁, rid₂, rid₃, ←List.reverse_append_append, ←List.reverse_append_append, ←
-      List.append_assoc, ←List.append_assoc]
+    rw [rid₁, rid₂, rid₃, ←List.reverse_append_append, ←List.reverse_append_append, ←List.append_assoc, ←List.append_assoc]
     congr
   · have snd_from_r : r₀.output = r.output.reverse
     · rw [←r_from_r₀]
@@ -70,17 +66,15 @@ private lemma reversed_word_in_original_language {g : Grammar T} {w : List T}
   w.reverse ∈ g.language :=
 by
   unfold Grammar.language at *
-  have almost_done := derives_reversed g (w.map Symbol.terminal) hwg
-  rw [←List.map_reverse] at almost_done
-  exact almost_done
+  have almost_done := derives_reversed hwg
+  rwa [←List.map_reverse] at almost_done
 
 
 /-- The class of grammar-generated languages is closed under reversal. -/
 theorem GG_of_reverse_GG (L : Language T) :
   L.IsGG → L.reverse.IsGG :=
 by
-  intro ⟨g, hgL⟩
-  rw [←hgL]
+  rintro ⟨g, rfl⟩
   use reversalGrammar g
   apply Set.eq_of_subset_of_subset ↓reversed_word_in_original_language
   intro w hwL

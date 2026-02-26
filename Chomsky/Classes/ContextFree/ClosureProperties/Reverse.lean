@@ -2,13 +2,14 @@ import Chomsky.Classes.ContextFree.Basics.Toolbox
 import Chomsky.Utilities.LanguageOperations
 import Chomsky.Utilities.ListUtils
 
+
 variable {T : Type}
 
 private def CFG.reverse (g : CFG T) : CFG T :=
   CFG.mk
     g.nt
     g.initial
-    (g.rules.map (fun r : g.nt × List (Symbol T g.nt) => (r.fst, List.reverse r.snd)))
+    (g.rules.map (fun r : g.nt × List (Symbol T g.nt) => (r.fst, r.snd.reverse)))
 
 private lemma dual_of_reversalGrammar (g : CFG T) :
   g.reverse.reverse = g :=
@@ -17,17 +18,16 @@ by
   unfold CFG.reverse
   aesop
 
-private lemma derives_reversed (g : CFG T) (v : List (Symbol T g.nt)) :
-  g.reverse.Derives [Symbol.nonterminal g.reverse.initial] v →
-    g.Derives [Symbol.nonterminal g.initial] v.reverse :=
+private lemma derives_reversed {g : CFG T} {v : List (Symbol T g.nt)}
+    (hgv : g.reverse.Derives [Symbol.nonterminal g.reverse.initial] v) :
+  g.Derives [Symbol.nonterminal g.initial] v.reverse :=
 by
-  intro hv
-  induction' hv with u w _ orig ih
+  induction' hgv with u w _ orig ih
   · rw [List.reverse_singleton]
     apply cf_deri_self
   apply cf_deri_of_deri_tran ih
   rcases orig with ⟨r, rin, x, y, bef, aft⟩
-  change r ∈ List.map (fun r : g.nt × List (Symbol T g.nt) => (r.fst, List.reverse r.snd)) g.rules at rin
+  change r ∈ g.rules.map (fun r : g.nt × List (Symbol T g.nt) => (r.fst, r.snd.reverse)) at rin
   rw [List.mem_map] at rin
   rcases rin with ⟨r₀, rin₀, r_from_r₀⟩
   use r₀
@@ -53,14 +53,13 @@ by
   unfold CFG.language at *
   rw [Set.mem_setOf_eq] at *
   rw [List.map_reverse]
-  exact derives_reversed g (List.map Symbol.terminal w) hgw
+  exact derives_reversed hgw
 
 /-- The class of context-free languages is closed under reversal. -/
 theorem CF_of_reverse_CF (L : Language T) :
   L.IsCF → L.reverse.IsCF :=
 by
-  intro ⟨g, hgL⟩
-  rw [←hgL]
+  rintro ⟨g, rfl⟩
   use g.reverse
   apply Set.eq_of_subset_of_subset ↓reversed_word_in_original_language
   intro w hwL

@@ -49,19 +49,11 @@ by
 theorem CF_of_CF_c_CF (L₁ : Language T) (L₂ : Language T) :
   L₁.IsCF ∧ L₂.IsCF → (L₁ * L₂).IsCF :=
 by
-  intro ⟨⟨g₁, eq_L₁⟩, ⟨g₂, eq_L₂⟩⟩
-  rw [g₁.language_eq_toGeneral_language] at eq_L₁
-  rw [g₂.language_eq_toGeneral_language] at eq_L₂
+  rintro ⟨⟨g₁, rfl⟩, ⟨g₂, rfl⟩⟩
+  rw [g₁.language_eq_toGeneral_language]
+  rw [g₂.language_eq_toGeneral_language]
   use bigCFG g₁ g₂
   rw [bigCFG_language_eq_bigGrammar_language]
-  apply Set.eq_of_subset_of_subset
-  · intro w hw
-    rw [←eq_L₁]
-    rw [←eq_L₂]
-    exact in_concatenated_of_in_big hw
-  · intro w hw
-    rw [←eq_L₁] at hw
-    rw [←eq_L₂] at hw
-    exact in_big_of_in_concatenated hw
+  exact Set.eq_of_subset_of_subset ↓in_concatenated_of_in_big ↓in_big_of_in_concatenated
 
 #print axioms CF_of_CF_c_CF

@@ -28,16 +28,11 @@ by
 theorem CF_of_CF_u_CF (L₁ : Language T) (L₂ : Language T) :
   L₁.IsCF ∧ L₂.IsCF → (L₁ + L₂).IsCF :=
 by
-  intro ⟨⟨g₁, eq_L₁⟩, ⟨g₂, eq_L₂⟩⟩
-  rw [g₁.language_eq_toGeneral_language] at eq_L₁
-  rw [g₂.language_eq_toGeneral_language] at eq_L₂
+  rintro ⟨⟨g₁, rfl⟩, ⟨g₂, rfl⟩⟩
+  rw [g₁.language_eq_toGeneral_language]
+  rw [g₂.language_eq_toGeneral_language]
   use unionCFG g₁ g₂
   rw [unionCFG_language_eq_unionGrammar_language]
-  apply Set.eq_of_subset_of_subset
-  · intro w hw
-    rw [←eq_L₁, ←eq_L₂]
-    exact in_L₁_or_L₂_of_in_union hw
-  · intro w hw
-    exact hw.casesOn (in_union_of_in_L₁ <| eq_L₁ ▸ ·) (in_union_of_in_L₂ <| eq_L₂ ▸ ·)
+  exact Set.eq_of_subset_of_subset ↓in_L₁_or_L₂_of_in_union ↓(·.casesOn in_union_of_in_L₁ in_union_of_in_L₂)
 
 #print axioms CF_of_CF_u_CF

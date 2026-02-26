@@ -908,8 +908,8 @@ by
     have imposs : Symbol.nonterminal ◩r₀.inputN = R ∨ Symbol.nonterminal ◩r₀.inputN = H
     · simpa using congr_arg (Symbol.nonterminal ◩r₀.inputN ∈ ·) hyp
     cases' imposs with imposs imposs <;> exact Sum.noConfusion (Symbol.nonterminal.inj imposs)
-  have unn : u ≠ [] := by
-    by_contra u_nil
+  have unn : u ≠ []
+  · by_contra u_nil
     rw [u_nil, List.nil_append] at hyp
     cases hrL : r₀.inputL with
     | nil =>

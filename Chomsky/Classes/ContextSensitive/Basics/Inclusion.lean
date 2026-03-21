@@ -5,31 +5,33 @@ import Mathlib.Tactic
 variable {T : Type}
 
 
+/-- Convert a context-sensitive rule to an unrestricted rule. -/
+def CSRule.toGeneral {N : Type} (r : CSRule T N) : Grule T N where
+  inputL := r.contextL
+  inputN := r.inputN
+  inputR := r.contextR
+  output := r.contextL ++ r.output ++ r.contextR
+
 /-- Convert a context-sensitive grammar to an unrestricted grammar. -/
 def CSG.toGeneral (g : CSG T) : Grammar T where
   nt := g.nt
   initial := g.initial
-  rules := g.rules.map fun r => {
-    inputL := r.contextL
-    inputN := r.inputN
-    inputR := r.contextR
-    output := r.contextL ++ r.output ++ r.contextR
-  }
+  rules := g.rules.map CSRule.toGeneral
 
 private lemma CSG.tran_iff_toGeneral_tran (g : CSG T) (w₁ w₂ : List (Symbol T g.nt)) :
     g.Transforms w₁ w₂ ↔ g.toGeneral.Transforms w₁ w₂ :=
 by
   constructor
   · rintro ⟨r, rin, u, v, bef, aft⟩
-    refine ⟨{ inputL := r.contextL, inputN := r.inputN, inputR := r.contextR, output := r.contextL ++ r.output ++ r.contextR }, ?_, u, v, bef, ?_⟩
+    refine ⟨r.toGeneral, ?_, u, v, bef, ?_⟩
     · dsimp [CSG.toGeneral]; apply List.mem_map_of_mem; exact rin
-    · rw [aft]; simp only [List.append_assoc]
-  · rintro ⟨r, rin, u, v, bef, aft⟩
-    dsimp [CSG.toGeneral] at rin; rw [List.mem_map] at rin
-    rcases rin with ⟨r₀, rin₀, r_def⟩
-    use r₀, rin₀, u, v
+    · dsimp [CSRule.toGeneral]; rw [aft]; simp only [List.append_assoc]
+  · rintro ⟨r_gen, rin_gen, u, v, bef, aft⟩
+    dsimp [CSG.toGeneral] at rin_gen; rw [List.mem_map] at rin_gen
+    rcases rin_gen with ⟨r, rin, r_def⟩
+    use r, rin, u, v
     rw [←r_def] at bef aft
-    dsimp at bef aft
+    dsimp [CSRule.toGeneral] at bef aft
     constructor
     · exact bef
     · rw [aft]; simp only [List.append_assoc]

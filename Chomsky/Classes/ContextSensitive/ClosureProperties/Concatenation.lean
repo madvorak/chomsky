@@ -59,18 +59,12 @@ private def bigCSG (g₁ g₂ : CSG T) : CSG T where
 private lemma bigCSG_rules_eq (g₁ g₂ : CSG T) :
     (bigCSG g₁ g₂).toGeneral.rules = (bigGrammar g₁.toGeneral g₂.toGeneral).rules :=
 by
-  dsimp [bigCSG, bigGrammar, CSG.toGeneral, wrapCSR₁, wrapCSR₂, wrapGrule₁, wrapGrule₂]
+  dsimp [bigCSG, bigGrammar, CSG.toGeneral, CSRule.toGeneral, wrapCSR₁, wrapCSR₂, wrapGrule₁, wrapGrule₂]
   simp only [List.map_cons, List.map_append, List.map_map]
   congr 1
   · apply congr_arg2
-    · apply List.map_congr
-      intro r _
-      simp only [Function.comp_apply, List.map_append]
-      rfl
-    · apply List.map_congr
-      intro r _
-      simp only [Function.comp_apply, List.map_append]
-      rfl
+    · apply List.map_congr; intro r _; simp only [Function.comp_apply, List.map_append]; rfl
+    · apply List.map_congr; intro r _; simp only [Function.comp_apply, List.map_append]; rfl
   · simp only [rulesForTerminals₁, CSG.terminalsRules₁, rulesForTerminals₂, CSG.terminalsRules₂, List.map_map]
     rfl
 

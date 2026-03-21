@@ -1,7 +1,10 @@
 import Chomsky.Classes.ContextSensitive.Basics.Inclusion
 import Chomsky.Classes.Unrestricted.ClosureProperties.Concatenation
+import Chomsky.Basic
 
 variable {T : Type}
+
+open Sum
 
 
 private def wrapCSR₁ {N₁ : Type} (N₂ : Type) (r : CSRule T N₁) :
@@ -16,7 +19,7 @@ private def wrapCSR₂ (N₁ : Type) {N₂ : Type} (r : CSRule T N₂) :
   contextL := r.contextL.map (wrapSymbol₂ N₁)
   inputN := ◩(some ◪r.inputN)
   contextR := r.contextR.map (wrapSymbol₂ N₁)
-  output := r.output.map (wrapSymbol₂ N₁)
+  output := r.output.map (wrapSymbol₂ N₂)
 
 private def CSG.terminalsRules₁ (g : CSG T) (N₂ : Type) :
     List (CSRule T (nnn T g.nt N₂)) :=
@@ -76,4 +79,6 @@ by
   rw [g₁.language_eq_toGeneral_language, g₂.language_eq_toGeneral_language]
   use bigCSG g₁ g₂
   rw [bigCSG_language_eq_bigGrammar_language]
-  exact Set.eq_of_subset_of_subset ↓in_concatenated_of_in_big ↓in_big_of_in_concatenated
+  apply Set.eq_of_subset_of_subset
+  · exact in_concatenated_of_in_big
+  · exact in_big_of_in_concatenated

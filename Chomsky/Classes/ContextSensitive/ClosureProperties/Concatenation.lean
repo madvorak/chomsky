@@ -4,8 +4,6 @@ import Chomsky.Basic
 
 variable {T : Type}
 
-open Sum
-
 
 private def wrapCSR₁ {N₁ : Type} (N₂ : Type) (r : CSRule T N₁) :
     CSRule T (nnn T N₁ N₂) where
@@ -19,7 +17,7 @@ private def wrapCSR₂ (N₁ : Type) {N₂ : Type} (r : CSRule T N₂) :
   contextL := r.contextL.map (wrapSymbol₂ N₁)
   inputN := ◩(some ◪r.inputN)
   contextR := r.contextR.map (wrapSymbol₂ N₁)
-  output := r.output.map (wrapSymbol₂ N₂)
+  output := r.output.map (wrapSymbol₂ N₁)
 
 private def CSG.terminalsRules₁ (g : CSG T) (N₂ : Type) :
     List (CSRule T (nnn T g.nt N₂)) :=
@@ -53,8 +51,8 @@ private def bigCSG (g₁ g₂ : CSG T) : CSG T where
   } :: (
     g₁.rules.map (wrapCSR₁ g₂.nt) ++
     g₂.rules.map (wrapCSR₂ g₁.nt) ++
-    g₁.terminalsRules₁ g₂.nt ++
-    g₂.terminalsRules₂ g₁.nt
+    (g₁.terminalsRules₁ g₂.nt ++
+    g₂.terminalsRules₂ g₁.nt)
   )
 
 private lemma bigCSG_language_eq_bigGrammar_language (g₁ g₂ : CSG T) :
@@ -65,10 +63,11 @@ by
   dsimp [bigCSG, bigGrammar, CSG.toGeneral]
   congr 2
   simp only [List.map_append, List.map_map]
-  congr 2
-  · simp only [rulesForTerminals₁, CSG.terminalsRules₁, List.map_map]
-    rfl
-  · simp only [rulesForTerminals₂, CSG.terminalsRules₂, List.map_map]
+  congr 1
+  · congr 1
+    · ext; rfl
+    · ext; rfl
+  · simp only [rulesForTerminals₁, CSG.terminalsRules₁, rulesForTerminals₂, CSG.terminalsRules₂, List.map_map]
     rfl
 
 /-- The class of context-sensitive languages is closed under concatenation. -/
@@ -79,6 +78,7 @@ by
   rw [g₁.language_eq_toGeneral_language, g₂.language_eq_toGeneral_language]
   use bigCSG g₁ g₂
   rw [bigCSG_language_eq_bigGrammar_language]
-  apply Set.eq_of_subset_of_subset
-  · exact in_concatenated_of_in_big
-  · exact in_big_of_in_concatenated
+  ext w
+  constructor
+  · apply in_concatenated_of_in_big
+  · apply in_big_of_in_concatenated

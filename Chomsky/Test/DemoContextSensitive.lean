@@ -23,19 +23,19 @@ private def r1 : CSRule Te Nt := ⟨[], Nt.S, [], [sa, S, B, C]⟩
 private def r2 : CSRule Te Nt := ⟨[], Nt.S, [], [sa, R, C]⟩
 
 /-- non-contracting rule `CB → BC` modelled by `CB → XB → XC → BC` -/
-private def r3   : CSRule Te Nt := ⟨[], Nt.C, [Nt.B], [X]⟩
-private def r3_  : CSRule Te Nt := ⟨[X], Nt.B, [], [C]⟩
-private def r3__ : CSRule Te Nt := ⟨[], Nt.X, [C], [B]⟩
+private def r3  : CSRule Te Nt := ⟨[], Nt.C, [B], [X]⟩
+private def r3a : CSRule Te Nt := ⟨[X], Nt.B, [], [C]⟩
+private def r3b : CSRule Te Nt := ⟨[], Nt.X, [C], [B]⟩
 
 /-- non-contracting rule `RB → bR` modelled by `RB → YB → YR → bR` -/
-private def r4   : CSRule Te Nt := ⟨[], Nt.R, [Nt.B], [Y]⟩
-private def r4_  : CSRule Te Nt := ⟨[Y], Nt.B, [], [R]⟩
-private def r4__ : CSRule Te Nt := ⟨[], Nt.Y, [R], [sb]⟩
+private def r4  : CSRule Te Nt := ⟨[], Nt.R, [B], [Y]⟩
+private def r4a : CSRule Te Nt := ⟨[Y], Nt.B, [], [R]⟩
+private def r4b : CSRule Te Nt := ⟨[], Nt.Y, [R], [sb]⟩
 
 /-- non-contracting rule `RC → bc` modelled by `RC → ZC → Zc → bc` -/
-private def r5   : CSRule Te Nt := ⟨[], Nt.R, [Nt.C], [Z]⟩
-private def r5_  : CSRule Te Nt := ⟨[Z], Nt.C, [], [sc]⟩
-private def r5__ : CSRule Te Nt := ⟨[], Nt.Z, [sc], [sb]⟩
+private def r5  : CSRule Te Nt := ⟨[], Nt.R, [C], [Z]⟩
+private def r5a : CSRule Te Nt := ⟨[Z], Nt.C, [], [sc]⟩
+private def r5b : CSRule Te Nt := ⟨[], Nt.Z, [sc], [sb]⟩
 
 /-- context-sensitive rule `cC → cc` -/
 private def r6 : CSRule Te Nt := ⟨[sc], Nt.C, [], [sc]⟩
@@ -43,6 +43,6 @@ private def r6 : CSRule Te Nt := ⟨[sc], Nt.C, [], [sc]⟩
 def myGrammar : CSG Te where
   nt := Nt
   initial := Nt.S
-  rules := [r1, r2, r3, r3_, r3__, r4, r4_, r4__, r5, r5_, r5__, r6]
+  rules := [r1, r2, r3, r3a, r3b, r4, r4a, r4b, r5, r5a, r5b, r6]
 
 end ContextSensitiveDemo

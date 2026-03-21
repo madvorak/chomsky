@@ -21,7 +21,7 @@ lemma CSG.language_eq_toGeneral_language (g : CSG T) :
 by
   unfold CSG.language Grammar.language
   ext w
-  simp only [Set.mem_setOf_eq]
+  dsimp only [Set.mem_setOf_eq]
   constructor
   · intro h
     induction' h with x y _ hxy ih

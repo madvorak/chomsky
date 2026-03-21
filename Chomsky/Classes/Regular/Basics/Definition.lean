@@ -15,7 +15,7 @@ structure RLG (T : Type) where
 variable {T : Type}
 
 /-- Convert a right-linear rule to a context-free rule. -/
-def RLRule.toCF (r : RLRule T N) : N × List (Symbol T N) :=
+def RLRule.toCF {T N : Type} (r : RLRule T N) : N × List (Symbol T N) :=
   match r with
   | RLRule.terminal n t => (n, [Symbol.terminal t])
   | RLRule.nonterminal n t n' => (n, [Symbol.terminal t, Symbol.nonterminal n'])

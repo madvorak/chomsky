@@ -1,5 +1,6 @@
 import Chomsky.Classes.ContextSensitive.Basics.Toolbox
 import Chomsky.Classes.Unrestricted.Basics.Toolbox
+import Mathlib.Tactic
 
 variable {T : Type}
 
